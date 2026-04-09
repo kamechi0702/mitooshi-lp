@@ -1,0 +1,949 @@
+/**
+ * mitooshi 画面モック - Figma Make デザイン準拠版
+ * 体験設計: 「いま・つぎ・ゴール」3枚構造
+ * 画面: SceneSelect → Execution → Complete / ⚙️ → ParentManagement → SceneEdit → CardCreateModal
+ */
+
+// ===== DESIGN TOKENS (Kids Pop Style) =====
+const COLORS = {
+  brandPrimary: "#FF6B6B",
+  brandSecondary: "#4ECDC4",
+  brandAccent: "#FFE66D",
+  brandLavender: "#A78BFA",
+  background: "#FFF8F0",
+  cardWhite: "#FFFFFF",
+  textPrimary: "#2D3436",
+  textSecondary: "#636E72",
+  textMuted: "#B2BEC3",
+  border: "#F0F0F5",
+  success: "#00B894",
+  warning: "#FECA57",
+  danger: "#FF6B6B",
+};
+const SPACING = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 20 };
+const TYPOGRAPHY = {
+  heading: { fontSize: 28, fontWeight: 900, letterSpacing: -0.5 },
+  subheading: { fontSize: 18, fontWeight: 800 },
+  body: { fontSize: 15, fontWeight: 600 },
+  caption: { fontSize: 12, fontWeight: 700, color: "#636E72" },
+  childLabel: { fontSize: 22, fontWeight: 900, letterSpacing: 1 },
+  childSub: { fontSize: 14, fontWeight: 700 },
+};
+const RADII = { card: 24, childCard: 32, button: 9999, buttonPill: 9999, badge: 20, frame: 32 };
+const SHADOWS = {
+  card: "0 4px 20px rgba(255,107,107,0.12)",
+  cardSm: "0 3px 12px rgba(78,205,196,0.10)",
+  frame: "0 12px 48px rgba(255,107,107,0.15)",
+};
+
+// ===== ILLUSTRATIONS (base64 data URI - 120px thumbnails) =====
+const ILLUST = {
+  "あさのしたく": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGRDkzRCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI1MiIgcj0iMjQiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48ZyBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC45Ij48bGluZSB4MT0iNjAiIHkxPSIyMCIgeDI9IjYwIiB5Mj0iMjYiLz48bGluZSB4MT0iNjAiIHkxPSI3OCIgeDI9IjYwIiB5Mj0iODQiLz48bGluZSB4MT0iMjgiIHkxPSI1MiIgeDI9IjM0IiB5Mj0iNTIiLz48bGluZSB4MT0iODYiIHkxPSI1MiIgeDI9IjkyIiB5Mj0iNTIiLz48bGluZSB4MT0iMzciIHkxPSIyOSIgeDI9IjQxIiB5Mj0iMzMiLz48bGluZSB4MT0iNzkiIHkxPSI3MSIgeDI9IjgzIiB5Mj0iNzUiLz48bGluZSB4MT0iODMiIHkxPSIyOSIgeDI9Ijc5IiB5Mj0iMzMiLz48bGluZSB4MT0iNDEiIHkxPSI3MSIgeDI9IjM3IiB5Mj0iNzUiLz48L2c+PHRleHQgeD0iNjAiIHk9Ijk2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjExIiBmaWxsPSJ3aGl0ZSIgZm9udC13ZWlnaHQ9IjkwMCIgb3BhY2l0eT0iMC45Ij7jgYLjgZXjga7jgZfjgZ/jgY88L3RleHQ+Cjwvc3ZnPg==",
+  "びょういん": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzRFQ0RDNCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iNDIiIHk9IjMyIiB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIHJ4PSI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iNTYiIHk9IjM4IiB3aWR0aD0iOCIgaGVpZ2h0PSIyNCIgcng9IjIiIGZpbGw9IiM0RUNEQzQiLz48cmVjdCB4PSI0NiIgeT0iNDYiIHdpZHRoPSIyOCIgaGVpZ2h0PSI4IiByeD0iMiIgZmlsbD0iIzRFQ0RDNCIvPjx0ZXh0IHg9IjYwIiB5PSI5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMSIgZmlsbD0id2hpdGUiIGZvbnQtd2VpZ2h0PSI5MDAiIG9wYWNpdHk9IjAuOSI+44Gz44KH44GG44GE44KTPC90ZXh0Pgo8L3N2Zz4=",
+  "おかいもの": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGNkIzNSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iMzYiIHk9IjQyIiB3aWR0aD0iNDgiIGhlaWdodD0iMzIiIHJ4PSI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iNDIiIHk9IjQ4IiB3aWR0aD0iMTIiIGhlaWdodD0iOCIgcng9IjIiIGZpbGw9IiNGRjZCMzUiLz48Y2lyY2xlIGN4PSI0NCIgY3k9Ijc4IiByPSI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PGNpcmNsZSBjeD0iNzYiIGN5PSI3OCIgcj0iNCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxwYXRoIGQ9Ik0zNiA0MiBMMzAgMzAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjkiLz48dGV4dCB4PSI2MCIgeT0iOTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iOTAwIiBvcGFjaXR5PSIwLjkiPuOBiuOBi+OBhOOCguOBrjwvdGV4dD4KPC9zdmc+",
+  "おふろ〜ねる": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0E3OEJGQSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI0OCIgcj0iMjAiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjQ4IiByPSIxNCIgZmlsbD0iI0E3OEJGQSIvPjxjaXJjbGUgY3g9IjY2IiBjeT0iNDQiIHI9IjYiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48dGV4dCB4PSI2MCIgeT0iOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iOTAwIiBvcGFjaXR5PSIwLjgiPuOBiuOBteOCjeOAnOOBreOCizwvdGV4dD4KPC9zdmc+",
+  "でんしゃでおでかけ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzEwQUM4NCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iMzQiIHk9IjMwIiB3aWR0aD0iNTIiIGhlaWdodD0iNDAiIHJ4PSIxMCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxyZWN0IHg9IjQwIiB5PSIzNiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiByeD0iMiIgZmlsbD0iIzEwQUM4NCIvPjxyZWN0IHg9IjY0IiB5PSIzNiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiByeD0iMiIgZmlsbD0iIzEwQUM4NCIvPjxyZWN0IHg9IjQ4IiB5PSI1MiIgd2lkdGg9IjI0IiBoZWlnaHQ9IjYiIHJ4PSIyIiBmaWxsPSIjMTBBQzg0Ii8+PGNpcmNsZSBjeD0iNDQiIGN5PSI3NiIgcj0iNCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxjaXJjbGUgY3g9Ijc2IiBjeT0iNzYiIHI9IjQiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48bGluZSB4MT0iNDQiIHkxPSI3MiIgeDI9IjQ0IiB5Mj0iNzAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjxsaW5lIHgxPSI3NiIgeTE9IjcyIiB4Mj0iNzYiIHkyPSI3MCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjwvc3ZnPg==",
+  "レストラン": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZENzlBOCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGVsbGlwc2UgY3g9IjYwIiBjeT0iNTgiIHJ4PSIyOCIgcnk9IjgiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNDIgNTAgUTYwIDMwIDc4IDUwIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+PGxpbmUgeDE9IjM4IiB5MT0iNDAiIHgyPSIzOCIgeTI9Ijc1IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC45Ii8+PGxpbmUgeDE9IjgyIiB5MT0iNDAiIHgyPSI4MiIgeTI9Ijc1IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==",
+  "おきる": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGRDkzRCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI1MCIgcj0iMTgiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48bGluZSB4MT0iNjAiIHkxPSI1MCIgeDI9IjYwIiB5Mj0iMzgiIHN0cm9rZT0iI0ZGRDkzRCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxsaW5lIHgxPSI2MCIgeTE9IjUwIiB4Mj0iNzAiIHkyPSI1MCIgc3Ryb2tlPSIjRkZEOTNEIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGxpbmUgeDE9IjUyIiB5MT0iMjgiIHgyPSI0OCIgeTI9IjI0IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxsaW5lIHgxPSI2OCIgeTE9IjI4IiB4Mj0iNzIiIHkyPSIyNCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+",
+  "きがえ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzRFQ0RDNCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHBhdGggZD0iTTQyIDM4IEw2MCAzMCBMNzggMzggTDc0IDQ4IEw2OCA0NCBMNjggNzIgTDUyIDcyIEw1MiA0NCBMNDYgNDggWiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPgo8L3N2Zz4=",
+  "ごはん": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGNkI2QiIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGVsbGlwc2UgY3g9IjYwIiBjeT0iNTgiIHJ4PSIyNCIgcnk9IjE2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHBhdGggZD0iTTM2IDU2IFE2MCAzMCA4NCA1NiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuNyIvPgo8L3N2Zz4=",
+  "はみがき": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0E3OEJGQSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iNTIiIHk9IjI4IiB3aWR0aD0iMTYiIGhlaWdodD0iNDgiIHJ4PSI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iNDgiIHk9IjI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMTYiIHJ4PSI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PGxpbmUgeDE9IjU0IiB5MT0iMzQiIHgyPSI1NCIgeTI9IjQwIiBzdHJva2U9IiNBNzhCRkEiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjYwIiB5MT0iMzQiIHgyPSI2MCIgeTI9IjQwIiBzdHJva2U9IiNBNzhCRkEiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjY2IiB5MT0iMzQiIHgyPSI2NiIgeTI9IjQwIiBzdHJva2U9IiNBNzhCRkEiIHN0cm9rZS13aWR0aD0iMS41Ii8+Cjwvc3ZnPg==",
+  "もちもの": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGNkIzNSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iNDAiIHk9IjM2IiB3aWR0aD0iNDAiIGhlaWdodD0iMzgiIHJ4PSI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHBhdGggZD0iTTQ4IDM2IFE0OCAyNCA2MCAyNCBRNzIgMjQgNzIgMzYiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIvPgo8L3N2Zz4=",
+  "いってきます": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGRDkzRCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHBhdGggZD0iTTYwIDMwIEM2MCAzMCA4MCA0MiA4MCA1OCBDODAgNzIgNzIgODAgNjAgODAgQzQ4IDgwIDQwIDcyIDQwIDU4IEM0MCA0MiA2MCAzMCA2MCAzMFoiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48bGluZSB4MT0iODAiIHkxPSI0MiIgeDI9IjkwIiB5Mj0iMzYiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGxpbmUgeDE9IjgwIiB5MT0iNTAiIHgyPSI5MiIgeTI9IjQ4IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=",
+  "くるまにのる": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzRFQ0RDNCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iMzAiIHk9IjQ2IiB3aWR0aD0iNjAiIGhlaWdodD0iMjQiIHJ4PSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHBhdGggZD0iTTQyIDQ2IEw1MCAzMiBMNzAgMzIgTDc4IDQ2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC44Ii8+PGNpcmNsZSBjeD0iNDQiIGN5PSI3NCIgcj0iNiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxjaXJjbGUgY3g9IjQ0IiBjeT0iNzQiIHI9IjMiIGZpbGw9IiM0RUNEQzQiLz48Y2lyY2xlIGN4PSI3NiIgY3k9Ijc0IiByPSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PGNpcmNsZSBjeD0iNzYiIGN5PSI3NCIgcj0iMyIgZmlsbD0iIzRFQ0RDNCIvPgo8L3N2Zz4=",
+  "まつ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGQjZDMSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iNDIiIHk9IjMyIiB3aWR0aD0iMzYiIGhlaWdodD0iNiIgcng9IjIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48cmVjdCB4PSI0NCIgeT0iMzgiIHdpZHRoPSI0IiBoZWlnaHQ9IjM2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iNzIiIHk9IjM4IiB3aWR0aD0iNCIgaGVpZ2h0PSIzNiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxyZWN0IHg9IjQwIiB5PSI3MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjYiIHJ4PSIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==",
+  "せんせいとおはなし": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzQ1QjdEMSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI0MCIgcj0iMTQiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNDQgNTYgUTQ0IDgwIDYwIDgwIFE3NiA4MCA3NiA1NiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxyZWN0IHg9IjUwIiB5PSIzNiIgd2lkdGg9IjQiIGhlaWdodD0iMyIgcng9IjEiIGZpbGw9IiM0NUI3RDEiLz48cmVjdCB4PSI2NiIgeT0iMzYiIHdpZHRoPSI0IiBoZWlnaHQ9IjMiIHJ4PSIxIiBmaWxsPSIjNDVCN0QxIi8+Cjwvc3ZnPg==",
+  "おわり": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzJFQ0M3MSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI1MiIgcj0iMjIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48cG9seWxpbmUgcG9pbnRzPSI0OCw1MiA1Niw2MiA3NCw0MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkVDQzcxIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4=",
+  "ごほうび": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGNkI5RCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHBhdGggZD0iTTYwIDI4IEw1NCA1MCBMNDQgNTAgUTU0IDUwIDYwIDcyIFE2NiA1MCA3NiA1MCBMNjYgNTAgWiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNDAiIHI9IjEwIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHBhdGggZD0iTTUwIDQwIFE1MCAyOCA2MCAyNCBRNzAgMjggNzAgNDAiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjgiLz4KPC9zdmc+",
+  "カートをおす": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzRFQ0RDNCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHBhdGggZD0iTTM2IDM0IEw0MiAzNCBMNTIgNjQgTDc4IDY0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iNDgiIHk9IjQyIiB3aWR0aD0iMzIiIGhlaWdodD0iMTgiIHJ4PSIzIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+PGNpcmNsZSBjeD0iNTQiIGN5PSI3NCIgcj0iNCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxjaXJjbGUgY3g9Ijc0IiBjeT0iNzQiIHI9IjQiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KPC9zdmc+",
+  "かいもの": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzJFQ0M3MSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGVsbGlwc2UgY3g9IjYwIiBjeT0iNTAiIHJ4PSIyMCIgcnk9IjI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PGxpbmUgeDE9IjU0IiB5MT0iMzYiIHgyPSI1MCIgeTI9IjI4IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxsaW5lIHgxPSI2NiIgeTE9IjM2IiB4Mj0iNzAiIHkyPSIyOCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNDggNDggUTYwIDQwIDcyIDQ4IiBmaWxsPSJub25lIiBzdHJva2U9IiMyRUNDNzEiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4=",
+  "レジにならぶ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGRDkzRCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI0OCIgcj0iMjAiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48dGV4dCB4PSI2MCIgeT0iNTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjIiIGZpbGw9IiNGRkQ5M0QiIGZvbnQtd2VpZ2h0PSI5MDAiPsKlPC90ZXh0Pgo8L3N2Zz4=",
+  "おかしえらぶ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGNkI5RCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI0OCIgcj0iMTYiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNTIgNDggTDYwIDM2IEw2OCA0OCIgZmlsbD0iI0ZGNkI5RCIgb3BhY2l0eT0iMC42Ii8+PHJlY3QgeD0iNTYiIHk9IjY0IiB3aWR0aD0iOCIgaGVpZ2h0PSIxMiIgcng9IjIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KPC9zdmc+",
+  "おふろ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzQ1QjdEMSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iMzYiIHk9IjQ4IiB3aWR0aD0iNDgiIGhlaWdodD0iMjgiIHJ4PSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHBhdGggZD0iTTMyIDQ4IEw4OCA0OCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNDQgNDQgUTQ0IDM2IDUwIDM2IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuNyIvPjxwYXRoIGQ9Ik01NiA0MCBRNTYgMzIgNjIgMzIiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgb3BhY2l0eT0iMC43Ii8+PHBhdGggZD0iTTY4IDQ0IFE2OCAzNiA3NCAzNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjciLz4KPC9zdmc+",
+  "パジャマ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0E3OEJGQSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHBhdGggZD0iTTQyIDM4IEw2MCAzMCBMNzggMzggTDc0IDQ4IEw2OCA0NCBMNjggNzIgTDUyIDcyIEw1MiA0NCBMNDYgNDggWiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxjaXJjbGUgY3g9IjU4IiBjeT0iNTIiIHI9IjIiIGZpbGw9IiNBNzhCRkEiLz48Y2lyY2xlIGN4PSI1OCIgY3k9IjYwIiByPSIyIiBmaWxsPSIjQTc4QkZBIi8+Cjwvc3ZnPg==",
+  "えほん": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGRDkzRCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iMzgiIHk9IjMyIiB3aWR0aD0iNDQiIGhlaWdodD0iNDAiIHJ4PSI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PGxpbmUgeDE9IjYwIiB5MT0iMzIiIHgyPSI2MCIgeTI9IjcyIiBzdHJva2U9IiNGRkQ5M0QiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0zOCAzNCBRNDkgMzggNjAgMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRDkzRCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48cGF0aCBkPSJNNjAgMzQgUTcxIDM4IDgyIDM0IiBmaWxsPSJub25lIiBzdHJva2U9IiNGRkQ5M0QiIHN0cm9rZS13aWR0aD0iMS41Ii8+Cjwvc3ZnPg==",
+  "おやすみ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0E3OEJGQSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHBhdGggZD0iTTU2IDMwIFE3MiAzNCA3MiA1MiBRNzIgNzAgNTYgNzQgUTY4IDY2IDY4IDUyIFE2OCAzOCA1NiAzMFoiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48Y2lyY2xlIGN4PSI0NCIgY3k9IjM2IiByPSIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+PGNpcmNsZSBjeD0iODAiIGN5PSI1NiIgcj0iMiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuNyIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iNjgiIHI9IjEuNSIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuNiIvPgo8L3N2Zz4=",
+  "えきにいく": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzJFQ0M3MSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSIzNiIgcj0iMTAiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48cmVjdCB4PSI1NCIgeT0iNDYiIHdpZHRoPSIxMiIgaGVpZ2h0PSIyMCIgcng9IjIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48bGluZSB4MT0iNTAiIHkxPSI3MiIgeDI9IjU0IiB5Mj0iNjYiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGxpbmUgeDE9IjcwIiB5MT0iNzIiIHgyPSI2NiIgeTI9IjY2IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=",
+  "でんしゃにのる": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzRFQ0RDNCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iMzQiIHk9IjMwIiB3aWR0aD0iNTIiIGhlaWdodD0iNDAiIHJ4PSIxMCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxyZWN0IHg9IjQwIiB5PSIzNiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiByeD0iMiIgZmlsbD0iIzRFQ0RDNCIvPjxyZWN0IHg9IjY0IiB5PSIzNiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiByeD0iMiIgZmlsbD0iIzRFQ0RDNCIvPjxjaXJjbGUgY3g9IjQ0IiBjeT0iNzYiIHI9IjQiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48Y2lyY2xlIGN4PSI3NiIgY3k9Ijc2IiByPSI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==",
+  "ついた！": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGNkI2QiIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI1MCIgcj0iMjIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjUwIiByPSI4IiBmaWxsPSIjRkY2QjZCIi8+PGNpcmNsZSBjeD0iNjAiIGN5PSI1MCIgcj0iMyIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+  "えらぶ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzQ1QjdEMSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iNDAiIHk9IjI4IiB3aWR0aD0iNDAiIGhlaWdodD0iNTAiIHJ4PSI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PGxpbmUgeDE9IjQ4IiB5MT0iNDAiIHgyPSI3MiIgeTI9IjQwIiBzdHJva2U9IiM0NUI3RDEiIHN0cm9rZS13aWR0aD0iMiIvPjxsaW5lIHgxPSI0OCIgeTE9IjUwIiB4Mj0iNzIiIHkyPSI1MCIgc3Ryb2tlPSIjNDVCN0QxIiBzdHJva2Utd2lkdGg9IjIiLz48bGluZSB4MT0iNDgiIHkxPSI2MCIgeDI9IjY0IiB5Mj0iNjAiIHN0cm9rZT0iIzQ1QjdEMSIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjwvc3ZnPg==",
+  "たべる": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGNkIzNSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGVsbGlwc2UgY3g9IjYwIiBjeT0iNTYiIHJ4PSIyNCIgcnk9IjE4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHBhdGggZD0iTTQyIDUwIFE2MCAzNCA3OCA1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjYiLz48bGluZSB4MT0iNTAiIHkxPSIzNCIgeDI9IjUwIiB5Mj0iNDIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGxpbmUgeDE9IjcwIiB5MT0iMzQiIHgyPSI3MCIgeTI9IjQyIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=",
+  "ごちそうさま": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGRDkzRCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHBhdGggZD0iTTQ2IDQyIEw2MCAzMCBMNzQgNDIiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjkiLz48cGF0aCBkPSJNNTAgNTAgTDYwIDM4IEw3MCA1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuOSIvPjxsaW5lIHgxPSI2MCIgeTE9IjU4IiB4Mj0iNjAiIHkyPSI3NCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuOSIvPgo8L3N2Zz4=",
+  "ならぶ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzk2RTZBMSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNDYiIGN5PSIzOCIgcj0iOCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxyZWN0IHg9IjQwIiB5PSI0OCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjIyIiByeD0iMyIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxjaXJjbGUgY3g9Ijc0IiBjeT0iMzgiIHI9IjgiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48cmVjdCB4PSI2OCIgeT0iNDgiIHdpZHRoPSIxMiIgaGVpZ2h0PSIyMiIgcng9IjMiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KPC9zdmc+",
+  "トイレ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzQ1QjdEMSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iNDQiIHk9IjMwIiB3aWR0aD0iMzIiIGhlaWdodD0iNDAiIHJ4PSI0IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iNTAiIHk9IjcwIiB3aWR0aD0iMjAiIGhlaWdodD0iNiIgcng9IjIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48ZWxsaXBzZSBjeD0iNjAiIGN5PSI0NiIgcng9IjEwIiByeT0iOCIgZmlsbD0iIzQ1QjdEMSIgb3BhY2l0eT0iMC41Ii8+Cjwvc3ZnPg==",
+  "すわる": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGQjZDMSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHJlY3QgeD0iNDIiIHk9IjI4IiB3aWR0aD0iMzYiIGhlaWdodD0iNiIgcng9IjIiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48cmVjdCB4PSI0NCIgeT0iMzQiIHdpZHRoPSI0IiBoZWlnaHQ9IjM4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iNzIiIHk9IjM0IiB3aWR0aD0iNCIgaGVpZ2h0PSIzOCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPjxyZWN0IHg9IjQwIiB5PSI1NCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjYiIHJ4PSIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==",
+  "しずかに": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0E3OEJGQSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI0NCIgcj0iMTYiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48Y2lyY2xlIGN4PSI1NCIgY3k9IjQwIiByPSIyIiBmaWxsPSIjQTc4QkZBIi8+PGNpcmNsZSBjeD0iNjYiIGN5PSI0MCIgcj0iMiIgZmlsbD0iI0E3OEJGQSIvPjxsaW5lIHgxPSI1NiIgeTE9IjUyIiB4Mj0iNjgiIHkyPSI1MCIgc3Ryb2tlPSIjQTc4QkZBIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxsaW5lIHgxPSI3OCIgeTE9IjM4IiB4Mj0iODYiIHkyPSIzNCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuOCIvPgo8L3N2Zz4=",
+  "おかたづけ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iIzJFQ0M3MSIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPGxpbmUgeDE9IjU2IiB5MT0iMjgiIHgyPSI1NiIgeTI9IjY4IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC45Ii8+PHBhdGggZD0iTTQ0IDY4IEw1NiA1NiBMNjggNjggWiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuNyIvPjxsaW5lIHgxPSI0NCIgeTE9Ijc0IiB4Mj0iNjgiIHkyPSI3NCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuOSIvPgo8L3N2Zz4=",
+  "ごあいさつ": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGNkI5RCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHBhdGggZD0iTTYwIDMwIEM2MCAzMCA4MCA0MiA4MCA1OCBDODAgNzIgNzIgODAgNjAgODAgQzQ4IDgwIDQwIDcyIDQwIDU4IEM0MCA0MiA2MCAzMCA2MCAzMFoiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz48bGluZSB4MT0iODAiIHkxPSI0MiIgeDI9IjkwIiB5Mj0iMzYiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGxpbmUgeDE9IjgwIiB5MT0iNTAiIHgyPSI5MiIgeTI9IjQ4IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=",
+  "ゴール1": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIzMCIgZmlsbD0iI0ZGRDkzRCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iMzUiIHI9IjIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xNSIvPgogIDxjaXJjbGUgY3g9IjkwIiBjeT0iODUiIHI9IjI4IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4xIi8+CiAgPHBvbHlnb24gcG9pbnRzPSI2MCwyNCA2Niw0NCA4OCw0NCA3MCw1NiA3Niw3NiA2MCw2NCA0NCw3NiA1MCw1NiAzMiw0NCA1NCw0NCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPgo8L3N2Zz4=",
+};
+
+// ===== イラスト表示コンポーネント =====
+function Illust({ label, size = 56, style = {} }) {
+  if (ILLUST[label]) {
+    return (
+      <img
+        src={ILLUST[label]}
+        alt={label}
+        style={{
+          width: size, height: size, objectFit: "contain",
+          ...style,
+        }}
+      />
+    );
+  }
+  // フォールバック: ラベルの1文字目を表示
+  return (
+    <div style={{
+      width: size, height: size,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      background: "linear-gradient(135deg, #FFE66D, #FF6B6B20)",
+      borderRadius: size * 0.3,
+      fontSize: size * 0.45, fontWeight: 900, color: "#FF6B6B",
+      ...style,
+    }}>
+      {(label || "?").charAt(0)}
+    </div>
+  );
+}
+
+// ===== DATA: SCENES & CARDS =====
+const SCENES = [
+  {
+    id: "morning", label: "あさのしたく", color: "#FFD93D",
+    flow: { now: "おきる", next: "きがえ", goal: "いってきます！" },
+    cards: [
+      { id: 1, label: "おきる", minutes: 0 },
+      { id: 2, label: "きがえ", minutes: 5 },
+      { id: 3, label: "ごはん", minutes: 15 },
+      { id: 4, label: "はみがき", minutes: 3 },
+      { id: 5, label: "もちもの", minutes: 3 },
+      { id: 6, label: "いってきます", minutes: 0 },
+    ],
+  },
+  {
+    id: "hospital", label: "びょういん", color: "#4ECDC4",
+    flow: { now: "くるまにのる", next: "せんせいとおはなし", goal: "ごほうび！" },
+    cards: [
+      { id: 1, label: "くるまにのる", minutes: 5 },
+      { id: 2, label: "まつ", minutes: 10 },
+      { id: 3, label: "せんせいとおはなし", minutes: 10 },
+      { id: 4, label: "おわり", minutes: 0 },
+      { id: 5, label: "ごほうび", minutes: 0 },
+    ],
+  },
+  {
+    id: "shopping", label: "おかいもの", color: "#FF6B35",
+    flow: { now: "カートをおす", next: "レジにならぶ", goal: "おかしえらぶ！" },
+    cards: [
+      { id: 1, label: "カートをおす", minutes: 5 },
+      { id: 2, label: "かいもの", minutes: 15 },
+      { id: 3, label: "レジにならぶ", minutes: 5 },
+      { id: 4, label: "おかしえらぶ", minutes: 3 },
+    ],
+  },
+  {
+    id: "bedtime", label: "おふろ〜ねる", color: "#A78BFA",
+    flow: { now: "おふろはいる", next: "パジャマきる", goal: "えほんよむ！" },
+    cards: [
+      { id: 1, label: "おふろ", minutes: 15 },
+      { id: 2, label: "はみがき", minutes: 3 },
+      { id: 3, label: "パジャマ", minutes: 3 },
+      { id: 4, label: "えほん", minutes: 10 },
+      { id: 5, label: "おやすみ", minutes: 0 },
+    ],
+  },
+  {
+    id: "train", label: "でんしゃでおでかけ", color: "#10AC84",
+    flow: { now: "えきにいく", next: "でんしゃにのる", goal: "ついた！" },
+    cards: [
+      { id: 1, label: "えきにいく", minutes: 5 },
+      { id: 2, label: "でんしゃにのる", minutes: 0 },
+      { id: 3, label: "まつ", minutes: 10 },
+      { id: 4, label: "ついた！", minutes: 0 },
+    ],
+  },
+  {
+    id: "restaurant", label: "レストラン", color: "#FD79A8",
+    flow: { now: "すわる", next: "たべる", goal: "ごちそうさま！" },
+    cards: [
+      { id: 1, label: "すわる", minutes: 2 },
+      { id: 2, label: "えらぶ", minutes: 5 },
+      { id: 3, label: "たべる", minutes: 20 },
+      { id: 4, label: "ごちそうさま", minutes: 0 },
+    ],
+  },
+];
+
+const ALL_CARDS = [
+  { label: "おきる" }, { label: "きがえ" }, { label: "ごはん" },
+  { label: "はみがき" }, { label: "もちもの" }, { label: "いってきます" },
+  { label: "くるまにのる" }, { label: "まつ" }, { label: "せんせいとおはなし" },
+  { label: "おわり" }, { label: "ごほうび" }, { label: "カートをおす" },
+  { label: "かいもの" }, { label: "レジにならぶ" }, { label: "おかしえらぶ" },
+  { label: "おふろ" }, { label: "パジャマ" }, { label: "えほん" },
+  { label: "おやすみ" }, { label: "えきにいく" }, { label: "でんしゃにのる" },
+  { label: "ついた！" }, { label: "えらぶ" }, { label: "たべる" },
+  { label: "ごちそうさま" }, { label: "ならぶ" }, { label: "トイレ" },
+  { label: "すわる" }, { label: "しずかに" }, { label: "おかたづけ" },
+  { label: "ごあいさつ" },
+];
+
+const SCENE_PICKER_COLORS = [
+  "#FF6B9D", "#FFD93D", "#2ECC71", "#4ECDC4",
+  "#45B7D1", "#96E6A1", "#FF8A80", "#FFB6C1",
+];
+
+const CONFETTI_COLORS = ["#FF6B6B", "#FECA57", "#48DBFB", "#FF9FF3", "#54A0FF", "#5F27CD", "#01A3A4", "#F368E0"];
+
+// ===== CONFETTI COMPONENT =====
+function Confetti({ active }) {
+  if (!active) return null;
+  const pieces = Array.from({ length: 40 }, (_, i) => {
+    const left = Math.random() * 100;
+    const delay = Math.random() * 0.5;
+    const duration = 1.5 + Math.random() * 1;
+    const color = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+    const size = 6 + Math.random() * 8;
+    return (
+      <div key={i} style={{
+        position: "absolute", left: `${left}%`, top: "-20px",
+        width: size, height: size, borderRadius: size > 9 ? "50%" : "2px",
+        background: color,
+        animation: `confettiFall ${duration}s ease-in ${delay}s forwards`,
+      }} />
+    );
+  });
+  return <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 100 }}>{pieces}</div>;
+}
+
+// ================================================================
+// SCREEN 1: SceneSelectScreen（子ども画面）
+// ================================================================
+function SceneSelectScreen({ onSelect, onSettings, customScenes = [] }) {
+  const allScenes = [...SCENES, ...customScenes];
+
+  return (
+    <div style={{
+      width: "100%", height: "100%", background: COLORS.background,
+      padding: "16px", display: "flex", flexDirection: "column",
+      boxSizing: "border-box", position: "relative",
+    }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+        <div>
+          <div style={{
+            fontSize: 24, fontWeight: 900,
+            background: "linear-gradient(135deg, #FF6B6B, #4ECDC4)",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+          }}>mitooshi</div>
+          <div style={{ fontSize: 13, color: COLORS.textSecondary, fontWeight: 700 }}>
+            つぎ、なにする？
+          </div>
+        </div>
+        <button onClick={onSettings} style={{
+          background: COLORS.cardWhite, border: "none", fontSize: 20, cursor: "pointer",
+          width: 44, height: 44, borderRadius: "50%", display: "flex",
+          alignItems: "center", justifyContent: "center",
+          boxShadow: SHADOWS.cardSm,
+        }}>⚙️</button>
+      </div>
+
+      {/* Decorative circle */}
+      <div style={{
+        position: "absolute", top: 18, right: 70, width: 36, height: 36,
+        borderRadius: "50%", background: "rgba(255,217,61,0.35)", zIndex: 0,
+      }} />
+
+      {/* Scene grid 2x2 */}
+      <div style={{
+        display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
+        flex: 1, alignContent: "start",
+      }}>
+        {allScenes.slice(0, 6).map((scene) => (
+          <button
+            key={scene.id}
+            onClick={() => onSelect(scene)}
+            style={{
+              background: scene.color,
+              borderRadius: 24, padding: "20px 12px", border: "none",
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
+              cursor: "pointer", position: "relative",
+              minHeight: 140, boxShadow: SHADOWS.card,
+              transition: "transform 0.2s",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = "scale(0.97)"}
+            onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+          >
+            {/* Decorative circles on card */}
+            <div style={{
+              position: "absolute", width: 28, height: 28, borderRadius: "50%",
+              background: "rgba(255,255,255,0.25)", top: 10, left: 10,
+            }} />
+            <div style={{
+              position: "absolute", width: 44, height: 44, borderRadius: "50%",
+              background: "rgba(255,255,255,0.12)", bottom: 16, right: 12,
+            }} />
+
+            <Illust label={scene.cards[0]?.label || scene.label} size={56} />
+            <div style={{
+              fontSize: 16, fontWeight: 900, color: COLORS.cardWhite,
+              marginTop: 10, textAlign: "center",
+            }}>
+              {scene.label}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* いまから Quick button */}
+      <button style={{
+        width: "100%", padding: "14px 20px", borderRadius: 9999,
+        background: "linear-gradient(135deg, #FF6B9D, #FF4757)",
+        border: "none", color: COLORS.cardWhite, fontSize: 16, fontWeight: 900,
+        cursor: "pointer", boxShadow: SHADOWS.card, marginTop: 12,
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+      }}>
+        ⚡ いまから
+      </button>
+    </div>
+  );
+}
+
+// ================================================================
+// SCREEN 2: ExecutionScreen（子ども実行画面 - いま・つぎ・ゴール）
+// ================================================================
+function ExecutionScreen({ scene, onComplete, onBack }) {
+  const cards = scene.cards || [];
+  const [currentStep, setCurrentStep] = useState(0);
+
+  // 3枚構造: いま=current, つぎ=current+1, ゴール=last
+  const nowCard = cards[currentStep];
+  const nextCard = cards[Math.min(currentStep + 1, cards.length - 1)];
+  const goalCard = cards[cards.length - 1];
+
+  const handleDone = () => {
+    if (currentStep >= cards.length - 1) {
+      onComplete();
+    } else {
+      setCurrentStep((p) => p + 1);
+    }
+  };
+
+  // Decorative shapes
+  const decoShapes = [
+    { top: "8%", left: "3%", size: 45, color: "#FFD93D", opacity: 0.35 },
+    { top: "18%", right: "5%", size: 30, color: "#A0D2DB", opacity: 0.4 },
+    { top: "40%", left: "2%", size: 24, color: "#FFB6C1", opacity: 0.3 },
+    { bottom: "25%", right: "4%", size: 55, color: "#D4A5FF", opacity: 0.2 },
+    { bottom: "12%", left: "8%", size: 35, color: "#B5EAD7", opacity: 0.3 },
+    { top: "60%", right: "10%", size: 18, color: "#87CEEB", shape: "diamond", opacity: 0.35 },
+  ];
+
+  return (
+    <div style={{
+      width: "100%", height: "100%",
+      background: `linear-gradient(160deg, #FFF0F5 0%, ${scene.color}18 40%, #F0F4FF 100%)`,
+      padding: "12px 16px", display: "flex", flexDirection: "column",
+      boxSizing: "border-box", position: "relative", overflow: "hidden",
+    }}>
+      {/* Decorative shapes */}
+      {decoShapes.map((s, i) => (
+        <div key={i} style={{
+          position: "absolute", width: s.size, height: s.size,
+          borderRadius: s.shape === "diamond" ? "4px" : "50%",
+          transform: s.shape === "diamond" ? "rotate(45deg)" : "none",
+          background: s.color, opacity: s.opacity,
+          top: s.top, left: s.left, right: s.right, bottom: s.bottom,
+        }} />
+      ))}
+
+      {/* Header: ← [シーン名] ♥ */}
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        marginBottom: 12, position: "relative", zIndex: 10,
+      }}>
+        <button onClick={onBack} style={{
+          background: COLORS.cardWhite, border: "none", width: 40, height: 40,
+          borderRadius: "50%", fontSize: 20, cursor: "pointer",
+          boxShadow: SHADOWS.cardSm, display: "flex", alignItems: "center", justifyContent: "center",
+        }}>←</button>
+        <div style={{
+          background: COLORS.cardWhite, borderRadius: 9999, padding: "8px 20px",
+          fontSize: 14, fontWeight: 900, color: COLORS.textPrimary,
+          boxShadow: SHADOWS.cardSm,
+        }}>{scene.label}</div>
+        <div style={{
+          width: 40, height: 40, borderRadius: "50%", display: "flex",
+          alignItems: "center", justifyContent: "center", fontSize: 22, color: "#FF6B9D",
+        }}>♥</div>
+      </div>
+
+      {/* Main card - 現在のステップ */}
+      <div style={{
+        background: COLORS.cardWhite, borderRadius: 28, padding: "32px 24px",
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", flex: 1, marginBottom: 8,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.06)", position: "relative", zIndex: 10,
+        animation: "stepBounce 0.4s cubic-bezier(0.34,1.56,0.64,1)",
+      }}>
+        {/* Decorative circle on card */}
+        <div style={{
+          position: "absolute", top: 16, right: 20, width: 32, height: 32,
+          borderRadius: "50%", background: `${scene.color}25`,
+        }} />
+        <Illust label={nowCard?.label} size={140} />
+      </div>
+
+      {/* Hint text */}
+      <div style={{
+        fontSize: 12, color: COLORS.textMuted, textAlign: "center",
+        marginBottom: 8, zIndex: 10, position: "relative",
+      }}>
+        ← できた！スワイプ
+      </div>
+
+      {/* 3-card preview strip: いま・つぎ・ゴール */}
+      <div style={{
+        display: "flex", gap: 8, marginBottom: 12, zIndex: 10, position: "relative",
+      }}>
+        {[
+          { card: nowCard, label: "いま", idx: 0 },
+          { card: nextCard, label: "つぎ", idx: 1 },
+          { card: goalCard, label: "ゴール", idx: 2 },
+        ].map((item) => (
+          <div key={item.label} style={{
+            flex: 1, background: item.idx === 0 ? `${scene.color}15` : COLORS.cardWhite,
+            borderRadius: 16, padding: "10px 6px", textAlign: "center",
+            border: item.idx === 0 ? `3px solid ${scene.color}` : "1.5px solid #EEE",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+          }}>
+            <Illust label={item.card?.label} size={36} />
+            <div style={{
+              fontSize: 11, fontWeight: 800,
+              color: item.idx === 0 ? scene.color : COLORS.textMuted,
+              background: item.idx === 0 ? scene.color : "transparent",
+              WebkitBackgroundClip: item.idx === 0 ? "unset" : "unset",
+              ...(item.idx === 0 ? {
+                background: scene.color, color: COLORS.cardWhite,
+                borderRadius: 8, padding: "2px 10px",
+              } : {}),
+            }}>
+              {item.label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* できた！ button */}
+      <button onClick={handleDone} style={{
+        width: "100%", padding: "16px", borderRadius: 9999,
+        background: COLORS.success, border: "none", color: COLORS.cardWhite,
+        fontSize: 20, fontWeight: 900, cursor: "pointer",
+        boxShadow: "0 4px 16px rgba(0,184,148,0.3)", zIndex: 10, position: "relative",
+      }}>
+        できた！
+      </button>
+    </div>
+  );
+}
+
+// ================================================================
+// SCREEN 3: ParentManagementScreen（シーン管理 - 保護者画面）
+// ================================================================
+function ParentManagementScreen({ onCreateScene, onEditScene, onBack, customScenes = [] }) {
+  const allScenes = [...SCENES, ...customScenes];
+
+  return (
+    <div style={{
+      width: "100%", height: "100%", background: COLORS.background,
+      padding: "16px", display: "flex", flexDirection: "column",
+      boxSizing: "border-box", overflowY: "auto",
+    }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 900, color: COLORS.textPrimary }}>
+            シーン管理
+          </div>
+          <div style={{ fontSize: 12, color: COLORS.textSecondary }}>
+            カードやシーンを編集できます
+          </div>
+        </div>
+        <button onClick={onBack} style={{
+          background: "none", border: `2px solid ${COLORS.textPrimary}`,
+          borderRadius: 9999, padding: "8px 16px", fontSize: 12, fontWeight: 700,
+          cursor: "pointer", color: COLORS.textPrimary,
+        }}>子供画面へ</button>
+      </div>
+
+      {/* Gradient action buttons */}
+      <button onClick={onCreateScene} style={{
+        width: "100%", padding: "16px 20px", borderRadius: 12,
+        background: "linear-gradient(135deg, #FF6B9D, #E91E63)",
+        border: "none", color: COLORS.cardWhite, fontSize: 15, fontWeight: 900,
+        cursor: "pointer", boxShadow: SHADOWS.card, marginBottom: 12,
+      }}>
+        ＋ 新しいシーンを作成
+      </button>
+
+      <button style={{
+        width: "100%", padding: "16px 20px", borderRadius: 12,
+        background: "linear-gradient(135deg, #00BCD4, #0277BD)",
+        border: "none", color: COLORS.cardWhite, fontSize: 15, fontWeight: 900,
+        cursor: "pointer", boxShadow: SHADOWS.card, marginBottom: 20,
+      }}>
+        ✨ AIでカードを生成
+      </button>
+
+      {/* Scene list */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {allScenes.map((scene) => (
+          <div
+            key={scene.id}
+            onClick={() => onEditScene(scene)}
+            style={{
+              borderRadius: 16, overflow: "hidden", cursor: "pointer",
+              boxShadow: SHADOWS.card, background: COLORS.cardWhite,
+            }}
+          >
+            {/* Colored header with icon */}
+            <div style={{
+              background: scene.color, padding: "16px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              minHeight: 80,
+            }}>
+              <Illust label={scene.cards[0]?.label || scene.label} size={48} />
+            </div>
+            {/* Scene info */}
+            <div style={{ padding: "12px 16px" }}>
+              <div style={{ fontSize: 15, fontWeight: 900, color: COLORS.textPrimary }}>
+                {scene.label}
+              </div>
+              <div style={{ display: "flex", gap: 4, marginTop: 6, alignItems: "center" }}>
+                {["いま", "つぎ", "ゴール"].map((tag, i) => (
+                  <React.Fragment key={tag}>
+                    {i > 0 && <span style={{ fontSize: 11, color: COLORS.textMuted }}>→</span>}
+                    <span style={{
+                      background: COLORS.border, padding: "2px 10px",
+                      borderRadius: 4, fontSize: 11, fontWeight: 700, color: COLORS.textSecondary,
+                    }}>{tag}</span>
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ================================================================
+// SCREEN 4: SceneEditScreen（シーン編集）
+// ================================================================
+function SceneEditScreen({ scene, onBack, onSave }) {
+  const isNew = !scene;
+  const [sceneName, setSceneName] = useState(scene?.label || "新しいシーン");
+  const [selectedColor, setSelectedColor] = useState(scene?.color || "#FF6B9D");
+  const [cardSlots, setCardSlots] = useState(
+    scene ? [
+      scene.cards[0] || null,
+      scene.cards.length > 1 ? scene.cards[1] : null,
+      scene.cards[scene.cards.length - 1] || null,
+    ] : [null, null, null]
+  );
+  const [showCardModal, setShowCardModal] = useState(false);
+  const [editingSlot, setEditingSlot] = useState(0);
+
+  const slotLabels = ["1. いま", "2. つぎ", "3. ゴール"];
+
+  const handleAddCard = (slotIdx) => {
+    setEditingSlot(slotIdx);
+    setShowCardModal(true);
+  };
+
+  const handleSaveCard = (cardData) => {
+    const newSlots = [...cardSlots];
+    newSlots[editingSlot] = cardData;
+    setCardSlots(newSlots);
+    setShowCardModal(false);
+  };
+
+  return (
+    <div style={{
+      width: "100%", height: "100%", background: COLORS.background,
+      padding: "16px", display: "flex", flexDirection: "column",
+      boxSizing: "border-box", overflowY: "auto", position: "relative",
+    }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+        <button onClick={onBack} style={{
+          background: COLORS.cardWhite, border: "none", width: 40, height: 40,
+          borderRadius: "50%", fontSize: 20, cursor: "pointer", boxShadow: SHADOWS.cardSm,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>←</button>
+        <div style={{ fontSize: 20, fontWeight: 900, color: COLORS.textPrimary }}>
+          シーン編集
+        </div>
+      </div>
+
+      {/* 基本設定 card */}
+      <div style={{
+        background: COLORS.cardWhite, borderRadius: 16, padding: 16,
+        marginBottom: 16, boxShadow: SHADOWS.cardSm,
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 900, color: COLORS.textSecondary, marginBottom: 12 }}>
+          基本設定
+        </div>
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 4 }}>シーン名</div>
+          <input
+            type="text" value={sceneName}
+            onChange={(e) => setSceneName(e.target.value)}
+            style={{
+              width: "100%", padding: "10px 12px", borderRadius: 10,
+              border: `1.5px solid ${COLORS.border}`, fontSize: 14,
+              boxSizing: "border-box", fontFamily: "inherit",
+            }}
+          />
+        </div>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>シーンカラー</div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {SCENE_PICKER_COLORS.map((c) => (
+              <button key={c} onClick={() => setSelectedColor(c)} style={{
+                width: 40, height: 40, borderRadius: "50%", background: c, border: "none",
+                cursor: "pointer",
+                outline: selectedColor === c ? "3px solid #9C27B0" : "none",
+                outlineOffset: 2,
+                boxShadow: SHADOWS.cardSm,
+              }} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* AI一括生成 */}
+      <button style={{
+        width: "100%", padding: "14px", borderRadius: 12,
+        background: "linear-gradient(135deg, #00BCD4, #0277BD)",
+        border: "none", color: COLORS.cardWhite, fontSize: 14, fontWeight: 900,
+        cursor: "pointer", marginBottom: 16,
+      }}>
+        ✨ AIで3枚のカードを一括生成
+      </button>
+
+      {/* Card slots: いま / つぎ / ゴール */}
+      {slotLabels.map((label, idx) => (
+        <div key={idx} style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: COLORS.textPrimary }}>{label}</div>
+            <button onClick={() => handleAddCard(idx)} style={{
+              background: "#FF7A59", border: "none", color: COLORS.cardWhite,
+              borderRadius: 8, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer",
+            }}>＋ カード追加</button>
+          </div>
+          {cardSlots[idx] ? (
+            <div style={{
+              borderRadius: 12, border: `2px solid ${selectedColor}30`,
+              padding: "14px", display: "flex", alignItems: "center", gap: 12,
+              background: `${selectedColor}08`,
+            }}>
+              <Illust label={cardSlots[idx].label} size={48} />
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 800 }}>{cardSlots[idx].label}</div>
+                {cardSlots[idx].description && (
+                  <div style={{ fontSize: 11, color: COLORS.textMuted }}>{cardSlots[idx].description}</div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div style={{
+              borderRadius: 12, border: `2px dashed ${COLORS.border}`,
+              padding: "24px", textAlign: "center", color: COLORS.textMuted, fontSize: 13,
+            }}>
+              カードを追加してください
+            </div>
+          )}
+        </div>
+      ))}
+
+      {/* Floating save button */}
+      <button onClick={() => onSave({ label: sceneName, color: selectedColor, cards: cardSlots })} style={{
+        position: "sticky", bottom: 12, alignSelf: "flex-end",
+        background: COLORS.success, color: COLORS.cardWhite,
+        border: "none", borderRadius: 14, padding: "12px 20px",
+        fontSize: 14, fontWeight: 900, cursor: "pointer",
+        boxShadow: "0 4px 20px rgba(0,184,148,0.3)",
+        display: "flex", alignItems: "center", gap: 6, zIndex: 50,
+      }}>
+        📋 保存する
+      </button>
+
+      {/* Card Create Modal */}
+      {showCardModal && (
+        <CardCreateModal
+          onSave={handleSaveCard}
+          onCancel={() => setShowCardModal(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ================================================================
+// MODAL: CardCreateModal（カード作成）
+// ================================================================
+function CardCreateModal({ onSave, onCancel }) {
+  const [cardName, setCardName] = useState("");
+  const [description, setDescription] = useState("");
+  const [time, setTime] = useState("");
+  const [cardColor, setCardColor] = useState("#FF6B9D");
+
+  return (
+    <div style={{
+      position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      zIndex: 200, padding: 20, boxSizing: "border-box",
+    }}>
+      <div style={{
+        background: COLORS.cardWhite, borderRadius: 20, padding: "24px",
+        width: "100%", maxWidth: 340, boxShadow: "0 16px 48px rgba(0,0,0,0.15)",
+      }}>
+        <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 20, color: COLORS.textPrimary }}>
+          カード作成
+        </div>
+
+        {/* カード名 */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 4 }}>カード名</div>
+          <input
+            type="text" value={cardName} onChange={(e) => setCardName(e.target.value)}
+            placeholder="例：はをみがく"
+            style={{
+              width: "100%", padding: "10px 12px", borderRadius: 10,
+              border: `1.5px solid ${COLORS.border}`, fontSize: 14,
+              boxSizing: "border-box", fontFamily: "inherit",
+            }}
+          />
+        </div>
+
+        {/* 説明 */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 4 }}>説明（任意）</div>
+          <input
+            type="text" value={description} onChange={(e) => setDescription(e.target.value)}
+            placeholder="例：しっかりみがこう"
+            style={{
+              width: "100%", padding: "10px 12px", borderRadius: 10,
+              border: `1.5px solid ${COLORS.border}`, fontSize: 14,
+              boxSizing: "border-box", fontFamily: "inherit",
+            }}
+          />
+        </div>
+
+        {/* 実施時刻 */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
+            🕐 実施時刻（任意）
+          </div>
+          <input
+            type="time" value={time} onChange={(e) => setTime(e.target.value)}
+            placeholder="--:--"
+            style={{
+              width: "100%", padding: "10px 12px", borderRadius: 10,
+              border: `1.5px solid ${COLORS.border}`, fontSize: 14,
+              boxSizing: "border-box", fontFamily: "inherit",
+            }}
+          />
+          <div style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 4 }}>
+            この活動をする予定の時刻を設定できます
+          </div>
+        </div>
+
+        {/* カードカラー */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>カードカラー</div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {SCENE_PICKER_COLORS.map((c) => (
+              <button key={c} onClick={() => setCardColor(c)} style={{
+                width: 40, height: 40, borderRadius: "50%", background: c, border: "none",
+                cursor: "pointer",
+                outline: cardColor === c ? "3px solid #9C27B0" : "none",
+                outlineOffset: 2, boxShadow: SHADOWS.cardSm,
+              }} />
+            ))}
+          </div>
+        </div>
+
+        {/* Buttons */}
+        <div style={{ display: "flex", gap: 12 }}>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "12px", borderRadius: 12,
+            border: `1.5px solid ${COLORS.border}`, background: COLORS.cardWhite,
+            fontSize: 14, fontWeight: 700, cursor: "pointer", color: COLORS.textPrimary,
+          }}>キャンセル</button>
+          <button onClick={() => onSave({ label: cardName, description, time, color: cardColor })} style={{
+            flex: 1, padding: "12px", borderRadius: 12,
+            border: "none", background: COLORS.brandLavender,
+            fontSize: 14, fontWeight: 900, cursor: "pointer", color: COLORS.cardWhite,
+          }}>保存</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ================================================================
+// SCREEN 5: CompleteScreen（完了画面）
+// ================================================================
+function CompleteScreen({ scene, onHome }) {
+  const [showConfetti, setShowConfetti] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setShowConfetti(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div style={{
+      width: "100%", height: "100%",
+      background: `linear-gradient(150deg, ${scene.color}35, ${scene.color}15, #FFF8F0)`,
+      display: "flex", flexDirection: "column", alignItems: "center",
+      justifyContent: "center", padding: 24, boxSizing: "border-box",
+      position: "relative",
+    }}>
+      <Confetti active={showConfetti} />
+
+      <div style={{ fontSize: 72, marginBottom: 20, animation: "celebrateBounce 0.6s cubic-bezier(0.34,1.56,0.64,1)" }}>
+        🎉
+      </div>
+
+      <div style={{ fontSize: 28, fontWeight: 900, color: COLORS.textPrimary, marginBottom: 8, textAlign: "center" }}>
+        ぜんぶ できた！
+      </div>
+
+      <div style={{ fontSize: 14, color: COLORS.textSecondary, marginBottom: 40, textAlign: "center" }}>
+        {scene.label} をがんばりました
+      </div>
+
+      <button onClick={onHome} style={{
+        padding: "16px 32px", borderRadius: 9999,
+        background: COLORS.success, color: COLORS.cardWhite,
+        border: "none", fontSize: 16, fontWeight: 900, cursor: "pointer",
+        boxShadow: "0 4px 16px rgba(0,184,148,0.3)",
+      }}>
+        つぎの しーんを みる
+      </button>
+    </div>
+  );
+}
+
+// ================================================================
+// MAIN APP
+// ================================================================
+export default function MainApp() {
+  const [screen, setScreen] = useState("select");
+  // select | execute | complete | management | sceneEdit
+  const [selectedScene, setSelectedScene] = useState(null);
+  const [customScenes, setCustomScenes] = useState([]);
+
+  const handleSelectScene = (scene) => {
+    setSelectedScene(scene);
+    setScreen("execute");
+  };
+
+  const handleComplete = () => setScreen("complete");
+
+  const handleHome = () => {
+    setScreen("select");
+    setSelectedScene(null);
+  };
+
+  const handleSaveScene = (newScene) => {
+    const scene = {
+      ...newScene,
+      id: `custom_${Date.now()}`,
+      cards: (newScene.cards || []).filter(Boolean).map((c, i) => ({ ...c, id: i + 1 })),
+    };
+    setCustomScenes((prev) => [...prev, scene]);
+    setScreen("management");
+  };
+
+  return (
+    <div style={{
+      width: 375, height: 812, margin: "0 auto",
+      background: COLORS.background, borderRadius: RADII.frame,
+      overflow: "hidden", position: "relative",
+      boxShadow: "0 16px 56px rgba(255,107,107,0.15), 0 4px 16px rgba(0,0,0,0.08)",
+      fontFamily: "'Rounded Mplus 1c', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif",
+    }}>
+      {screen === "select" && (
+        <SceneSelectScreen
+          onSelect={handleSelectScene}
+          onSettings={() => setScreen("management")}
+          customScenes={customScenes}
+        />
+      )}
+      {screen === "execute" && selectedScene && (
+        <ExecutionScreen
+          scene={selectedScene}
+          onComplete={handleComplete}
+          onBack={() => setScreen("select")}
+        />
+      )}
+      {screen === "complete" && selectedScene && (
+        <CompleteScreen
+          scene={selectedScene}
+          onHome={handleHome}
+        />
+      )}
+      {screen === "management" && (
+        <ParentManagementScreen
+          onCreateScene={() => {
+            setSelectedScene(null);
+            setScreen("sceneEdit");
+          }}
+          onEditScene={(scene) => {
+            setSelectedScene(scene);
+            setScreen("sceneEdit");
+          }}
+          onBack={() => setScreen("select")}
+          customScenes={customScenes}
+        />
+      )}
+      {screen === "sceneEdit" && (
+        <SceneEditScreen
+          scene={selectedScene}
+          onBack={() => setScreen("management")}
+          onSave={handleSaveScene}
+        />
+      )}
+
+      {/* CSS Animations */}
+      <style>{`
+        * { font-family: "Rounded Mplus 1c", "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif; }
+        @keyframes confettiFall {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(700px) rotate(720deg); opacity: 0; }
+        }
+        @keyframes stepBounce {
+          0%, 100% { transform: scale(1); }
+          30% { transform: scale(1.04); }
+          60% { transform: scale(0.98); }
+        }
+        @keyframes celebrateBounce {
+          0% { transform: scale(0) rotate(-10deg); }
+          50% { transform: scale(1.3) rotate(5deg); }
+          70% { transform: scale(0.95) rotate(-2deg); }
+          100% { transform: scale(1) rotate(0deg); }
+        }
+        @keyframes kidsFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+      `}</style>
+    </div>
+  );
+}

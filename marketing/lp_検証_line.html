@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mitooshi — 「もう何回言わせるの！」と叫ばなくていい朝へ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: SFPro, Arial, "Noto Sans JP", "Noto Sans KR", sans-serif;
+    font-size: 20px;
+    line-height: normal;
+    color: #000000;
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    line-break: strict;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: #06c755; text-decoration: none; }
+  .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  /* ===== Header ===== */
+  header {
+    border-bottom: 1px solid #e5e5e5;
+    background: #fff;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 72px;
+  }
+  .logo {
+    font-size: 28px; font-weight: 900; color: #000;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-mark {
+    width: 36px; height: 36px; background: #06c755;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 20px; font-weight: 900;
+  }
+  .nav { display: flex; gap: 32px; align-items: center; }
+  .nav a { color: #000; font-size: 16px; font-weight: 700; }
+  .btn-cta {
+    background: #06c755; color: #fff;
+    border: none; border-radius: 8px;
+    padding: 12px 32px; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+  }
+  .btn-cta:hover { background: #05b34c; }
+  .btn-secondary {
+    background: transparent; color: #000;
+    border: 1px solid #e5e5e5; border-radius: 8px;
+    padding: 12px 32px; font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    padding: 96px 0 80px;
+    background: linear-gradient(180deg, #f0fbf4 0%, #ffffff 100%);
+  }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; align-items: center;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: #06c755; color: #fff;
+    font-size: 14px; font-weight: 700;
+    padding: 6px 16px; border-radius: 999px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: 60px; font-weight: 900; line-height: 1.27;
+    margin-bottom: 24px;
+  }
+  .hero h1 .accent { color: #06c755; }
+  .hero .lead {
+    font-size: 20px; font-weight: 400; color: #666;
+    margin-bottom: 40px; line-height: 1.7;
+  }
+  .hero-cta { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .hero-note { font-size: 14px; color: #666; margin-top: 24px; }
+
+  .img-slot {
+    background: #f7f8f9;
+    border: 1px dashed #e5e5e5;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: #999; font-size: 14px; text-align: center;
+    aspect-ratio: 4 / 3;
+  }
+  .img-slot small { display: block; margin-top: 6px; opacity: 0.7; font-size: 12px; }
+
+  /* ===== Section common ===== */
+  section { padding: 96px 0; }
+  .section-label {
+    text-align: center;
+    display: inline-block;
+    background: #f0fbf4; color: #06c755;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.05em;
+    padding: 6px 16px; border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: 48px; font-weight: 900; line-height: 1.3;
+    color: #000; margin-bottom: 16px; text-align: center;
+  }
+  .section-sub {
+    text-align: center; font-size: 18px; color: #666;
+    margin-bottom: 64px; line-height: 1.6;
+  }
+  .label-wrap { text-align: center; }
+
+  /* ===== Empathy ===== */
+  .empathy { background: #f7f8f9; }
+  .empathy-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    margin-bottom: 56px;
+  }
+  .empathy-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .empathy-num {
+    display: inline-block;
+    background: #06c755; color: #fff;
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 900;
+    margin-bottom: 20px;
+  }
+  .empathy-card p {
+    font-size: 18px; font-weight: 500; line-height: 1.7; color: #000;
+  }
+  .empathy-closing {
+    background: #fff;
+    border: 2px solid #06c755;
+    border-radius: 16px;
+    padding: 32px 40px;
+    text-align: center;
+    font-size: 20px; line-height: 1.8;
+    max-width: 880px; margin: 0 auto;
+  }
+  .empathy-closing strong { color: #06c755; font-weight: 900; }
+
+  /* ===== Solution ===== */
+  .solution-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+  }
+  .solution-steps { display: flex; flex-direction: column; gap: 24px; }
+  .step {
+    display: flex; gap: 20px; align-items: flex-start;
+    background: #fff; border: 1px solid #e5e5e5;
+    border-radius: 12px; padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 48px; height: 48px;
+    background: #06c755; color: #fff;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900;
+  }
+  .step h4 { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+  .step p { font-size: 16px; color: #666; line-height: 1.6; }
+
+  /* ===== Features ===== */
+  .feature-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+  }
+  .feature-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .feature-tag {
+    display: inline-block;
+    background: #f0fbf4; color: #06c755;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
+    padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+  }
+  .feature-card h4 { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+  .feature-card p { font-size: 16px; color: #666; line-height: 1.7; }
+
+  /* ===== Scenes ===== */
+  .scenes { background: #f7f8f9; }
+  .scene-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  }
+  .scene-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .scene-card .img-slot { border: none; border-radius: 0; aspect-ratio: 16/10; }
+  .scene-body { padding: 24px; }
+  .scene-tag {
+    display: inline-block;
+    background: #06c755; color: #fff;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
+    padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+  }
+  .scene-body h4 { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+  .scene-body p { font-size: 16px; color: #666; line-height: 1.6; margin-bottom: 16px; }
+  .scene-steps {
+    font-size: 14px; color: #666;
+    padding-top: 16px; border-top: 1px solid #e5e5e5;
+  }
+
+  /* ===== Reassure ===== */
+  .reassure-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    margin-bottom: 64px;
+  }
+  .reassure-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .reassure-icon {
+    width: 64px; height: 64px;
+    background: #f0fbf4; color: #06c755;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; letter-spacing: 0.05em;
+    margin: 0 auto 16px;
+  }
+  .reassure-card h4 { font-size: 22px; font-weight: 900; margin-bottom: 10px; }
+  .reassure-card p { font-size: 16px; color: #666; line-height: 1.7; }
+
+  /* ===== CTA ===== */
+  .cta-block {
+    background: #06c755; color: #fff;
+    border-radius: 24px;
+    padding: 64px 48px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(6,199,85,0.24);
+  }
+  .cta-block h3 {
+    font-size: 40px; font-weight: 900; line-height: 1.4;
+    margin-bottom: 16px;
+  }
+  .cta-block .sub { font-size: 18px; margin-bottom: 32px; opacity: 0.92; }
+  .cta-perks {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .cta-perks span {
+    font-size: 14px; font-weight: 700; color: #fff;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.32);
+    padding: 10px 18px; border-radius: 999px;
+  }
+  .cta-form {
+    display: flex; gap: 12px; max-width: 520px; margin: 0 auto;
+  }
+  .cta-form input {
+    flex: 1; font-size: 16px; padding: 14px 18px;
+    border: none; border-radius: 8px;
+    color: #000; font-family: inherit; background: #fff;
+    height: 56px;
+  }
+  .cta-form input:focus { outline: 2px solid #fff; outline-offset: -1px; }
+  .cta-form button {
+    background: #fff; color: #06c755; border: none;
+    border-radius: 8px; padding: 14px 32px;
+    font-size: 16px; font-weight: 900; cursor: pointer; font-family: inherit;
+    height: 56px;
+  }
+  .cta-micro { font-size: 13px; color: rgba(255,255,255,0.86); margin-top: 16px; }
+  .cta-success {
+    margin-top: 16px; color: #fff; font-weight: 700; font-size: 14px;
+    background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px;
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    border-top: 1px solid #e5e5e5;
+    padding: 40px 0;
+    color: #666; font-size: 14px;
+    text-align: center;
+  }
+  footer .links { margin-bottom: 12px; }
+  footer .links a { margin: 0 16px; color: #666; }
+
+  @media (max-width: 1024px) {
+    body { font-size: 16px; }
+    .hero h1 { font-size: 42px; }
+    .section-title { font-size: 36px; }
+    .cta-block h3 { font-size: 28px; }
+    .hero-grid, .solution-grid { grid-template-columns: 1fr; gap: 40px; }
+    .empathy-grid, .feature-grid, .scene-grid, .reassure-grid { grid-template-columns: 1fr; }
+    .hero { padding: 56px 0 48px; }
+    section { padding: 64px 0; }
+    .cta-block { padding: 40px 24px; }
+    .cta-form { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header>
+  <div class="container header-inner">
+    <div class="logo">
+      <div class="logo-mark">m</div>
+      mitooshi
+    </div>
+    <nav class="nav">
+      <a href="#empathy">特徴</a>
+      <a href="#solution">使い方</a>
+      <a href="#cta">事前登録</a>
+      <button class="btn-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">事前登録</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="hero-tag">事前登録 受付中</span>
+      <h1>「もう何回言わせるの！」<br>と<span class="accent">叫ばなくていい朝</span>へ。</h1>
+      <p class="lead">テンプレートを選ぶだけで、子どもが自分で次の行動を見つけられる。<br>声かけに頼らない、新しい毎日の進めかた。</p>
+      <div class="hero-cta">
+        <button class="btn-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">事前登録する（無料）</button>
+        <button class="btn-secondary" onclick="document.getElementById('solution').scrollIntoView({behavior:'smooth'})">使い方を見る</button>
+      </div>
+      <p class="hero-note">HCD-Net認定専門家監修 / 療育現場の声を反映 / オフライン対応</p>
+    </div>
+    <div class="img-slot" data-img-prompt="子どもがスマホ画面の絵カードを指でタップしている瞬間。明るく親しみやすい、グリーンを差し色にしたフラットイラスト">
+      <div>HERO IMAGE<br><small>子どもが画面をタップしている瞬間</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Empathy ===== -->
+<section class="empathy" id="empathy">
+  <div class="container">
+    <div class="label-wrap"><span class="section-label">EMPATHY</span></div>
+    <h2 class="section-title">こんな毎日、ありませんか？</h2>
+    <p class="section-sub">朝の支度、お出かけ、寝る前——保護者の本音をそのまま並べてみました。</p>
+    <div class="empathy-grid">
+      <div class="empathy-card">
+        <div class="empathy-num">01</div>
+        <p>「もう何回言わせるの！」朝から怒鳴ってしまった自分に、出勤途中の電車でひとり落ち込む。</p>
+      </div>
+      <div class="empathy-card">
+        <div class="empathy-num">02</div>
+        <p>時計の針がすすむほど、声が大きくなる。「早くして」「あと5分」気づけば、命令と急かしの連続。</p>
+      </div>
+      <div class="empathy-card">
+        <div class="empathy-num">03</div>
+        <p>絵カードもタイマーも、続かなかった。試したものは全部、引き出しの奥で眠っている。</p>
+      </div>
+    </div>
+    <div class="empathy-closing">
+      叱りたくて叱っているわけじゃない。本当は、もっと優しくしたい。<br>
+      それは、あなたの愛情が足りないからではありません。<br>
+      お子さんが <strong>「次に何をすればいいか」</strong> を、目で見て確かめられないからです。
+    </div>
+  </div>
+</section>
+
+<!-- ===== Solution ===== -->
+<section id="solution">
+  <div class="container">
+    <div class="label-wrap"><span class="section-label">SOLUTION</span></div>
+    <h2 class="section-title">「つぎ」が見えると、<br>子どもは自分で動ける</h2>
+    <p class="section-sub">えらぶ、ととのえる、わたす。たった3ステップ。</p>
+    <div class="solution-grid">
+      <div class="solution-steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <h4>えらぶ</h4>
+            <p>「あさのしたく」「おでかけ」など、テンプレートをタップ。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <h4>ととのえる</h4>
+            <p>ステップの順番を指でならべ替え。30秒で完成します。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <h4>わたす</h4>
+            <p>お子さんに画面を渡すだけ。子ども自身がカードをめくります。</p>
+          </div>
+        </div>
+      </div>
+      <div class="img-slot" data-img-prompt="2台のスマホが並び、左に保護者用編集画面、右に子ども用実行画面。グリーンを差し色にしたフラットUI">
+        <div>SOLUTION IMAGE<br><small>保護者画面 → 子ども画面</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Features ===== -->
+<section style="background:#f7f8f9;">
+  <div class="container">
+    <div class="label-wrap"><span class="section-label">FEATURES</span></div>
+    <h2 class="section-title">続かなかった理由を、<br>ぜんぶなくしました</h2>
+    <p class="section-sub">準備、組み換え、子ども操作、オフライン。続けられる理由がここに。</p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-tag">FEATURE 01</span>
+        <h4>30秒で完成</h4>
+        <p>テンプレを選ぶだけで、そのまま使えます。準備の手間ゼロ。疲れている朝でも続けられます。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-tag">FEATURE 02</span>
+        <h4>外出先で組み換え自由</h4>
+        <p>急な予定変更にも、その場で対応。お店で「もうかえる！」となっても、サッと並べ替えられます。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-tag">FEATURE 03</span>
+        <h4>子どもが自分で操作</h4>
+        <p>タップとスワイプだけ。文字が読めなくてもOK。お子さんが主人公として進めます。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-tag">FEATURE 04</span>
+        <h4>オフラインでも動く</h4>
+        <p>電波がない場所でも安心して使えます。お出かけ先や移動中でも、いつも頼れる味方に。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Scenes ===== -->
+<section class="scenes">
+  <div class="container">
+    <div class="label-wrap"><span class="section-label">USE CASES</span></div>
+    <h2 class="section-title">一日のいろんな場面で</h2>
+    <p class="section-sub">朝の支度から寝る前まで、いつもそばに。</p>
+    <div class="scene-grid">
+      <div class="scene-card">
+        <div class="img-slot" data-img-prompt="朝の食卓と着替え、グリーンを差し色にしたフラット">
+          <div>MORNING<br><small>あさ</small></div>
+        </div>
+        <div class="scene-body">
+          <span class="scene-tag">MORNING</span>
+          <h4>あさ</h4>
+          <p>声かけなしで、リズムに乗って準備が進みます。</p>
+          <div class="scene-steps">おきる → きがえ → ごはん → はみがき → いってきます</div>
+        </div>
+      </div>
+      <div class="scene-card">
+        <div class="img-slot" data-img-prompt="お店でカートを押す親子、フラットイラスト">
+          <div>OUTDOOR<br><small>おでかけ先</small></div>
+        </div>
+        <div class="scene-body">
+          <span class="scene-tag">OUTDOOR</span>
+          <h4>おでかけ先</h4>
+          <p>その場で予定を組み替えて、画面で見せられます。</p>
+          <div class="scene-steps">おみせにはいる → かいもの → レジ → おうちにかえる</div>
+        </div>
+      </div>
+      <div class="scene-card">
+        <div class="img-slot" data-img-prompt="夜の絵本タイム、温かい色、フラットイラスト">
+          <div>NIGHT<br><small>ねるまえ</small></div>
+        </div>
+        <div class="scene-body">
+          <span class="scene-tag">NIGHT</span>
+          <h4>ねるまえ</h4>
+          <p>ぐずりがちな夜のルーティンが、すんなり進みます。</p>
+          <div class="scene-steps">おふろ → パジャマ → えほん → おやすみ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Reassure + CTA ===== -->
+<section id="cta">
+  <div class="container">
+    <div class="label-wrap"><span class="section-label">TRUST &amp; SIGN UP</span></div>
+    <h2 class="section-title">安心して、はじめられます</h2>
+    <p class="section-sub">プライバシー、料金、専門家監修。気になるところを、ぜんぶクリアに。</p>
+    <div class="reassure-grid">
+      <div class="reassure-card">
+        <div class="reassure-icon">PRIVACY</div>
+        <h4>プライバシー</h4>
+        <p>お子さんの情報は最小限。写真も名前も登録不要です。</p>
+      </div>
+      <div class="reassure-card">
+        <div class="reassure-icon">FREE</div>
+        <h4>無料で使える</h4>
+        <p>基本のテンプレートはずっと無料。有料は必要な方だけ。</p>
+      </div>
+      <div class="reassure-card">
+        <div class="reassure-icon">EXPERT</div>
+        <h4>専門家の知見</h4>
+        <p>HCD-Net認定の人間中心設計専門家が、お子さんの特性に合わせて監修。</p>
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <h3>もうすぐリリース。<br>まずは事前登録から</h3>
+      <p class="sub">登録した方には、リリース時に最速でお知らせします</p>
+      <div class="cta-perks">
+        <span>リリース時に最速通知</span>
+        <span>先行アクセス権</span>
+        <span>限定テンプレート</span>
+      </div>
+      <form class="cta-form" id="signup-form">
+        <input type="email" placeholder="メールアドレスを入力" required id="email-input">
+        <button type="submit">事前登録する</button>
+      </form>
+      <p class="cta-micro">配信停止はいつでもできます / メールアドレス以外の情報は取得しません</p>
+      <p class="cta-success" id="cta-success" style="display:none;"></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="links">
+      <a href="#">利用規約</a>
+      <a href="#">プライバシーポリシー</a>
+      <a href="#">お問い合わせ</a>
+    </div>
+    <div>© 2026 株式会社HuX</div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('signup-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var email = document.getElementById('email-input').value;
+    var success = document.getElementById('cta-success');
+    success.textContent = email + ' を登録しました。リリース時にお知らせします。';
+    success.style.display = 'block';
+    document.getElementById('email-input').value = '';
+  });
+</script>
+
+</body>
+</html>

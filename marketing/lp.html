@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>mitooshi — 「もう何回言わせるの！」と叫ばなくていい朝へ</title>
+<style>
+  /* ===== Design tokens ===== */
+  :root {
+    --primary: #00B894;        /* Mint Green: CTA / アクティブのみ */
+    --text: #333333;
+    --text-sub: #666666;
+    --link: #0073cc;
+    --bg: #ffffff;
+    --border: #e5e5e5;
+    --bg-soft: #f6f6f6;
+    --gutter: 24px;
+    --inset: 16px;
+    --pad-h: 36px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN Custom", "Hiragino Sans Custom", "Meiryo Custom", sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--link); text-decoration: none; }
+  img { max-width: 100%; display: block; }
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 var(--pad-h); }
+
+  /* ===== Header ===== */
+  header {
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+    position: sticky; top: 0; z-index: 1200;
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .logo {
+    font-size: 20px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .nav { display: flex; gap: 24px; align-items: center; }
+  .nav a { color: var(--text); font-size: 14px; font-weight: 700; }
+  .nav a.active { color: var(--primary); }
+  .btn-cta {
+    background: var(--primary); color: #fff;
+    border: none; border-radius: 4px;
+    padding: 10px 20px; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+  }
+  .btn-cta:hover { opacity: 0.9; }
+  .btn-secondary {
+    background: #fff; color: var(--text);
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 10px 20px; font-size: 14px; font-weight: 400;
+    cursor: pointer; font-family: inherit;
+  }
+
+  /* ===== Hero ===== */
+  .hero { padding: 64px 0 56px; border-bottom: 1px solid var(--border); }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center;
+  }
+  .hero-tag {
+    display: inline-block; font-size: 12px; font-weight: 700;
+    color: var(--primary); border: 1px solid var(--primary);
+    padding: 4px 10px; border-radius: 4px; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: 32px; font-weight: 700; line-height: 1.4;
+    color: var(--text); margin-bottom: 20px;
+  }
+  .hero h1 .accent { color: var(--primary); }
+  .hero .lead {
+    font-size: 15px; color: var(--text-sub); margin-bottom: 32px; line-height: 1.7;
+  }
+  .hero-cta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .hero-note { font-size: 12px; color: var(--text-sub); margin-top: 16px; }
+
+  /* 画像プレースホルダー枠 */
+  .img-slot {
+    background: var(--bg-soft);
+    border: 1px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-sub); font-size: 12px; text-align: center;
+    aspect-ratio: 4 / 3;
+    border-radius: 4px;
+  }
+  .img-slot small { display: block; margin-top: 6px; opacity: 0.7; }
+
+  /* ===== Section common ===== */
+  section { padding: 72px 0; border-bottom: 1px solid var(--border); }
+  .section-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 20px; font-weight: 700; color: var(--text-sub);
+    line-height: 1.4; margin-bottom: 32px;
+  }
+
+  /* ===== Empathy ===== */
+  .empathy-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter);
+    margin-bottom: 32px;
+  }
+  .empathy-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 4px; padding: 24px;
+  }
+  .empathy-num {
+    font-size: 12px; font-weight: 700; color: var(--primary);
+    letter-spacing: 0.1em; margin-bottom: 12px;
+  }
+  .empathy-title {
+    font-size: 17px; font-weight: 700; color: var(--text);
+    line-height: 1.5; margin-bottom: 12px;
+  }
+  .empathy-card p {
+    font-size: 15px; color: var(--text); line-height: 1.7;
+  }
+  .empathy-closing {
+    background: var(--bg-soft); padding: 24px; border-radius: 4px;
+    color: var(--text); font-size: 15px; line-height: 1.9;
+  }
+  .empathy-closing strong { color: var(--primary); font-weight: 700; }
+
+  /* ===== Solution ===== */
+  .solution-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+  }
+  .solution-steps { list-style: none; }
+  .solution-steps li {
+    display: flex; gap: 16px; padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .solution-steps li:last-child { border-bottom: none; }
+  .step-num {
+    flex-shrink: 0; width: 32px; height: 32px;
+    background: var(--primary); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+  }
+  .step-body h4 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .step-body p { font-size: 14px; color: var(--text-sub); line-height: 1.6; }
+
+  /* ===== Features ===== */
+  .feature-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gutter);
+  }
+  .feature-card {
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 24px; background: #fff;
+  }
+  .feature-tag {
+    font-size: 12px; font-weight: 700; color: var(--text-sub);
+    letter-spacing: 0.1em; margin-bottom: 8px;
+  }
+  .feature-card h4 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .feature-card p { font-size: 14px; color: var(--text-sub); line-height: 1.7; }
+
+  /* ===== Scenes ===== */
+  .scene-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter);
+  }
+  .scene-card {
+    border: 1px solid var(--border); border-radius: 4px;
+    overflow: hidden; background: #fff;
+  }
+  .scene-card .img-slot { aspect-ratio: 16 / 10; border: none; border-bottom: 1px solid var(--border); border-radius: 0; }
+  .scene-body { padding: 20px; }
+  .scene-tag {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    color: var(--primary); letter-spacing: 0.1em; margin-bottom: 8px;
+  }
+  .scene-body h4 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .scene-body p { font-size: 14px; color: var(--text-sub); line-height: 1.7; margin-bottom: 12px; }
+  .scene-steps { font-size: 12px; color: var(--text-sub); padding-top: 12px; border-top: 1px solid var(--border); }
+
+  /* ===== Voice ===== */
+  .voice-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter);
+  }
+  .voice-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 4px; padding: 32px 24px;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+  }
+  .voice-avatar {
+    width: 96px; height: 96px; border-radius: 50%;
+    object-fit: cover; background: var(--bg-soft);
+    margin-bottom: 20px; border: 2px solid var(--primary);
+  }
+  .voice-quote {
+    font-size: 15px; color: var(--text); line-height: 1.8;
+    margin-bottom: 20px; text-align: left;
+  }
+  .voice-meta {
+    border-top: 1px solid var(--border);
+    padding-top: 16px; width: 100%;
+  }
+  .voice-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .voice-role { font-size: 12px; color: var(--text-sub); }
+
+  /* ===== Reassure ===== */
+  .reassure-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter);
+    margin-bottom: 48px;
+  }
+  .reassure-card {
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 24px; background: #fff;
+  }
+  .reassure-tag {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    color: var(--primary); letter-spacing: 0.1em; margin-bottom: 8px;
+  }
+  .reassure-card h4 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .reassure-card p { font-size: 14px; color: var(--text-sub); line-height: 1.7; }
+
+  /* ===== CTA ===== */
+  .cta-block {
+    background: var(--bg-soft); border-radius: 4px;
+    padding: 48px; text-align: center;
+  }
+  .cta-block h3 {
+    font-size: 24px; font-weight: 700; color: var(--text);
+    line-height: 1.5; margin-bottom: 12px;
+  }
+  .cta-block .sub { font-size: 14px; color: var(--text-sub); margin-bottom: 24px; }
+  .cta-perks {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .cta-perks span {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    background: #fff; border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 4px;
+  }
+  .cta-form {
+    display: flex; gap: 8px; max-width: 480px; margin: 0 auto;
+  }
+  .cta-form input {
+    flex: 1; font-size: 16px; padding: 12px 14px;
+    border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); font-family: inherit;
+  }
+  .cta-form input:focus { outline: 2px solid var(--primary); outline-offset: -1px; }
+  .cta-form button {
+    background: var(--primary); color: #fff; border: none;
+    border-radius: 4px; padding: 12px 24px;
+    font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .cta-micro { font-size: 12px; color: var(--text-sub); margin-top: 16px; }
+  .cta-success {
+    margin-top: 16px; color: var(--primary); font-weight: 700; font-size: 14px;
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    padding: 32px 0;
+    color: var(--text); font-size: 13px;
+    text-align: center;
+  }
+  footer .links { margin-bottom: 12px; }
+  footer .links a { margin: 0 12px; color: var(--text); }
+  footer .copy { color: var(--text-sub); }
+
+  @media (max-width: 768px) {
+    :root { --pad-h: 16px; }
+    .hero { padding: 40px 0 32px; }
+    .hero-grid, .solution-grid { grid-template-columns: 1fr; gap: 32px; }
+    .hero h1 { font-size: 24px; }
+    .empathy-grid, .feature-grid, .scene-grid, .reassure-grid, .voice-grid {
+      grid-template-columns: 1fr;
+    }
+    section { padding: 48px 0; }
+    .cta-block { padding: 32px 20px; }
+    .cta-form { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<!-- ===== Header ===== -->
+<header>
+<div class="container header-inner">
+<div class="logo">mitooshi</div>
+<nav class="nav">
+<a class="active" href="#empathy">特徴</a>
+<a href="#solution">使い方</a>
+<a href="#voice">ユーザーの声</a>
+<button class="btn-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">事前登録</button>
+</nav>
+</div>
+</header>
+<!-- ===== Hero ===== -->
+<section class="hero" style="border-top:none;">
+<div class="container hero-grid">
+<div>
+<span class="hero-tag">事前登録 受付中</span>
+<h1>「もう何回言わせるの！」<br/>と<span class="accent">叫ばなくていい朝</span>へ。</h1>
+<p class="lead">テンプレートを選ぶだけで、子どもが自分で次の行動を見つけられる。<br/>声かけに頼らない、新しい毎日の進めかた。</p>
+<div class="hero-cta">
+<button class="btn-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">事前登録する（無料）</button>
+<button class="btn-secondary" onclick="document.getElementById('solution').scrollIntoView({behavior:'smooth'})">使い方を見る</button>
+</div>
+<p class="hero-note">HCD-Net認定専門家監修 / 療育現場の声を反映 / オフライン対応</p>
+</div>
+<!-- 画像枠 1: ヒーロー（子どもが画面をタップしている瞬間のイラスト） -->
+<img alt="フラットなベクターイラスト。白背景。子どもがスマートフォンの大きな絵カードを指でタップしている瞬間。子どもは抽象化された丸みのある人物。スマホ画面には朝の支度のステップカード（着替え・歯磨き・ごはん）が並ぶ。ミントグリーン(#00B894)と青(#0073cc)とソフトピンクを差し色。周囲にチェックマーク・星・吹き出しのアイコンが軽やかに浮遊。線は使わずシンプルなシェイプのみ、明るく親しみやすいトーン。アイソメトリック寄りの構図" class="img-slot-generated" src="../doc/lp_assets/lp_image_01.png" style="width:100%; border-radius:inherit; display:block;"/>
+</div>
+</section>
+<!-- ===== Section 2: Empathy ===== -->
+<section id="empathy">
+<div class="container">
+<div class="section-label">EMPATHY</div>
+<h2 class="section-title">こんな毎日、ありませんか？</h2>
+<div class="empathy-grid">
+<div class="empathy-card">
+<div class="empathy-num">01</div>
+<h3 class="empathy-title">怒鳴った朝の罪悪感</h3>
+<p>「もう何回言わせるの！」朝から怒鳴ってしまった自分に、出勤途中の電車でひとり落ち込む。</p>
+</div>
+<div class="empathy-card">
+<div class="empathy-num">02</div>
+<h3 class="empathy-title">命令と急かしの連続</h3>
+<p>時計の針がすすむほど、声が大きくなる。「早くして」「あと5分」気づけば、命令と急かしの連続。</p>
+</div>
+<div class="empathy-card">
+<div class="empathy-num">03</div>
+<h3 class="empathy-title">続かないグッズたち</h3>
+<p>絵カードもタイマーも、続かなかった。試したものは全部、引き出しの奥で眠っている。</p>
+</div>
+</div>
+<div class="empathy-closing">
+      叱りたくて叱っているわけじゃない。本当は、もっと優しくしたい。<br/>
+      それは、あなたの愛情が足りないからではありません。<br/>
+      お子さんが <strong>「次に何をすればいいか」</strong> を、目で見て確かめられないからです。
+    </div>
+</div>
+</section>
+<!-- ===== Section 3: Solution ===== -->
+<section id="solution">
+<div class="container">
+<div class="section-label">SOLUTION</div>
+<h2 class="section-title">「つぎ」が見えると、子どもは自分で動ける</h2>
+<div class="solution-grid">
+<ul class="solution-steps">
+<li>
+<div class="step-num">1</div>
+<div class="step-body">
+<h4>えらぶ</h4>
+<p>「あさのしたく」「おでかけ」など、テンプレートをタップ。</p>
+</div>
+</li>
+<li>
+<div class="step-num">2</div>
+<div class="step-body">
+<h4>ととのえる</h4>
+<p>ステップの順番を指でならべ替え。30秒で完成します。</p>
+</div>
+</li>
+<li>
+<div class="step-num">3</div>
+<div class="step-body">
+<h4>わたす</h4>
+<p>お子さんに画面を渡すだけ。子ども自身がカードをめくります。</p>
+</div>
+</li>
+</ul>
+<!-- 画像枠 2: 操作フロー（保護者画面 → 子ども画面の遷移） -->
+<img alt="フラットなベクターイラスト。白背景。2台のスマートフォンがアイソメトリックに並ぶ。左のスマホには保護者用の編集画面（ステップカードを指で並べ替えている様子）、右のスマホには子ども用の実行画面（大きな絵カードが1枚表示）。両者の間に矢印やキラキラのアクセント。ミントグリーン(#00B894)と青(#0073cc)とソフトピンクを差し色。周囲にカード・チェックマーク・吹き出しのアイコンが軽やかに浮遊。線は使わずシンプルなシェイプのみ、明るく親しみやすいトーン" class="img-slot-generated" src="../doc/lp_assets/lp_image_02.png" style="width:100%; border-radius:inherit; display:block;"/>
+</div>
+</div>
+</section>
+<!-- ===== Section 4: Features ===== -->
+<section>
+<div class="container">
+<div class="section-label">FEATURES</div>
+<h2 class="section-title">続かなかった理由を、ぜんぶなくしました</h2>
+<div class="feature-grid">
+<div class="feature-card">
+<div class="feature-tag">FEATURE 01</div>
+<h4>30秒で完成</h4>
+<p>テンプレを選ぶだけで、そのまま使えます。準備の手間ゼロ。疲れている朝でも続けられます。</p>
+</div>
+<div class="feature-card">
+<div class="feature-tag">FEATURE 02</div>
+<h4>外出先で組み換え自由</h4>
+<p>急な予定変更にも、その場で対応。お店で「もうかえる！」となっても、サッと並べ替えられます。</p>
+</div>
+<div class="feature-card">
+<div class="feature-tag">FEATURE 03</div>
+<h4>子どもが自分で操作</h4>
+<p>タップとスワイプだけ。文字が読めなくてもOK。お子さんが主人公として進めます。</p>
+</div>
+<div class="feature-card">
+<div class="feature-tag">FEATURE 04</div>
+<h4>オフラインでも動く</h4>
+<p>電波がない場所でも安心して使えます。お出かけ先や移動中でも、いつも頼れる味方に。</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ===== Section 5: Scenes ===== -->
+<section>
+<div class="container">
+<div class="section-label">USE CASES</div>
+<h2 class="section-title">一日のいろんな場面で</h2>
+<div class="scene-grid">
+<div class="scene-card">
+<img alt="フラットなベクターイラスト。白背景。朝の支度をする親子のシーン：パジャマから着替えてランドセルを背負う子どもと、笑顔で見守る親。ミントグリーン(#00B894)と青(#0073cc)とソフトピンクを差し色にした、抽象化された丸みのある人物。周囲に時計・歯ブラシ・ごはん茶碗・くつのアイコンが軽やかに浮遊。線は使わずシンプルなシェイプのみ、明るく親しみやすいトーン。アイソメトリック寄りの構図" class="img-slot-generated" src="../doc/lp_assets/lp_image_03.png" style="width:100%; border-radius:inherit; display:block;"/>
+<div class="scene-body">
+<span class="scene-tag">MORNING</span>
+<h4>あさ</h4>
+<p>声かけなしで、リズムに乗って準備が進みます。</p>
+<div class="scene-steps">おきる → きがえ → ごはん → はみがき → いってきます</div>
+</div>
+</div>
+<div class="scene-card">
+<img alt="フラットなベクターイラスト。白背景。お店でショッピングカートを押す親子のシーン：子どもがカートに掴まり、親がスマホを持って予定を見せている。ミントグリーン(#00B894)と青(#0073cc)とソフトピンクを差し色にした抽象化された人物。周囲に商品・コイン・買い物袋・レジのアイコンが軽やかに浮遊。線は使わずシンプルなシェイプのみ、明るく親しみやすいトーン。アイソメトリック寄りの構図" class="img-slot-generated" src="../doc/lp_assets/lp_image_04.png" style="width:100%; border-radius:inherit; display:block;"/>
+<div class="scene-body">
+<span class="scene-tag">OUTDOOR</span>
+<h4>おでかけ先</h4>
+<p>その場で予定を組み替えて、画面で見せられます。</p>
+<div class="scene-steps">おみせにはいる → かいもの → レジ → おうちにかえる</div>
+</div>
+</div>
+<div class="scene-card">
+<img alt="フラットなベクターイラスト。白背景。寝る前の親子のシーン：パジャマ姿の子どもと、ベッドサイドで絵本を読む親。ミントグリーン(#00B894)と青(#0073cc)とソフトピンクを差し色にした抽象化された丸みのある人物。周囲に月・星・絵本・歯ブラシ・コップのアイコンが軽やかに浮遊。線は使わずシンプルなシェイプのみ、温かく落ち着いたトーン。アイソメトリック寄りの構図" class="img-slot-generated" src="../doc/lp_assets/lp_image_05.png" style="width:100%; border-radius:inherit; display:block;"/>
+<div class="scene-body">
+<span class="scene-tag">NIGHT</span>
+<h4>ねるまえ</h4>
+<p>ぐずりがちな夜のルーティンが、すんなり進みます。</p>
+<div class="scene-steps">おふろ → パジャマ → えほん → おやすみ</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ===== Section: ユーザーの声 ===== -->
+<section id="voice" style="background:#fafafa;">
+<div class="container">
+<div class="section-label">VOICE</div>
+<h2 class="section-title">ユーザーの声</h2>
+<div class="voice-grid">
+<div class="voice-card">
+<img class="voice-avatar" src="../doc/lp_assets/voice_01.png" alt="Aさん" />
+<p class="voice-quote">「毎朝『はやく！』の連呼でヘトヘトでした。mitooshiを渡したら、娘が自分でカードをめくって支度してくれて、涙が出ました。」</p>
+<div class="voice-meta">
+<div class="voice-name">Aさん（5歳女の子のママ）</div>
+<div class="voice-role">会社員 / 東京都</div>
+</div>
+</div>
+<div class="voice-card">
+<img class="voice-avatar" src="../doc/lp_assets/voice_02.png" alt="Bさん" />
+<p class="voice-quote">「絵カードを作っても続きませんでした。mitooshiはテンプレを選ぶだけ。準備がゼロなので、本当に続けられています。」</p>
+<div class="voice-meta">
+<div class="voice-name">Bさん（7歳男の子のパパ）</div>
+<div class="voice-role">自営業 / 神奈川県</div>
+</div>
+</div>
+<div class="voice-card">
+<img class="voice-avatar" src="../doc/lp_assets/voice_03.png" alt="Cさん" />
+<p class="voice-quote">「外出先で予定が変わるとパニックになる子でした。その場で並べ替えて見せられるので、お出かけが怖くなくなりました。」</p>
+<div class="voice-meta">
+<div class="voice-name">Cさん（6歳女の子のママ）</div>
+<div class="voice-role">パート / 大阪府</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ===== Section 6: Reassure + CTA ===== -->
+<section id="cta">
+<div class="container">
+<div class="section-label">TRUST &amp; SIGN UP</div>
+<h2 class="section-title">安心して、はじめられます</h2>
+<div class="reassure-grid">
+<div class="reassure-card">
+<span class="reassure-tag">PRIVACY</span>
+<h4>プライバシー</h4>
+<p>お子さんの情報は最小限。写真も名前も登録不要です。</p>
+</div>
+<div class="reassure-card">
+<span class="reassure-tag">FREE</span>
+<h4>無料で使える</h4>
+<p>基本のテンプレートはずっと無料。有料は必要な方だけ。</p>
+</div>
+<div class="reassure-card">
+<span class="reassure-tag">EXPERT</span>
+<h4>専門家の知見</h4>
+<p>HCD-Net認定の人間中心設計専門家が、お子さんの特性に合わせて監修。</p>
+</div>
+</div>
+<div class="cta-block">
+<h3>もうすぐリリース。<br/>まずは事前登録から</h3>
+<p class="sub">登録した方には、リリース時に最速でお知らせします</p>
+<div class="cta-perks">
+<span>リリース時に最速通知</span>
+<span>先行アクセス権</span>
+<span>限定テンプレート</span>
+</div>
+<form class="cta-form" id="signup-form">
+<input id="email-input" placeholder="メールアドレスを入力" required="" type="email"/>
+<button type="submit">事前登録する</button>
+</form>
+<p class="cta-micro">配信停止はいつでもできます / メールアドレス以外の情報は取得しません</p>
+<p class="cta-success" id="cta-success" style="display:none;"></p>
+</div>
+</div>
+</section>
+<footer>
+<div class="container">
+<div class="links">
+<a href="#">利用規約</a>
+<a href="#">プライバシーポリシー</a>
+<a href="#">お問い合わせ</a>
+</div>
+<div class="copy">© 2026 株式会社HuX</div>
+</div>
+</footer>
+<script>
+  document.getElementById('signup-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var email = document.getElementById('email-input').value;
+    var success = document.getElementById('cta-success');
+    success.textContent = email + ' を登録しました。リリース時にお知らせします。';
+    success.style.display = 'block';
+    document.getElementById('email-input').value = '';
+  });
+</script>
+</body>
+</html>

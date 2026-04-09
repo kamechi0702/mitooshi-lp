@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mitooshi — サービスコンセプト 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #FAFBFC;
+    color: #1a1a2e;
+    line-height: 1.8;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 80px 40px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    animation: float 8s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, -20px); }
+  }
+  .hero h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    position: relative;
+    z-index: 1;
+  }
+  .hero .tagline {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-top: 16px;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+  }
+  .hero .version {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== CONTAINER ===== */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ===== SECTION ===== */
+  section {
+    padding: 60px 0;
+  }
+  section + section {
+    border-top: 1px solid #e8e8f0;
+  }
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #667eea;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.4;
+  }
+  .section-desc {
+    font-size: 1.05rem;
+    color: #555;
+    max-width: 800px;
+    margin-bottom: 40px;
+  }
+
+  /* ===== ONE-LINER ===== */
+  .one-liner {
+    background: #fff;
+    border-radius: 16px;
+    padding: 48px;
+    margin: -40px auto 0;
+    max-width: 900px;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 8px 32px rgba(102,126,234,0.12);
+    text-align: center;
+  }
+  .one-liner .label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #667eea;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+  .one-liner h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.6;
+    color: #1a1a2e;
+  }
+  .one-liner h2 em {
+    font-style: normal;
+    background: linear-gradient(transparent 60%, rgba(102,126,234,0.2) 60%);
+  }
+
+  /* ===== PERSONA ===== */
+  .persona-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .persona-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .persona-card .icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+  }
+  .persona-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .persona-card .attr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .persona-card .attr span {
+    background: #f0f0ff;
+    color: #667eea;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  .persona-card p {
+    color: #666;
+    font-size: 0.95rem;
+  }
+
+  /* ===== PAIN POINTS ===== */
+  .pain-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .pain-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border-left: 4px solid #ff6b6b;
+  }
+  .pain-card h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #d63031;
+  }
+  .pain-card p {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  /* ===== SOLUTION ===== */
+  .solution-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .solution-step {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    text-align: center;
+    position: relative;
+  }
+  .solution-step::after {
+    content: '→';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: #667eea;
+    font-weight: 700;
+    z-index: 1;
+  }
+  .solution-step:last-child::after { display: none; }
+  .solution-step .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .solution-step h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .solution-step p {
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  /* ===== FEATURES ===== */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .feature-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .feature-card .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .badge-mvp { background: #e0f5e9; color: #00b894; }
+  .badge-v2 { background: #fff3e0; color: #e17055; }
+  .feature-card h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .feature-card p {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  /* ===== COMPETITIVE ===== */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .comp-table thead { background: #f8f8ff; }
+  .comp-table th, .comp-table td {
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f0f0f5;
+  }
+  .comp-table th {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+  .comp-table td:first-child { font-weight: 600; }
+  .check { color: #00b894; font-weight: 700; }
+  .cross { color: #ccc; }
+  .highlight-row { background: #f5f3ff; }
+  .highlight-row td:first-child { color: #667eea; }
+
+  /* ===== BUSINESS MODEL ===== */
+  .biz-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .biz-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .biz-card .phase {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #667eea;
+    margin-bottom: 8px;
+  }
+  .biz-card h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .biz-card ul {
+    list-style: none;
+    padding: 0;
+  }
+  .biz-card ul li {
+    padding: 6px 0;
+    font-size: 0.9rem;
+    color: #555;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .biz-card ul li:last-child { border-bottom: none; }
+  .biz-card ul li::before {
+    content: '●';
+    color: #667eea;
+    font-size: 0.6rem;
+    margin-right: 8px;
+  }
+
+  /* ===== SCENE CARDS ===== */
+  .scene-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .scene-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    text-align: center;
+  }
+  .scene-card .emoji {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+  .scene-card h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #1a1a2e;
+  }
+  .scene-card .flow {
+    background: #f8f8ff;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #667eea;
+    letter-spacing: 0.05em;
+  }
+  .scene-card .psychology {
+    font-size: 0.75rem;
+    color: #999;
+    line-height: 1.6;
+  }
+
+  /* ===== UX PRINCIPLES ===== */
+  .ux-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .ux-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .ux-card .ux-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+  .ux-card h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .ux-card p {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 2rem; }
+    .persona-grid, .pain-grid, .feature-grid, .biz-grid, .ux-grid { grid-template-columns: 1fr; }
+    .template-grid { grid-template-columns: 1fr 1fr; }
+    .solution-flow { flex-direction: column; }
+    .solution-step::after { display: none; }
+    .one-liner { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>mitooshi</h1>
+  <p class="tagline">「つぎ、なにする？」がひと目でわかる見通しボードアプリ</p>
+  <span class="version">サービスコンセプト — 2026.04</span>
+</div>
+
+<!-- ONE-LINER -->
+<div class="container">
+  <div class="one-liner">
+    <div class="label">ONE-LINE CONCEPT</div>
+    <h2>
+      文字が読めない・指示が伝わりにくい子どもと保護者が、<br>
+      <em>みとおしカードで「いま・つぎ・ゴール」を整えるだけ</em>で<br>
+      外出先でも家の中でも<em>子ども自身が見通しを持てる</em><br>
+      体験設計されたアプリ
+    </h2>
+  </div>
+</div>
+
+<!-- PERSONA -->
+<div class="container">
+  <section>
+    <div class="section-label">Persona</div>
+    <div class="section-title">誰のためのサービスか</div>
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="icon">👧</div>
+        <h3>メインユーザー：子ども</h3>
+        <div class="attr">
+          <span>3歳〜小学校低学年</span>
+          <span>文字が読めない</span>
+          <span>指示が伝わりにくい</span>
+        </div>
+        <p>文字が読めず、言葉での指示も通りにくい。「次に何をするか」が分からないと不安になり、切り替えができない。イラストや絵で見せれば理解でき、見通しが持てれば自分から動ける力は持っている。</p>
+      </div>
+      <div class="persona-card">
+        <div class="icon">👩</div>
+        <h3>実質的な操作者：保護者</h3>
+        <div class="attr">
+          <span>30〜40代</span>
+          <span>母親が中心</span>
+          <span>共働き多数</span>
+        </div>
+        <p>毎日の生活導線で「早くして」「次これだよ」と声かけを繰り返し、疲弊している。絵カードの準備や持ち運びは続かなかった。スマホで完結するなら使いたい。</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- PAIN POINTS -->
+<div class="container">
+  <section>
+    <div class="section-label">Pain Points</div>
+    <div class="section-title">保護者が抱える3つの課題</div>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <h4>言葉も文字も伝わらない</h4>
+        <p>「次はこれだよ」と口で言っても、文字で書いても伝わらない。言語での指示だけでは子どもの頭に入らず、毎回パニックや癇癪につながる。視覚的に「見て分かる」手段が必要。</p>
+      </div>
+      <div class="pain-card">
+        <h4>準備が面倒すぎる</h4>
+        <p>絵カードは印刷・ラミネート・マジックテープ貼り。外出先に持ち出すにはボードごと持ち歩く必要がある。結局「今日はいいか」と使わなくなる。</p>
+      </div>
+      <div class="pain-card">
+        <h4>子どもが見たがらない</h4>
+        <p>紙のカードも既存アプリも、見た目が地味で単調。最初は物珍しさで見てくれるが、2週間で興味を失う。子どもが「自分から見たい」と思えるような魅力的なビジュアルがない。</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- SOLUTION -->
+<div class="container">
+  <section>
+    <div class="section-label">Solution</div>
+    <div class="section-title">mitooshiの解決アプローチ</div>
+    <div class="section-desc">シーンを選んで、子どもの「いま・つぎ・ゴール」を並べるだけ。文字を使わず、魅力的なイラストだけで見通しが伝わる。</div>
+
+    <div class="solution-flow">
+      <div class="solution-step">
+        <div class="step-num">1</div>
+        <h4>シーンをえらぶ</h4>
+        <p>「おかいもの」「びょういん」「あさのしたく」など、みとおしカードから今のシーンをタップ</p>
+      </div>
+      <div class="solution-step">
+        <div class="step-num">2</div>
+        <h4>いま・つぎ・ゴールの3枚を確認</h4>
+        <p>子どもの心理の流れに沿った「いま・つぎ・ゴール」の3枚構成を確認。保護者はカードの追加・入れ替え・順番変更が自由</p>
+      </div>
+      <div class="solution-step">
+        <div class="step-num">3</div>
+        <h4>子どもに見せる</h4>
+        <p>大きなイラストカードが1枚ずつ表示。文字なし、絵だけで伝わるUI。ゴールの絵が常に小さく見えている</p>
+      </div>
+      <div class="solution-step">
+        <div class="step-num">4</div>
+        <h4>子どもが進める</h4>
+        <p>カード完了で子ども自身がスワイプ。達成演出が流れ、次のカードが現れる。自分で見通しを進める体験</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- SCENE CARDS -->
+<div class="container">
+  <section>
+    <div class="section-label">Scene Cards</div>
+    <div class="section-title">みとおしカード — シーンごとの体験設計</div>
+    <div class="section-desc">子どもが見るのは「いま・つぎ・ゴール」の3枚。手順リストではなく、子どもの心理が自然に流れる構造で設計。</div>
+
+    <div class="scene-grid">
+      <div class="scene-card">
+        <div class="emoji">🌅</div>
+        <h4>あさのしたく</h4>
+        <div class="flow">おきる → きがえ → いってきます！</div>
+        <div class="psychology">ねむい → うごく → できた！</div>
+      </div>
+      <div class="scene-card">
+        <div class="emoji">🏥</div>
+        <h4>びょういん</h4>
+        <div class="flow">くるまにのる → せんせいとおはなし → ごほうび！</div>
+        <div class="psychology">ドキドキ → がんばる → やった！</div>
+      </div>
+      <div class="scene-card">
+        <div class="emoji">🛒</div>
+        <h4>おかいもの</h4>
+        <div class="flow">カートをおす → レジにならぶ → おかしえらぶ！</div>
+        <div class="psychology">つまんない → もうすこし → うれしい！</div>
+      </div>
+      <div class="scene-card">
+        <div class="emoji">🌙</div>
+        <h4>おふろ〜ねる</h4>
+        <div class="flow">おふろはいる → パジャマきる → えほんよむ！</div>
+        <div class="psychology">あったかい → さっぱり → しあわせ</div>
+      </div>
+      <div class="scene-card">
+        <div class="emoji">🚃</div>
+        <h4>でんしゃでおでかけ</h4>
+        <div class="flow">えきにいく → でんしゃにのる → ついた！</div>
+        <div class="psychology">ワクワク → がまん → たのしい！</div>
+      </div>
+      <div class="scene-card">
+        <div class="emoji">🍽️</div>
+        <h4>レストラン</h4>
+        <div class="flow">すわる → たべる → ごちそうさま！</div>
+        <div class="psychology">おなかすいた → おいしい → まんぞく</div>
+      </div>
+      <div class="scene-card">
+        <div class="emoji">✂️</div>
+        <h4>びようしつ</h4>
+        <div class="flow">すわる → ちょきちょき → かっこいい！</div>
+        <div class="psychology">ドキドキ → がまん → うれしい！</div>
+      </div>
+      <div class="scene-card">
+        <div class="emoji">📚</div>
+        <h4>おべんきょう</h4>
+        <div class="flow">じゅんび → がんばる → おわり！</div>
+        <div class="psychology">めんどう → しゅうちゅう → できた！</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- KEY FEATURES -->
+<div class="container">
+  <section>
+    <div class="section-label">Key Features</div>
+    <div class="section-title">核となる機能</div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="badge badge-mvp">MVP</span>
+        <h4>みとおしカード＋自由編集</h4>
+        <p>シーンごとのみとおしカードを選んで、「いま・つぎ・ゴール」の構成を確認。カードの追加・入れ替え・順番変更は保護者画面で自由自在。</p>
+      </div>
+      <div class="feature-card">
+        <span class="badge badge-mvp">MVP</span>
+        <h4>魅力的なイラストカード＋飽き対策</h4>
+        <p>文字が読めない子どもでもひと目で分かる、大きくて魅力的なイラストカード。同じシーンでもイラストが日替わり・季節替わりで変化。操作や達成演出もバリエーション豊富で、「今日はどんな絵かな？」が見る動機になる。</p>
+      </div>
+      <div class="feature-card">
+        <span class="badge badge-mvp">MVP</span>
+        <h4>子どもがスワイプで進める</h4>
+        <p>ステップ完了時に子ども自身がスワイプして次へ。「自分で進めている」感覚が見通し力の内在化を促す。受動的に見るだけでなく能動的に操作する体験。</p>
+      </div>
+      <div class="feature-card">
+        <span class="badge badge-mvp">MVP</span>
+        <h4>達成演出</h4>
+        <p>ステップ完了ごとにアニメーション。全完了時には大きな演出。バリエーションを定期更新することで「飽き」を防ぐ。</p>
+      </div>
+      <div class="feature-card">
+        <span class="badge badge-mvp">MVP</span>
+        <h4>いまからボタン — 咄嗟の1枚</h4>
+        <p>外出先で突然の予定変更。「いまから」ボタンで、「ならぶ」「まつ」「くるまにのる」などのカードを1枚だけ即座に表示。フルのボードを組まなくても、0秒で1枚、5秒で2〜3枚。</p>
+      </div>
+      <div class="feature-card">
+        <span class="badge badge-mvp">MVP</span>
+        <h4>おちつくモード — パニック対応</h4>
+        <p>子どものパニック時にワンタップ。ゴールの絵や子どもの好きなものの絵を画面いっぱいに表示。情報量を最小にし、視覚に訴えて安心感を届ける。事前に「おちつく1枚」を登録しておける。</p>
+      </div>
+      <div class="feature-card">
+        <span class="badge badge-v2">v2</span>
+        <h4>AI自動生成</h4>
+        <p>「これから歯医者」と入力するだけで、子どものプロフィールに合わせた見通しボードをAIが自動生成。みとおしカードの先の体験。</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- UX PRINCIPLES -->
+<div class="container">
+  <section>
+    <div class="section-label">UX Principles</div>
+    <div class="section-title">体験設計の4原則</div>
+
+    <div class="ux-grid">
+      <div class="ux-card">
+        <div class="ux-icon">⚡</div>
+        <div>
+          <h4>30秒で完成</h4>
+          <p>シーン選択→微調整→完了。外出先で「今すぐ」使える速さ。準備の面倒さが使わなくなる最大の原因だから、ここを極限まで削る。文字入力は不要。</p>
+        </div>
+      </div>
+      <div class="ux-card">
+        <div class="ux-icon">👆</div>
+        <div>
+          <h4>子どもが主役</h4>
+          <p>親が見せるのではなく、子ども自身がスワイプして進める。操作する体験が「指示される」から「自分でやる」への転換を生む。</p>
+        </div>
+      </div>
+      <div class="ux-card">
+        <div class="ux-icon">🔄</div>
+        <div>
+          <h4>飽きない工夫</h4>
+          <p>イラストの日替わり・季節替わり、操作バリエーション、ランダムな達成演出。子どもが「今日はどんなかな？」と自分から見たくなる仕掛けを随所に。</p>
+        </div>
+      </div>
+      <div class="ux-card">
+        <div class="ux-icon">🎯</div>
+        <div>
+          <h4>イラストで伝わる、文字に頼らない</h4>
+          <p>子ども向け画面には文字を一切使わない。魅力的なイラストだけで「次にやること」を伝える。文字が読めない子でも、絵を見れば何をすべきか直感的に分かるUI設計。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- COMPETITIVE -->
+<div class="container">
+  <section>
+    <div class="section-label">Competitive Landscape</div>
+    <div class="section-title">競合比較</div>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>サービス</th>
+          <th>シーンカード</th>
+          <th>リアルタイム編集</th>
+          <th>子どもの操作</th>
+          <th>イラスト品質</th>
+          <th>達成演出</th>
+          <th>外出対応</th>
+          <th>日本語</th>
+          <th>価格帯</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row">
+          <td>mitooshi</td>
+          <td class="check">◎</td>
+          <td class="check">◎</td>
+          <td class="check">◎</td>
+          <td class="check">◎</td>
+          <td class="check">◎</td>
+          <td class="check">◎</td>
+          <td class="check">◎</td>
+          <td>月480〜980円</td>
+        </tr>
+        <tr>
+          <td>LITALICO やることカード</td>
+          <td class="check">○</td>
+          <td class="cross">△</td>
+          <td class="check">○</td>
+          <td class="cross">△</td>
+          <td class="check">○</td>
+          <td class="cross">△</td>
+          <td class="check">◎</td>
+          <td>無料</td>
+        </tr>
+        <tr>
+          <td>Lil Planner</td>
+          <td class="check">○</td>
+          <td class="cross">△</td>
+          <td class="check">○</td>
+          <td class="check">○</td>
+          <td class="check">◎</td>
+          <td class="cross">△</td>
+          <td class="cross">×</td>
+          <td>無料〜</td>
+        </tr>
+        <tr>
+          <td>Goally</td>
+          <td class="check">◎</td>
+          <td class="check">○</td>
+          <td class="check">○</td>
+          <td class="check">○</td>
+          <td class="check">◎</td>
+          <td class="check">○</td>
+          <td class="cross">×</td>
+          <td>$189+月額</td>
+        </tr>
+        <tr>
+          <td>コバリテ</td>
+          <td class="cross">×</td>
+          <td class="cross">×</td>
+          <td class="cross">△</td>
+          <td class="cross">△</td>
+          <td class="cross">×</td>
+          <td class="cross">×</td>
+          <td class="check">◎</td>
+          <td>4,950円〜</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<!-- BUSINESS MODEL -->
+<div class="container">
+  <section>
+    <div class="section-label">Business Model</div>
+    <div class="section-title">マネタイズ設計</div>
+
+    <div class="biz-grid">
+      <div class="biz-card">
+        <div class="phase">PHASE 1 — to C</div>
+        <h4>ユーザー課金（フリーミアム）</h4>
+        <ul>
+          <li>無料プラン：みとおしカード3シーン、ボード1枚、基本イラスト</li>
+          <li>月額480円：全シーン解放、ボード無制限、カスタムステップ、全イラスト解放</li>
+          <li>月額980円：家族共有（最大3端末）、達成履歴・レポート、プレミアム演出</li>
+          <li>無料で「使える」→ 日常で手放せなくなる → 有料でフル機能解放</li>
+        </ul>
+      </div>
+      <div class="biz-card">
+        <div class="phase">PHASE 2 — to B</div>
+        <h4>事業所向けプラン</h4>
+        <ul>
+          <li>放課後等デイサービス・児童発達支援事業所向け</li>
+          <li>複数児童のボード管理、スタッフ間共有機能</li>
+          <li>利用履歴の記録 → 個別支援計画の根拠データに活用</li>
+          <li>事業所単位の月額課金（施設あたり3,000〜5,000円/月）</li>
+          <li>家庭と事業所の見通しボード連携（保護者↔支援者）</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- DIFFERENTIATION -->
+<div class="container">
+  <section>
+    <div class="section-label">Why Mitooshi</div>
+    <div class="section-title">mitooshiが選ばれる理由</div>
+
+    <div class="pain-grid">
+      <div class="pain-card" style="border-left-color: #667eea;">
+        <h4 style="color: #667eea;">日本の生活シーンに最適化</h4>
+        <p>海外アプリ（Goally、Lil Planner）は英語圏の生活文脈で設計されている。mitooshiは日本の生活シーン（お風呂→歯磨き→パジャマの順序、靴を脱ぐ文化、日本の病院の流れ）に合わせたみとおしカードとイラストを提供。</p>
+      </div>
+      <div class="pain-card" style="border-left-color: #667eea;">
+        <h4 style="color: #667eea;">「いま・つぎ・ゴール」の3枚設計</h4>
+        <p>既存アプリは大人目線の手順リストを子どもに見せるだけ。mitooshiは子どもの心理の流れに沿った「いま・つぎ・ゴール」の3枚構造。情報量を絞り、ゴールを常に見せることで、子ども自身が見通しを持てる体験を実現。</p>
+      </div>
+      <div class="pain-card" style="border-left-color: #667eea;">
+        <h4 style="color: #667eea;">現場で即座に使える柔軟性</h4>
+        <p>スーパーのレジで急に並ぶことになった。電車が遅延した。外出先のイレギュラーに対して、その場でボードを組み換えられる柔軟性が最大の武器。事前準備に依存しない。</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>mitooshi サービスコンセプト — 2026年4月 | Confidential</p>
+</footer>
+
+</body>
+</html>
