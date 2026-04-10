@@ -70,7 +70,9 @@
     border: none; border-radius: 4px;
     padding: 10px 20px; font-size: 14px; font-weight: 700;
     cursor: pointer; font-family: inherit;
+    display: inline-block; text-decoration: none;
   }
+  a.btn-cta { color: #fff; }
   .btn-cta:hover { opacity: 0.9; }
   .btn-secondary {
     background: #fff; color: var(--text);
@@ -324,7 +326,7 @@
 <a class="active" href="#empathy">特徴</a>
 <a href="#solution">使い方</a>
 <a href="#voice">ユーザーの声</a>
-<button class="btn-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">事前登録</button>
+<a class="btn-cta" href="https://docs.google.com/forms/d/e/1FAIpQLSd5kD5_qLoBzW4q4xREZdZ_XwAhJ4y9lHJf7OFQ32bT97XigQ/viewform?usp=publish-editor" target="_blank" rel="noopener">事前登録</a>
 </nav>
 </div>
 </header>
@@ -336,7 +338,7 @@
 <h1>「もう何回言わせるの！」<br/>と<span class="accent">叫ばなくていい朝</span>へ。</h1>
 <p class="lead">テンプレートを選ぶだけで、子どもが自分で次の行動を見つけられる。<br/>声かけに頼らない、新しい毎日の進めかた。</p>
 <div class="hero-cta">
-<button class="btn-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">事前登録する（無料）</button>
+<a class="btn-cta" href="https://docs.google.com/forms/d/e/1FAIpQLSd5kD5_qLoBzW4q4xREZdZ_XwAhJ4y9lHJf7OFQ32bT97XigQ/viewform?usp=publish-editor" target="_blank" rel="noopener">事前登録する（無料）</a>
 <button class="btn-secondary" onclick="document.getElementById('solution').scrollIntoView({behavior:'smooth'})">使い方を見る</button>
 </div>
 <p class="hero-note">HCD-Net認定専門家監修 / 療育現場の声を反映 / オフライン対応</p>
@@ -536,16 +538,10 @@
 <span>先行アクセス権</span>
 <span>限定テンプレート</span>
 </div>
-<form class="cta-form" id="signup-form">
-<input id="email-input" placeholder="メールアドレスを入力" required="" type="email"/>
-<button id="signup-submit" type="submit" disabled>事前登録する</button>
-</form>
-<label class="cta-consent">
-<input id="consent-check" type="checkbox"/>
-<span><a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>に同意の上、登録します</span>
-</label>
-<p class="cta-micro">配信停止はいつでもできます / メールアドレス以外の情報は取得しません</p>
-<p class="cta-success" id="cta-success" style="display:none;"></p>
+<div style="text-align:center;">
+<a class="btn-cta" style="display:inline-block;padding:16px 40px;font-size:16px;" href="https://docs.google.com/forms/d/e/1FAIpQLSd5kD5_qLoBzW4q4xREZdZ_XwAhJ4y9lHJf7OFQ32bT97XigQ/viewform?usp=publish-editor" target="_blank" rel="noopener">事前登録する（無料）</a>
+</div>
+<p class="cta-micro">登録フォームは別タブで開きます / <a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>をご確認の上ご登録ください</p>
 </div>
 </div>
 </section>
@@ -558,30 +554,5 @@
 <div class="copy">© 2026 株式会社HuX</div>
 </div>
 </footer>
-<script>
-  // 同意チェックでボタン活性化
-  var consent = document.getElementById('consent-check');
-  var submitBtn = document.getElementById('signup-submit');
-  consent.addEventListener('change', function(){
-    submitBtn.disabled = !consent.checked;
-  });
-
-  // 事前登録フォーム送信
-  document.getElementById('signup-form').addEventListener('submit', function(e){
-    e.preventDefault();
-    if (!consent.checked) return;
-    var email = document.getElementById('email-input').value;
-    var success = document.getElementById('cta-success');
-    // mailto: で運用側に通知（静的サイトのため）。Formspree等に切替可能
-    var subject = encodeURIComponent('[mitooshi] 事前登録');
-    var body = encodeURIComponent('事前登録を希望します。\nメールアドレス: ' + email);
-    window.location.href = 'mailto:info@hux.co.jp?subject=' + subject + '&body=' + body;
-    success.textContent = 'ご登録ありがとうございます。メーラーが起動しますので、そのまま送信してください。';
-    success.style.display = 'block';
-    document.getElementById('email-input').value = '';
-    consent.checked = false;
-    submitBtn.disabled = true;
-  });
-</script>
 </body>
 </html>
