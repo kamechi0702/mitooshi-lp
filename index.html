@@ -5,6 +5,22 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>mitooshi — 「もう何回言わせるの！」と叫ばなくていい朝へ</title>
+<meta name="description" content="見通しが、こどもを安心させる。文字が読めない子どもにも「つぎ」が伝わる、見通しボードアプリ mitooshi。"/>
+<!-- Open Graph -->
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://mitooshi.jp/"/>
+<meta property="og:title" content="mitooshi — 見通しが、こどもを安心させる。"/>
+<meta property="og:description" content="文字が読めない子どもにも「つぎ」が伝わる、見通しボードアプリ。声かけに頼らない新しい毎日の進めかたを。"/>
+<meta property="og:image" content="https://mitooshi.jp/assets/ogp.png"/>
+<meta property="og:image:width" content="2752"/>
+<meta property="og:image:height" content="1536"/>
+<meta property="og:site_name" content="mitooshi"/>
+<meta property="og:locale" content="ja_JP"/>
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="mitooshi — 見通しが、こどもを安心させる。"/>
+<meta name="twitter:description" content="文字が読めない子どもにも「つぎ」が伝わる、見通しボードアプリ。"/>
+<meta name="twitter:image" content="https://mitooshi.jp/assets/ogp.png"/>
 <style>
   /* ===== Design tokens ===== */
   :root {
@@ -260,6 +276,17 @@
     font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
   }
   .cta-micro { font-size: 12px; color: var(--text-sub); margin-top: 16px; }
+  .cta-consent {
+    display: flex; align-items: flex-start; gap: 8px;
+    max-width: 480px; margin: 12px auto 0;
+    font-size: 12px; color: var(--text-sub); text-align: left;
+  }
+  .cta-consent input[type="checkbox"] {
+    margin-top: 2px; accent-color: var(--primary);
+    width: 16px; height: 16px; cursor: pointer;
+  }
+  .cta-consent a { color: var(--primary); text-decoration: underline; }
+  .cta-form button:disabled { opacity: 0.4; cursor: not-allowed; }
   .cta-success {
     margin-top: 16px; color: var(--primary); font-weight: 700; font-size: 14px;
   }
@@ -511,8 +538,12 @@
 </div>
 <form class="cta-form" id="signup-form">
 <input id="email-input" placeholder="メールアドレスを入力" required="" type="email"/>
-<button type="submit">事前登録する</button>
+<button id="signup-submit" type="submit" disabled>事前登録する</button>
 </form>
+<label class="cta-consent">
+<input id="consent-check" type="checkbox"/>
+<span><a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>に同意の上、登録します</span>
+</label>
 <p class="cta-micro">配信停止はいつでもできます / メールアドレス以外の情報は取得しません</p>
 <p class="cta-success" id="cta-success" style="display:none;"></p>
 </div>
@@ -521,21 +552,35 @@
 <footer>
 <div class="container">
 <div class="links">
-<a href="#">利用規約</a>
-<a href="#">プライバシーポリシー</a>
-<a href="#">お問い合わせ</a>
+<a href="privacy.html">プライバシーポリシー</a>
+<a href="mailto:info@hux.co.jp">お問い合わせ</a>
 </div>
 <div class="copy">© 2026 株式会社HuX</div>
 </div>
 </footer>
 <script>
+  // 同意チェックでボタン活性化
+  var consent = document.getElementById('consent-check');
+  var submitBtn = document.getElementById('signup-submit');
+  consent.addEventListener('change', function(){
+    submitBtn.disabled = !consent.checked;
+  });
+
+  // 事前登録フォーム送信
   document.getElementById('signup-form').addEventListener('submit', function(e){
     e.preventDefault();
+    if (!consent.checked) return;
     var email = document.getElementById('email-input').value;
     var success = document.getElementById('cta-success');
-    success.textContent = email + ' を登録しました。リリース時にお知らせします。';
+    // mailto: で運用側に通知（静的サイトのため）。Formspree等に切替可能
+    var subject = encodeURIComponent('[mitooshi] 事前登録');
+    var body = encodeURIComponent('事前登録を希望します。\nメールアドレス: ' + email);
+    window.location.href = 'mailto:info@hux.co.jp?subject=' + subject + '&body=' + body;
+    success.textContent = 'ご登録ありがとうございます。メーラーが起動しますので、そのまま送信してください。';
     success.style.display = 'block';
     document.getElementById('email-input').value = '';
+    consent.checked = false;
+    submitBtn.disabled = true;
   });
 </script>
 </body>
