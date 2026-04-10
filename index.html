@@ -59,9 +59,9 @@
     height: 56px;
   }
   .logo {
-    font-size: 20px; font-weight: 700; color: var(--text);
-    letter-spacing: -0.02em;
+    display: flex; align-items: center;
   }
+  .logo img { height: 28px; width: auto; display: block; }
   .nav { display: flex; gap: 24px; align-items: center; }
   .nav a { color: var(--text); font-size: 14px; font-weight: 700; }
   .nav a.active { color: var(--primary); }
@@ -321,7 +321,7 @@
 <!-- ===== Header ===== -->
 <header>
 <div class="container header-inner">
-<div class="logo">mitooshi</div>
+<a class="logo" href="./"><img src="./assets/logo.png" alt="mitooshi"/></a>
 <nav class="nav">
 <a class="active" href="#empathy">特徴</a>
 <a href="#solution">使い方</a>
@@ -522,11 +522,6 @@
 <span class="reassure-tag">FREE</span>
 <h4>無料で使える</h4>
 <p>基本のテンプレートはずっと無料。有料は必要な方だけ。</p>
-</div>
-<div class="reassure-card">
-<span class="reassure-tag">EXPERT</span>
-<h4>専門家の知見</h4>
-<p>HCD-Net認定の人間中心設計専門家が、お子さんの特性に合わせて監修。</p>
 </div>
 </div>
 <div class="cta-block">
