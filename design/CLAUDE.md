@@ -65,7 +65,7 @@ DESIGN.mdの改善や新しいコンポーネントスタイルの検討時は�
 
 ## 具体仕様の参照先
 
-- デザインシステム定義: `/doc/DESIGN.md`
+- デザインシステム定義: `/shared/design-system/DESIGN.md`
 - サービスコンセプト: `/doc/mitooshi_サービスコンセプト.html`
 - アプリ内テキスト仕様: `/content/CLAUDE.md`
 - 技術制約: `/development/CLAUDE.md`

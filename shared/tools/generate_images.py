@@ -42,8 +42,9 @@ except ImportError:
     sys.exit(1)
 
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-ASSETS_DIR = REPO_ROOT / "doc" / "lp_assets"
+# shared/tools/ の 2階層上がリポジトリルート
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+ASSETS_DIR = REPO_ROOT / "products" / "lp" / "variants" / "assets"
 
 # .env を自動ロード（python-dotenv 不要の簡易パーサー）
 _env_file = REPO_ROOT / ".env"
