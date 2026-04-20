@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mitooshi Pro | 基本体験 → データ → 事業所価値 マッピング</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F7F2;
+    --mint-strong: #00806A;
+    --blue: #0073cc;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --text: #333333;
+    --text-sub: #666666;
+    --border: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-soft: #F7F7F7;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  header {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  header .eyebrow {
+    color: var(--mint);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 8px;
+    line-height: 1.3;
+  }
+  header p {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin: 0;
+  }
+
+  .flow {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 24px;
+    position: relative;
+  }
+
+  .layer {
+    background: var(--bg-soft);
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 600px;
+  }
+
+  .layer-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .layer-number {
+    display: inline-block;
+    background: var(--mint);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: 700;
+    font-size: 14px;
+    margin-right: 8px;
+  }
+  .layer-title {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .layer-subtitle {
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-top: 8px;
+    margin-left: 36px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .card-desc {
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  .card-accent {
+    border-left: 3px solid var(--mint);
+  }
+  .card-pink {
+    background: var(--pink-soft);
+    border-color: var(--pink);
+  }
+  .card-pink .card-title {
+    color: var(--text);
+  }
+
+  .chip-group {
+    margin-bottom: 14px;
+  }
+  .chip-group-title {
+    font-size: 11px;
+    color: var(--text-sub);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .chip {
+    display: inline-block;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--text);
+    margin: 0 4px 4px 0;
+  }
+  .chip-highlight {
+    background: var(--mint-soft);
+    border-color: var(--mint);
+    color: var(--mint-strong);
+    font-weight: 700;
+  }
+
+  .process {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .process-period {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--mint);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .process-name {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .process-detail {
+    font-size: 11px;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  .value-highlight {
+    background: white;
+    border: 2px solid var(--mint);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .value-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--mint);
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .value-number {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .value-desc {
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  .connector {
+    margin: 32px 0 8px;
+    text-align: center;
+    color: var(--text-sub);
+    font-size: 12px;
+  }
+  .connector-arrow {
+    display: inline-block;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--mint) 0%, var(--mint) 100%);
+    opacity: 0.3;
+    position: relative;
+    margin: 8px 0;
+  }
+
+  .table-section {
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+  .table-section h2 {
+    font-size: 20px;
+    color: var(--text-sub);
+    font-weight: 700;
+    margin: 0 0 20px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-soft);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-sub);
+    letter-spacing: 0.02em;
+  }
+  tr:hover td {
+    background: var(--mint-soft);
+  }
+  .kpi-cell {
+    font-weight: 700;
+    color: var(--mint-strong);
+  }
+
+  .note {
+    margin-top: 40px;
+    padding: 16px 20px;
+    background: var(--pink-soft);
+    border-left: 4px solid var(--pink);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .note strong {
+    color: var(--text);
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-sub);
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 1100px) {
+    .flow { grid-template-columns: 1fr 1fr; }
+    .layer { min-height: auto; }
+  }
+  @media (max-width: 640px) {
+    .flow { grid-template-columns: 1fr; }
+    .container { padding: 24px 16px 48px; }
+    header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="eyebrow">mitooshi Pro / Discovery & Business Design</div>
+  <h1>基本体験 → データ → 事業所価値 マッピング</h1>
+  <p>個別療育事業所向け・既存iPad前提・モバイル運用を想定した価値構造図</p>
+</header>
+
+<div class="flow">
+
+  <!-- Layer 1: 基本体験 -->
+  <section class="layer">
+    <div class="layer-header">
+      <span class="layer-number">1</span>
+      <span class="layer-title">基本体験</span>
+      <div class="layer-subtitle">先生と子どもの日常操作</div>
+    </div>
+
+    <div class="card card-accent">
+      <div class="card-title">① カード作成</div>
+      <div class="card-desc">カードライブラリから選択・並び替え・タイマー設定。児童別テンプレとして保存・再利用。</div>
+    </div>
+
+    <div class="card card-accent">
+      <div class="card-title">② カードめくり</div>
+      <div class="card-desc">子ども or 先生のタッチで進行。自発 / 補助を区別してログ。いま・つぎの2枚表示。</div>
+    </div>
+
+    <div class="card card-accent">
+      <div class="card-title">③ タイマー表示</div>
+      <div class="card-desc">カード単位・シーン単位で計画時間を表示。計画 vs 実績をログ化。</div>
+    </div>
+
+    <div class="card card-accent">
+      <div class="card-title">④ 児童別ボード自動切替</div>
+      <div class="card-desc">スケジュール or 完了で次児童のボードへ。先生の選択タップを不要に。</div>
+    </div>
+  </section>
+
+  <!-- Layer 2: 生成データ -->
+  <section class="layer">
+    <div class="layer-header">
+      <span class="layer-number">2</span>
+      <span class="layer-title">生成データ</span>
+      <div class="layer-subtitle">原ログ → 集約指標</div>
+    </div>
+
+    <div class="chip-group">
+      <div class="chip-group-title">① カード作成から</div>
+      <span class="chip">選択カード履歴</span>
+      <span class="chip">シーン構成パターン</span>
+      <span class="chip">テンプレ使用率</span>
+    </div>
+
+    <div class="chip-group">
+      <div class="chip-group-title">② めくりから</div>
+      <span class="chip chip-highlight">自発めくり率</span>
+      <span class="chip">カード別所要時間</span>
+      <span class="chip">中断発生場面</span>
+      <span class="chip">切替抵抗頻度</span>
+    </div>
+
+    <div class="chip-group">
+      <div class="chip-group-title">③ タイマーから</div>
+      <span class="chip">計画 vs 実績</span>
+      <span class="chip">タイムアウト発生</span>
+      <span class="chip">児童別時間特性</span>
+    </div>
+
+    <div class="chip-group">
+      <div class="chip-group-title">④ ボード切替から</div>
+      <span class="chip">セッション実績</span>
+      <span class="chip">事業所稼働率</span>
+      <span class="chip">職員負荷分布</span>
+    </div>
+
+    <div class="chip-group">
+      <div class="chip-group-title">副次データ</div>
+      <span class="chip chip-highlight">観察タグ（1タップ）</span>
+    </div>
+  </section>
+
+  <!-- Layer 3: 事業所実務 -->
+  <section class="layer">
+    <div class="layer-header">
+      <span class="layer-number">3</span>
+      <span class="layer-title">事業所実務プロセス</span>
+      <div class="layer-subtitle">日次 / 月次 / 六ヶ月 / 加算</div>
+    </div>
+
+    <div class="process">
+      <div class="process-period">DAILY</div>
+      <div class="process-name">連絡帳作成</div>
+      <div class="process-detail">シーン＋観察タグから自動ドラフト。1人5分→1分</div>
+    </div>
+    <div class="process">
+      <div class="process-period">DAILY</div>
+      <div class="process-name">職員間申し送り</div>
+      <div class="process-detail">児童別ハイライト自動生成。シフト交代の情報劣化を防ぐ</div>
+    </div>
+
+    <div class="process">
+      <div class="process-period">MONTHLY</div>
+      <div class="process-name">モニタリング面談</div>
+      <div class="process-detail">自発率・切替成功率の推移グラフ。記憶ベースからの脱却</div>
+    </div>
+
+    <div class="process">
+      <div class="process-period">6-MONTH</div>
+      <div class="process-name">個別支援計画 更新</div>
+      <div class="process-detail">達成度評価エビデンス・新目標の示唆・記述例の自動抽出</div>
+    </div>
+
+    <div class="process">
+      <div class="process-period">ANNUAL</div>
+      <div class="process-name">卒業・移行支援</div>
+      <div class="process-detail">次事業所・学校への引継ぎ資料。保護者向け成長ストーリー</div>
+    </div>
+  </section>
+
+  <!-- Layer 4: ビジネス価値 -->
+  <section class="layer">
+    <div class="layer-header">
+      <span class="layer-number">4</span>
+      <span class="layer-title">事業所ビジネス価値</span>
+      <div class="layer-subtitle">サブスク正当化の根拠</div>
+    </div>
+
+    <div class="value-highlight">
+      <div class="value-label">COST CUT</div>
+      <div class="value-number">月20〜30時間</div>
+      <div class="value-desc">朝の準備＋連絡帳作成の工数削減。人件費換算で月5〜10万円</div>
+    </div>
+
+    <div class="value-highlight">
+      <div class="value-label">REVENUE UP</div>
+      <div class="value-number">月 数万円〜10万円</div>
+      <div class="value-desc">家庭連携加算 / 個別サポート加算II の取得増（児童10名規模想定）</div>
+    </div>
+
+    <div class="value-highlight">
+      <div class="value-label">QUALITY</div>
+      <div class="value-number">計画・監査対応</div>
+      <div class="value-desc">個別支援計画・モニタリング記録の根拠質が向上。監査指摘リスク減</div>
+    </div>
+
+    <div class="value-highlight">
+      <div class="value-label">RETENTION</div>
+      <div class="value-number">脱属人化・職員定着</div>
+      <div class="value-desc">ベテラン依存から共有テンプレへ。新人育成期間の短縮</div>
+    </div>
+
+    <div class="card card-pink" style="margin-top: 16px;">
+      <div class="card-title">サブスク正当化</div>
+      <div class="card-desc">加算収入増だけで月額費用を回収可能。投資対効果が明確な「払いたい理由」が成立。</div>
+    </div>
+  </section>
+
+</div>
+
+<!-- 加算詳細テーブル -->
+<section class="table-section">
+  <h2>加算取得マップ — 収益直結の詳細</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 22%;">加算名</th>
+        <th style="width: 15%;">目安単位</th>
+        <th style="width: 31%;">必要エビデンス</th>
+        <th>mitooshi Pro での自動取得</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>家庭連携加算</strong></td>
+        <td class="kpi-cell">約200〜300単位/月</td>
+        <td>保護者との情報共有記録</td>
+        <td>シーン配信ログ＋保護者閲覧履歴</td>
+      </tr>
+      <tr>
+        <td><strong>個別サポート加算II</strong></td>
+        <td class="kpi-cell">約100〜125単位/日</td>
+        <td>個別支援の実施記録</td>
+        <td>児童別セッションログ＋観察タグ</td>
+      </tr>
+      <tr>
+        <td><strong>関係機関連携加算</strong></td>
+        <td class="kpi-cell">約200単位/回</td>
+        <td>園・学校との連携記録</td>
+        <td>シーン共有＋フィードバック履歴</td>
+      </tr>
+      <tr>
+        <td><strong>強度行動障害児支援加算</strong></td>
+        <td class="kpi-cell">対象該当のみ</td>
+        <td>個別支援計画に基づく実施記録</td>
+        <td>詳細セッションログ</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="note">
+  <strong>※ 注記：</strong>加算の単位数は令和6年報酬改定前提の概算値。Discovery フェーズで児童発達支援・放課後等デイサービスそれぞれの正確な単位数・算定要件を確認する必要がある。また、システム記録が加算エビデンスとして認められる範囲は、事業所・自治体の監査方針により解釈差がある点にも注意。
+</div>
+
+<footer>
+  <span>mitooshi Pro — Value Mapping v0.1 / 2026-04-20</span>
+  <span>HuX Inc. / Document for internal discussion</span>
+</footer>
+
+</div>
+</body>
+</html>

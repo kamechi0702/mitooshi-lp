@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>mitooshi — インタラクティブプロトタイプ（方向A: LP準拠）</title>
+<style>
+  /* ============================================
+     mitooshi.jp LP 準拠デザイントークン
+     - Font: Helvetica Neue + Hiragino Kaku Gothic ProN Custom
+     - Body: 15px / 1.4 / #333
+     - H2: #666（mercariパターン）
+     - Radius: 4px
+     - Border: 1px solid #e5e5e5
+     - Shadow: 使わない（カード積層のみ最小限）
+     ============================================ */
+  :root {
+    --primary: #00B894;
+    --primary-hover: #009b7c;
+    --link: #0073cc;
+    --accent-pink: #FFB6B6;
+    --accent-blue: #B3D4F0;
+    --text: #333333;
+    --text-sub: #666666;
+    --bg: #ffffff;
+    --bg-soft: #f6f6f6;
+    --border: #e5e5e5;
+    --border-strong: #d0d0d0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--text);
+    background: var(--bg-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 16px;
+    overflow: hidden;
+  }
+  button, input { font-family: inherit; }
+
+  /* Intro note */
+  .intro {
+    text-align: center;
+    max-width: 380px;
+    margin-bottom: 16px;
+    color: var(--text-sub);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .intro strong { color: var(--primary); font-weight: 700; }
+
+  /* Phone Frame */
+  .phone {
+    width: 375px;
+    height: 812px;
+    max-height: calc(100vh - 80px);
+    background: var(--bg);
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 8px #1a1a1a, 0 0 0 9px #2a2a2a;
+  }
+  .phone-inner {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg);
+  }
+
+  /* Status Bar — 設定アイコンを統合 */
+  .status-bar {
+    height: 40px;
+    padding: 10px 16px 8px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .status-bar .brand {
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 1.5px;
+    font-size: 13px;
+  }
+  .status-settings {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: none;
+    color: var(--text-sub);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+  }
+  .status-settings:hover { background: var(--bg-soft); }
+  .status-settings svg { width: 18px; height: 18px; }
+
+  /* Screens */
+  .screen {
+    position: absolute;
+    top: 41px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: var(--bg);
+    display: none;
+    flex-direction: column;
+  }
+  .screen.active { display: flex; }
+
+  /* Section label (LP mercariパターン) */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-sub);
+    line-height: 1.4;
+  }
+
+  /* ========== S1: TOP ========== */
+  .top-header {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .top-header .settings-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-sub);
+  }
+  .top-header .settings-btn svg { width: 16px; height: 16px; }
+
+  /* Recent scene shortcut (親向け最上段) */
+  .recent-section {
+    padding: 16px 24px 12px;
+    border-bottom: 1px solid var(--border);
+    display: none;
+  }
+  .recent-section.visible { display: block; }
+  .recent-section .section-label { margin-bottom: 10px; }
+  .recent-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    font-family: inherit;
+  }
+  .recent-card:hover, .recent-card:active {
+    border-color: var(--primary);
+    background: #f9fdfb;
+  }
+  .recent-thumb {
+    width: 72px;
+    height: 72px;
+    background: var(--bg-soft);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .recent-thumb svg { width: 82%; height: 82%; }
+  .recent-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+  .recent-body { flex: 1; min-width: 0; }
+  .recent-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+  .recent-meta {
+    font-size: 12px;
+    color: var(--text-sub);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .recent-meta .sep { color: var(--border); }
+  .recent-cta {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  /* Scene section heading */
+  .scene-section-head {
+    padding: 16px 24px 0;
+  }
+
+  .scene-grid {
+    padding: 12px 24px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .scene-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+    overflow: hidden;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+  }
+  .scene-card:hover, .scene-card:active {
+    border-color: var(--primary);
+  }
+  /* 新規作成直後のハイライト */
+  @keyframes highlightPulse {
+    0%   { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,184,148,0.18); background: #ebfaf4; }
+    60%  { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,184,148,0.1); background: #f6fffb; }
+    100% { border-color: var(--border); box-shadow: 0 0 0 0 rgba(0,184,148,0); background: var(--bg); }
+  }
+  .scene-card.highlight-new {
+    animation: highlightPulse 1.8s ease-out forwards;
+  }
+  .scene-card .new-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    z-index: 2;
+  }
+  .scene-card { position: relative; }
+
+  /* 保存トースト */
+  .save-toast {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 60;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    box-shadow: 0 4px 12px rgba(0,184,148,0.25);
+  }
+  .save-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .scene-card .thumb {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+  }
+  .scene-card .thumb svg { width: 70%; height: 70%; }
+  .scene-card .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .scene-card .meta {
+    padding: 14px 14px 16px;
+  }
+  .scene-card .name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .scene-card .count {
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-top: 4px;
+  }
+
+  .scene-card.create-new {
+    border: 1px dashed var(--border-strong);
+    background: var(--bg-soft);
+    justify-content: center;
+    align-items: center;
+    padding: 32px 16px;
+    gap: 8px;
+  }
+  .scene-card.create-new:hover, .scene-card.create-new:active {
+    border-color: var(--primary);
+  }
+  .scene-card.create-new .plus {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 400;
+  }
+  .scene-card.create-new .label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .scene-card.create-new .sub {
+    font-size: 11px;
+    color: var(--text-sub);
+    text-align: center;
+  }
+
+  /* ========== S2: CREATE ========== */
+  .create-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .create-header .back-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text);
+  }
+  .create-header .title-area {
+    flex: 1;
+  }
+  .create-header .title-area .small {
+    font-size: 11px;
+    color: var(--text-sub);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .create-header input[type="text"] {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 2px 0;
+    outline: none;
+    color: var(--text);
+  }
+  .create-header input[type="text"]::placeholder { color: #bbb; font-weight: 400; }
+
+  .cat-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+  }
+  .cat-tabs::-webkit-scrollbar { display: none; }
+  .cat-tab {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--text-sub);
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .cat-tab.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  .card-pool {
+    padding: 16px 20px 12px;
+  }
+  .card-pool-title {
+    font-size: 11px;
+    color: var(--text-sub);
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .card-pool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .pool-card {
+    aspect-ratio: 1 / 1.25;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px 6px;
+    transition: border-color 0.15s ease;
+    position: relative;
+  }
+  .pool-card:hover, .pool-card:active {
+    border-color: var(--primary);
+  }
+  .pool-card.picked {
+    border-color: var(--primary);
+    background: #f0faf7;
+  }
+  .pool-card.picked::after {
+    content: '✓';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pool-card .illust {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-soft);
+    border-radius: 4px;
+  }
+  .pool-card .illust svg { width: 72%; height: 72%; }
+  .pool-card .illust img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block; }
+  .pool-card .lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  .picked-area {
+    border-top: 1px solid var(--border);
+    padding: 14px 20px 12px;
+    background: var(--bg-soft);
+  }
+  .picked-title {
+    font-size: 11px;
+    color: var(--text-sub);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .picked-title .count {
+    color: var(--primary);
+    font-weight: 700;
+  }
+  .picked-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .picked-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .picked-row .num {
+    width: 24px; height: 24px; border-radius: 12px;
+    background: var(--primary); color: #fff;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .picked-row .mini-illust {
+    width: 28px; height: 28px; flex-shrink: 0;
+    background: var(--bg-soft);
+    border-radius: 4px;
+    padding: 2px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .picked-row .mini-illust svg { width: 100%; height: 100%; }
+  .picked-row .mini-illust img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; display: block; }
+  .picked-row .mini-label {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .picked-row .actions {
+    display: flex;
+    gap: 4px;
+  }
+  .picked-row .act-btn {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-sub);
+  }
+  .picked-row .act-btn.del { color: #c0392b; }
+  .picked-row .act-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .picked-empty {
+    padding: 24px 10px;
+    text-align: center;
+    color: var(--text-sub);
+    font-size: 13px;
+  }
+
+  .save-area {
+    padding: 14px 20px 20px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .save-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .save-btn:disabled {
+    background: #d0d0d0;
+    cursor: not-allowed;
+  }
+  .save-btn:not(:disabled):hover { background: var(--primary-hover); }
+  .save-hint {
+    font-size: 11px;
+    color: var(--text-sub);
+    text-align: center;
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  /* ========== S3: EXECUTE ========== */
+  #screen-execute { background: var(--bg); }
+  .exec-top {
+    padding: 14px 20px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .exec-back {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--text-sub);
+    cursor: pointer;
+  }
+  .exec-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .exec-progress {
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .exec-steps {
+    display: flex;
+    gap: 4px;
+    padding: 14px 20px 16px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .exec-steps::-webkit-scrollbar { display: none; }
+  .step-chip {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    background: #f0f0f0;
+    color: #bbb;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+  }
+  .step-chip.done {
+    background: #d4f0e6;
+    color: #00967a;
+  }
+  .step-chip.current {
+    background: var(--primary);
+    color: #fff;
+    min-width: 32px;
+    height: 28px;
+    font-size: 13px;
+  }
+  .step-sep {
+    width: 6px;
+    height: 2px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+  .step-sep.done {
+    background: #9ad7c6;
+  }
+
+  .card-stack {
+    flex: 1;
+    position: relative;
+    padding: 0 24px 16px;
+    min-height: 500px;
+  }
+
+  .stack-card {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.35s ease;
+    will-change: transform, opacity;
+    display: flex;
+    flex-direction: column;
+  }
+  .stack-card .illust-area {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+  }
+  .stack-card .illust-area svg { width: 66%; height: 66%; }
+  .stack-card .illust-area img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .stack-card .label-area {
+    padding: 18px 16px 20px;
+    text-align: center;
+  }
+  .stack-card .label-main {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.5px;
+  }
+
+  /* Stack layers — 次のカードが下から覗く */
+  .stack-card.layer-0 {
+    top: 8px;
+    transform: translateY(0) scale(1);
+    transform-origin: top center;
+    z-index: 3;
+    opacity: 1;
+    cursor: pointer;
+  }
+  .stack-card.layer-1 {
+    top: 8px;
+    transform: translateY(68px) scale(0.94);
+    transform-origin: top center;
+    z-index: 2;
+    opacity: 0.65;
+  }
+  .stack-card.layer-2 {
+    top: 8px;
+    transform: translateY(104px) scale(0.88);
+    transform-origin: top center;
+    z-index: 1;
+    opacity: 0.25;
+  }
+  .stack-card.layer-hidden {
+    top: 8px;
+    transform: translateY(130px) scale(0.84);
+    transform-origin: top center;
+    opacity: 0;
+    z-index: 0;
+  }
+  .stack-card.swiping-up {
+    transform: translateY(-120%) scale(1.02) rotate(-2deg);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  }
+  .stack-card.dragging { transition: none; }
+
+  .exec-hint-bottom {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-sub);
+    padding: 14px 24px 22px;
+    flex-shrink: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+  .exec-hint-bottom .arrow {
+    display: inline-block;
+    margin-right: 6px;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* ========== S4: COMPLETE ========== */
+  #screen-complete {
+    background: var(--bg);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  .complete-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+  .complete-art {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 24px;
+    animation: popIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .complete-art svg { width: 100%; height: 100%; }
+  .complete-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .complete-sub {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin-bottom: 32px;
+  }
+  .complete-card-name {
+    color: var(--primary);
+    font-weight: 700;
+  }
+  .home-btn {
+    padding: 14px 32px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .home-btn:hover { background: var(--primary-hover); }
+
+  /* Confetti on complete */
+  .confetti {
+    position: absolute;
+    top: -20px;
+    width: 8px;
+    height: 12px;
+    opacity: 0;
+    animation: fall 2.2s ease-in forwards;
+    border-radius: 2px;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0); opacity: 1; }
+    100% { transform: translateY(900px) rotate(540deg); opacity: 0; }
+  }
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Step done overlay */
+  .step-done-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 10;
+    transition: opacity 0.2s ease;
+  }
+  .step-done-overlay.show { opacity: 1; }
+  .step-done-overlay .msg {
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    transform: scale(0.85);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .step-done-overlay.show .msg { transform: scale(1); }
+
+  /* Confirm Dialog */
+  .dialog-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .dialog-backdrop.show { display: flex; }
+  .dialog {
+    background: #fff;
+    border-radius: 4px;
+    padding: 22px 20px 16px;
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
+  }
+  .dialog h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .dialog p {
+    font-size: 13px;
+    color: var(--text-sub);
+    margin-bottom: 18px;
+    line-height: 1.6;
+  }
+  .dialog-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .dialog-actions button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .dialog-actions .cancel {
+    background: var(--bg);
+    color: var(--text);
+  }
+  .dialog-actions .confirm {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <strong>mitooshi</strong> インタラクティブプロトタイプ（方向A: LP準拠）<br>
+  上スワイプでカードを進める／長押しでやめる
+</div>
+
+<div class="phone">
+  <div class="phone-inner">
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <span class="brand">mitooshi</span>
+      <button class="status-settings" aria-label="設定">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- =========================
+         S1: TOP (マイシーン一覧)
+         ========================= -->
+    <div id="screen-top" class="screen active">
+      <!-- さいきん つかった ショートカット（初回は非表示、シーン実行後に表示） -->
+      <div id="recent-section" class="recent-section">
+        <div class="section-label">さいきん つかった</div>
+        <button id="recent-card" class="recent-card">
+          <div class="recent-thumb" id="recent-thumb"></div>
+          <div class="recent-body">
+            <div class="recent-name" id="recent-name"></div>
+            <div class="recent-meta" id="recent-meta"></div>
+          </div>
+          <div class="recent-cta">▶</div>
+        </button>
+      </div>
+
+      <div class="scene-section-head">
+        <div class="section-label">マイシーン</div>
+      </div>
+      <div id="scene-grid" class="scene-grid"></div>
+    </div>
+
+    <!-- =========================
+         S2: CREATE
+         ========================= -->
+    <div id="screen-create" class="screen">
+      <div class="create-header">
+        <button class="back-btn" id="create-back">←</button>
+        <div class="title-area">
+          <div class="small">SCENE NAME</div>
+          <input type="text" id="scene-name" placeholder="シーンの なまえ" maxlength="12">
+        </div>
+      </div>
+
+      <div class="cat-tabs" id="cat-tabs"></div>
+
+      <div class="card-pool">
+        <div class="card-pool-title">カテゴリから えらぶ</div>
+        <div class="card-pool-grid" id="card-pool"></div>
+      </div>
+
+      <div class="picked-area">
+        <div class="picked-title">えらんだカード <span class="count" id="picked-count">0</span></div>
+        <div id="picked-list" class="picked-list"></div>
+      </div>
+
+      <div class="save-area">
+        <button class="save-btn" id="save-btn" disabled>ほぞんする</button>
+        <div class="save-hint" id="save-hint">カードを 1まいいじょう えらんでね</div>
+      </div>
+    </div>
+
+    <!-- =========================
+         S3: EXECUTE
+         ========================= -->
+    <div id="screen-execute" class="screen">
+      <div class="exec-top">
+        <button class="exec-back" id="exec-back">←</button>
+        <div class="exec-title" id="exec-title"></div>
+        <div class="exec-progress" id="exec-progress"></div>
+      </div>
+      <div class="exec-steps" id="exec-steps"></div>
+
+      <div class="card-stack" id="card-stack"></div>
+
+      <div class="step-done-overlay" id="step-done">
+        <div class="msg">できた！</div>
+      </div>
+
+      <div class="exec-hint-bottom">
+        <span class="arrow">↑</span>うえに スワイプして すすめよう
+      </div>
+    </div>
+
+    <!-- =========================
+         S4: COMPLETE
+         ========================= -->
+    <div id="screen-complete" class="screen">
+      <div class="complete-inner">
+        <div class="complete-art">
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="54" fill="#f0faf7"/>
+            <circle cx="60" cy="60" r="40" fill="#00B894"/>
+            <path d="M44 60 L54 70 L78 46" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- accents -->
+            <circle cx="20" cy="30" r="4" fill="#FFB6B6"/>
+            <circle cx="100" cy="28" r="3" fill="#0073cc"/>
+            <path d="M102 92 L107 96 L102 100 L97 96 Z" fill="#FFB6B6"/>
+            <circle cx="18" cy="95" r="3" fill="#00B894"/>
+          </svg>
+        </div>
+        <div class="complete-title">ぜんぶ できたね！</div>
+        <div class="complete-sub">
+          <span class="complete-card-name" id="complete-scene-name"></span>
+          <span> を クリア！</span>
+        </div>
+        <button class="home-btn" id="home-btn">ホームに もどる</button>
+      </div>
+      <div id="confetti-wrap" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;"></div>
+    </div>
+
+    <!-- 保存完了トースト -->
+    <div class="save-toast" id="save-toast">✓ ほぞんしました</div>
+
+    <!-- Dialog -->
+    <div class="dialog-backdrop" id="stop-dialog">
+      <div class="dialog">
+        <h3>やめる？</h3>
+        <p>いまのシーンを とめて<br>ホームにもどります</p>
+        <div class="dialog-actions">
+          <button class="cancel" id="stop-cancel">つづける</button>
+          <button class="confirm" id="stop-confirm">やめる</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* =====================================================
+   CARDS
+   生成済みPNG (../../shared/illust/mitooshi/*) を使用。
+   v1.1ラベル→既存PNG名のマッピング表はpdm/card_library_draft.mdと整合させる
+   ===================================================== */
+const ILLUST_BASE = 'assets/';
+function cardImg(file, alt) {
+  return `<img src="${ILLUST_BASE}${encodeURIComponent(file)}" alt="${alt}" loading="lazy" draggable="false">`;
+}
+
+const CARDS = {
+  wakeup:           { label: 'おきる',         cat: 'morning', svg: cardImg('おきる.png',       'おきる')         },
+  change_clothes:   { label: 'ふくをきる',     cat: 'morning', svg: cardImg('きがえ.png',       'ふくをきる')     },
+  breakfast:        { label: 'ごはんをたべる', cat: 'morning', svg: cardImg('ごはん.png',       'ごはんをたべる') },
+  brush_teeth:      { label: 'はをみがく',     cat: 'morning', svg: cardImg('はみがき.png',     'はをみがく')     },
+  pack_bag:         { label: 'かばんをもつ',   cat: 'morning', svg: cardImg('もちもの.png',     'かばんをもつ')   },
+  leave_home:       { label: 'いえをでる',     cat: 'morning', svg: cardImg('いってきます.png', 'いえをでる')     },
+  take_bath:        { label: 'おふろにはいる', cat: 'evening', svg: cardImg('おふろ.png',       'おふろにはいる') },
+  put_pajamas:      { label: 'パジャマをきる', cat: 'evening', svg: cardImg('パジャマ.png',     'パジャマをきる') },
+  read_book:        { label: 'えほんをよむ',   cat: 'evening', svg: cardImg('えほん.png',       'えほんをよむ')   },
+  go_to_sleep:      { label: 'ベッドにはいる', cat: 'evening', svg: cardImg('おやすみ.png',     'ベッドにはいる') },
+  put_shoes:        { label: 'くつをはく',     cat: 'outing',  svg: cardImg('もちもの.png',     'くつをはく')     },  // 暫定代替
+  put_jacket:       { label: 'うわぎをきる',   cat: 'outing',  svg: cardImg('きがえ.png',       'うわぎをきる')   },  // 暫定代替
+  use_transport:    { label: 'のりものにのる', cat: 'outing',  svg: cardImg('でんしゃにのる.png', 'のりものにのる') },
+  reach_destination:{ label: 'めあてにつく',   cat: 'outing',  svg: cardImg('ついた！.png',     'めあてにつく')   },
+  come_home:        { label: 'おうちにかえる', cat: 'outing',  svg: cardImg('おわり.png',       'おうちにかえる') },  // 暫定代替
+};
+
+const CATEGORIES = [
+  { id: 'morning', label: 'あさ' },
+  { id: 'evening', label: 'よる' },
+  { id: 'outing',  label: 'おでかけ' },
+];
+
+const PRESET_SCENES = [
+  { id: 'morning',  name: 'あさのしたく',     cardIds: ['wakeup','change_clothes','breakfast','brush_teeth','pack_bag','leave_home'] },
+  { id: 'bedtime',  name: 'おやすみじゅんび', cardIds: ['take_bath','brush_teeth','put_pajamas','read_book','go_to_sleep'] },
+  { id: 'outing',   name: 'おでかけ',          cardIds: ['put_shoes','put_jacket','use_transport','reach_destination','come_home'] },
+];
+
+/* =====================================================
+   STATE & ROUTING
+   ===================================================== */
+const state = {
+  scenes: JSON.parse(JSON.stringify(PRESET_SCENES)),
+  pickedCards: [],
+  activeCategory: 'morning',
+  executingScene: null,
+  currentIdx: 0,
+  // デモ用初期値：最後に使ったのは「あさのしたく」（1時間前）
+  // 実装時は永続化ストレージ（AsyncStorage等）から復元する
+  lastUsedSceneId: 'morning',
+  lastUsedAt: new Date(Date.now() - 60 * 60 * 1000),
+  justCreatedSceneId: null,
+};
+
+function formatRecentTime(date) {
+  if (!date) return '';
+  const now = new Date();
+  const diffMin = (now - date) / 60000;
+  if (diffMin < 5) return 'さっき';
+  if (diffMin < 60) return `${Math.floor(diffMin)}分前`;
+  const diffHr = diffMin / 60;
+  if (diffHr < 24) return `${Math.floor(diffHr)}時間前`;
+  if (diffHr < 48) return '1日前';
+  return `${Math.floor(diffHr / 24)}日前`;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+/* ========== S1: TOP ========== */
+function renderTop() {
+  // ----- さいきん つかった ショートカット -----
+  const recentSection = document.getElementById('recent-section');
+  const recentScene = state.lastUsedSceneId
+    ? state.scenes.find(s => s.id === state.lastUsedSceneId)
+    : null;
+
+  if (recentScene) {
+    recentSection.classList.add('visible');
+    const firstCard = CARDS[recentScene.cardIds[0]];
+    document.getElementById('recent-thumb').innerHTML = firstCard.svg;
+    document.getElementById('recent-name').textContent = recentScene.name;
+    document.getElementById('recent-meta').textContent = formatRecentTime(state.lastUsedAt);
+    document.getElementById('recent-card').onclick = () => startExecute(recentScene);
+  } else {
+    recentSection.classList.remove('visible');
+  }
+
+  // ----- マイシーン グリッド (recentは除外) -----
+  const grid = document.getElementById('scene-grid');
+  grid.innerHTML = '';
+  state.scenes
+    .filter(s => s.id !== state.lastUsedSceneId)
+    .forEach(scene => {
+      const firstCard = CARDS[scene.cardIds[0]];
+      const card = document.createElement('button');
+      const isNew = scene.id === state.justCreatedSceneId;
+      card.className = 'scene-card' + (isNew ? ' highlight-new' : '');
+      card.innerHTML = `
+        ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+        <div class="thumb">${firstCard.svg}</div>
+        <div class="meta">
+          <div class="name">${scene.name}</div>
+          <div class="count">${scene.cardIds.length}まいのカード</div>
+        </div>
+      `;
+      card.addEventListener('click', () => startExecute(scene));
+      grid.appendChild(card);
+    });
+
+  const add = document.createElement('button');
+  add.className = 'scene-card create-new';
+  add.innerHTML = `
+    <div class="plus">＋</div>
+    <div class="label">もっとつくる</div>
+    <div class="sub">カテゴリからカードをえらぶ</div>
+  `;
+  add.addEventListener('click', startCreate);
+  grid.appendChild(add);
+}
+
+/* ========== S2: CREATE ========== */
+function startCreate() {
+  state.pickedCards = [];
+  state.activeCategory = 'morning';
+  document.getElementById('scene-name').value = '';
+  renderCreate();
+  showScreen('create');
+  // 名前入力欄にフォーカスして「まずシーン名を」と促す
+  setTimeout(() => {
+    const input = document.getElementById('scene-name');
+    if (input) input.focus();
+  }, 200);
+}
+function renderCreate() {
+  renderCategoryTabs();
+  renderCardPool();
+  renderPickedList();
+  updateSaveBtn();
+}
+function renderCategoryTabs() {
+  const tabs = document.getElementById('cat-tabs');
+  tabs.innerHTML = '';
+  CATEGORIES.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'cat-tab' + (c.id === state.activeCategory ? ' active' : '');
+    b.textContent = c.label;
+    b.addEventListener('click', () => {
+      state.activeCategory = c.id;
+      renderCategoryTabs();
+      renderCardPool();
+    });
+    tabs.appendChild(b);
+  });
+}
+function renderCardPool() {
+  const pool = document.getElementById('card-pool');
+  pool.innerHTML = '';
+  Object.entries(CARDS).filter(([, c]) => c.cat === state.activeCategory).forEach(([id, c]) => {
+    const el = document.createElement('button');
+    el.className = 'pool-card' + (state.pickedCards.includes(id) ? ' picked' : '');
+    el.innerHTML = `
+      <div class="illust">${c.svg}</div>
+      <div class="lbl">${c.label}</div>
+    `;
+    el.addEventListener('click', () => togglePick(id));
+    pool.appendChild(el);
+  });
+}
+function togglePick(id) {
+  const idx = state.pickedCards.indexOf(id);
+  if (idx >= 0) state.pickedCards.splice(idx, 1);
+  else state.pickedCards.push(id);
+  renderCardPool();
+  renderPickedList();
+  updateSaveBtn();
+}
+function renderPickedList() {
+  const list = document.getElementById('picked-list');
+  const count = document.getElementById('picked-count');
+  count.textContent = state.pickedCards.length;
+  list.innerHTML = '';
+  if (state.pickedCards.length === 0) {
+    list.innerHTML = '<div class="picked-empty">うえからカードをえらんでね</div>';
+    return;
+  }
+  state.pickedCards.forEach((id, i) => {
+    const c = CARDS[id];
+    const row = document.createElement('div');
+    row.className = 'picked-row';
+    row.innerHTML = `
+      <div class="num">${i+1}</div>
+      <div class="mini-illust">${c.svg}</div>
+      <div class="mini-label">${c.label}</div>
+      <div class="actions">
+        <button class="act-btn up" ${i===0?'disabled':''}>▲</button>
+        <button class="act-btn down" ${i===state.pickedCards.length-1?'disabled':''}>▼</button>
+        <button class="act-btn del">×</button>
+      </div>
+    `;
+    row.querySelector('.up').addEventListener('click', () => reorder(i, i-1));
+    row.querySelector('.down').addEventListener('click', () => reorder(i, i+1));
+    row.querySelector('.del').addEventListener('click', () => togglePick(id));
+    list.appendChild(row);
+  });
+}
+function reorder(from, to) {
+  if (to < 0 || to >= state.pickedCards.length) return;
+  const arr = state.pickedCards;
+  const [m] = arr.splice(from, 1);
+  arr.splice(to, 0, m);
+  renderPickedList();
+  renderCardPool();
+}
+function updateSaveBtn() {
+  const btn = document.getElementById('save-btn');
+  const hint = document.getElementById('save-hint');
+  const cardCount = state.pickedCards.length;
+  // カード1枚以上でOK（シーン名は空なら自動命名）
+  btn.disabled = cardCount < 1;
+  if (hint) {
+    if (cardCount < 1) {
+      hint.textContent = 'カードを 1まいいじょう えらんでね';
+    } else {
+      const name = document.getElementById('scene-name').value.trim();
+      hint.textContent = name
+        ? `${cardCount}まいのカードで「${name}」を ほぞん`
+        : `${cardCount}まいのカード・シーン名はあとで へんこうできる`;
+    }
+  }
+}
+function saveScene() {
+  if (state.pickedCards.length < 1) return;
+  let name = document.getElementById('scene-name').value.trim();
+  if (!name) {
+    // シーン名が空なら自動命名
+    const userSceneCount = state.scenes.filter(s => s.id.startsWith('user-')).length;
+    name = `あたらしいシーン ${userSceneCount + 1}`;
+  }
+  const newScene = {
+    id: 'user-' + Date.now(),
+    name,
+    cardIds: [...state.pickedCards],
+  };
+  // 新規作成は先頭に挿入（可視性優先）
+  state.scenes.unshift(newScene);
+  state.justCreatedSceneId = newScene.id;
+  renderTop();
+  showScreen('top');
+  showSaveToast();
+  // ハイライトは 2秒後に解除
+  setTimeout(() => {
+    state.justCreatedSceneId = null;
+    document.querySelectorAll('.scene-card.highlight-new').forEach(el => {
+      el.classList.remove('highlight-new');
+      const badge = el.querySelector('.new-badge');
+      if (badge) badge.remove();
+    });
+  }, 2000);
+}
+
+function showSaveToast() {
+  const toast = document.getElementById('save-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1800);
+}
+
+/* ========== S3: EXECUTE ========== */
+function startExecute(scene) {
+  state.executingScene = scene;
+  state.currentIdx = 0;
+  document.getElementById('exec-title').textContent = scene.name;
+  renderStack();
+  renderDots();
+  updateProgress();
+  showScreen('execute');
+}
+
+function renderStack() {
+  const stack = document.getElementById('card-stack');
+  stack.innerHTML = '';
+  const cards = state.executingScene.cardIds;
+  cards.forEach((id, i) => {
+    const layerIdx = i - state.currentIdx;
+    if (layerIdx < 0) return;
+    const card = buildStackCard(id);
+    if (layerIdx === 0) card.classList.add('layer-0');
+    else if (layerIdx === 1) card.classList.add('layer-1');
+    else if (layerIdx === 2) card.classList.add('layer-2');
+    else card.classList.add('layer-hidden');
+    card.dataset.idx = i;
+    stack.appendChild(card);
+  });
+}
+
+function buildStackCard(id) {
+  const c = CARDS[id];
+  const el = document.createElement('div');
+  el.className = 'stack-card';
+  el.innerHTML = `
+    <div class="illust-area">${c.svg}</div>
+    <div class="label-area"><div class="label-main">${c.label}</div></div>
+  `;
+  return el;
+}
+
+function renderDots() {
+  const container = document.getElementById('exec-steps');
+  container.innerHTML = '';
+  const total = state.executingScene.cardIds.length;
+  state.executingScene.cardIds.forEach((_, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'step-chip';
+    if (i < state.currentIdx) chip.classList.add('done');
+    else if (i === state.currentIdx) chip.classList.add('current');
+    chip.textContent = (i + 1);
+    container.appendChild(chip);
+    if (i < total - 1) {
+      const sep = document.createElement('div');
+      sep.className = 'step-sep' + (i < state.currentIdx ? ' done' : '');
+      container.appendChild(sep);
+    }
+  });
+}
+
+function updateProgress() {
+  document.getElementById('exec-progress').textContent = `${state.currentIdx + 1} / ${state.executingScene.cardIds.length}`;
+}
+
+let isAdvancing = false;
+function advanceCard() {
+  if (isAdvancing) return;
+  const stack = document.getElementById('card-stack');
+  const top = stack.querySelector('.layer-0');
+  if (!top) return;
+  isAdvancing = true;
+
+  const overlay = document.getElementById('step-done');
+  overlay.classList.add('show');
+
+  top.classList.remove('layer-0');
+  top.classList.add('swiping-up');
+
+  const l1 = stack.querySelector('.layer-1');
+  const l2 = stack.querySelector('.layer-2');
+  const lH = stack.querySelector('.layer-hidden');
+  if (l1) { l1.classList.remove('layer-1'); l1.classList.add('layer-0'); }
+  if (l2) { l2.classList.remove('layer-2'); l2.classList.add('layer-1'); }
+  if (lH) { lH.classList.remove('layer-hidden'); lH.classList.add('layer-2'); }
+
+  state.currentIdx += 1;
+  renderDots();
+  updateProgress();
+
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    if (top.parentNode) top.remove();
+    if (state.currentIdx >= state.executingScene.cardIds.length) {
+      isAdvancing = false;
+      setTimeout(completeScene, 200);
+    } else {
+      isAdvancing = false;
+    }
+  }, 500);
+}
+
+/* ----- Swipe (event delegation) ----- */
+const swipe = { el: null, startY: 0, curY: 0, active: false };
+
+function swipeStart(y, target) {
+  const top = target && target.closest
+    ? target.closest('#card-stack .layer-0')
+    : document.querySelector('#card-stack .layer-0');
+  if (!top) return;
+  swipe.el = top;
+  swipe.startY = y;
+  swipe.curY = y;
+  swipe.active = true;
+  top.classList.add('dragging');
+}
+function swipeMove(y) {
+  if (!swipe.active || !swipe.el) return;
+  swipe.curY = y;
+  const dy = Math.min(0, y - swipe.startY);
+  swipe.el.style.transform = `translateY(${dy}px) rotate(${dy / 24}deg)`;
+}
+function swipeEnd() {
+  if (!swipe.active || !swipe.el) return;
+  const el = swipe.el;
+  const dy = swipe.curY - swipe.startY;
+  swipe.active = false;
+  swipe.el = null;
+  el.classList.remove('dragging');
+  el.style.transform = '';
+  if (dy < -80) advanceCard();
+}
+
+document.addEventListener('touchstart', e => {
+  const card = e.target.closest && e.target.closest('#card-stack .layer-0');
+  if (card) swipeStart(e.touches[0].clientY, card);
+}, { passive: true });
+document.addEventListener('touchmove', e => {
+  if (swipe.active) swipeMove(e.touches[0].clientY);
+}, { passive: true });
+document.addEventListener('touchend', swipeEnd);
+document.addEventListener('touchcancel', swipeEnd);
+document.addEventListener('mousedown', e => {
+  const card = e.target.closest && e.target.closest('#card-stack .layer-0');
+  if (card) { swipeStart(e.clientY, card); e.preventDefault(); }
+});
+document.addEventListener('mousemove', e => { if (swipe.active) swipeMove(e.clientY); });
+document.addEventListener('mouseup', swipeEnd);
+
+/* ----- Long press back ----- */
+const execBack = document.getElementById('exec-back');
+let pressTimer = null;
+function startPress() {
+  pressTimer = setTimeout(() => {
+    document.getElementById('stop-dialog').classList.add('show');
+  }, 500);
+}
+function cancelPress() { clearTimeout(pressTimer); }
+execBack.addEventListener('mousedown', startPress);
+execBack.addEventListener('touchstart', startPress, { passive: true });
+execBack.addEventListener('mouseup', cancelPress);
+execBack.addEventListener('mouseleave', cancelPress);
+execBack.addEventListener('touchend', cancelPress);
+execBack.addEventListener('touchcancel', cancelPress);
+
+/* ========== S4: COMPLETE ========== */
+function completeScene() {
+  // 完了したシーンを「さいきん つかった」として記録
+  state.lastUsedSceneId = state.executingScene.id;
+  state.lastUsedAt = new Date();
+  document.getElementById('complete-scene-name').textContent = state.executingScene.name;
+  launchConfetti();
+  showScreen('complete');
+}
+function launchConfetti() {
+  const wrap = document.getElementById('confetti-wrap');
+  wrap.innerHTML = '';
+  const palette = [C.outfit, C.pink, C.blue, C.yellow];
+  for (let i = 0; i < 24; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.background = palette[i % palette.length];
+    p.style.animationDelay = (Math.random() * 0.5) + 's';
+    p.style.animationDuration = (1.6 + Math.random() * 1) + 's';
+    wrap.appendChild(p);
+  }
+  setTimeout(() => wrap.innerHTML = '', 3200);
+}
+
+/* ========== EVENT WIRING ========== */
+document.getElementById('create-back').addEventListener('click', () => showScreen('top'));
+document.getElementById('scene-name').addEventListener('input', updateSaveBtn);
+document.getElementById('save-btn').addEventListener('click', saveScene);
+// tap on the current card to advance (swipe is handled separately)
+document.addEventListener('click', e => {
+  const card = e.target.closest && e.target.closest('#card-stack .layer-0');
+  if (card && !swipe.active) advanceCard();
+});
+document.getElementById('home-btn').addEventListener('click', () => {
+  renderTop();
+  showScreen('top');
+});
+document.getElementById('stop-cancel').addEventListener('click', () => document.getElementById('stop-dialog').classList.remove('show'));
+document.getElementById('stop-confirm').addEventListener('click', () => {
+  document.getElementById('stop-dialog').classList.remove('show');
+  renderTop();
+  showScreen('top');
+});
+
+renderTop();
+</script>
+</body>
+</html>
