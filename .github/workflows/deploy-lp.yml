@@ -1,0 +1,49 @@
+name: Deploy LP to GitHub Pages
+
+# products/lp/ の内容を GitHub Pages にデプロイする。
+# GitHub Pages の Source dropdown は / と /docs のみなので、
+# 任意フォルダ（products/lp/）を配信するためにこのワークフローを使う。
+
+on:
+  # main への push（products/lp/ 配下が変わった時のみ）
+  push:
+    branches: [main]
+    paths:
+      - 'products/lp/**'
+      - '.github/workflows/deploy-lp.yml'
+  # 手動実行も許可
+  workflow_dispatch:
+
+# 同時実行を1つに制限（先着優先）
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+# GitHub Pages へのデプロイに必要な権限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact (products/lp/)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # このフォルダ配下を Pages ルートとして配信
+          path: products/lp
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
