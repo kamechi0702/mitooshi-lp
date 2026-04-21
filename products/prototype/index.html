@@ -635,6 +635,41 @@
     font-size: 14px;
     color: var(--text-sub);
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  /* 長押し時にミントの進捗が左から右へ満たされる */
+  .exec-back::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--primary);
+    opacity: 0;
+    transform-origin: left center;
+    transform: scaleX(0);
+    border-radius: 3px;
+    pointer-events: none;
+    transition: none;
+  }
+  .exec-back.pressing::before {
+    opacity: 0.22;
+    animation: backPressFill 0.5s linear forwards;
+  }
+  @keyframes backPressFill {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+  .exec-back-hint {
+    font-size: 10px;
+    color: var(--text-sub);
+    margin-top: 2px;
+    opacity: 0.7;
+  }
+  .exec-back-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
   }
   .exec-title {
     font-size: 14px;
@@ -1031,7 +1066,10 @@
          ========================= -->
     <div id="screen-execute" class="screen">
       <div class="exec-top">
-        <button class="exec-back" id="exec-back">←</button>
+        <div class="exec-back-wrap">
+          <button class="exec-back" id="exec-back" aria-label="長押しでやめる">←</button>
+          <div class="exec-back-hint">ながおし</div>
+        </div>
         <div class="exec-title" id="exec-title"></div>
         <div class="exec-progress" id="exec-progress"></div>
       </div>
@@ -1519,12 +1557,20 @@ document.addEventListener('mouseup', swipeEnd);
 /* ----- Long press back ----- */
 const execBack = document.getElementById('exec-back');
 let pressTimer = null;
-function startPress() {
+function startPress(e) {
+  // 進捗フィルを視覚化
+  execBack.classList.remove('pressing');
+  void execBack.offsetWidth;  // reflow でアニメをリセット
+  execBack.classList.add('pressing');
   pressTimer = setTimeout(() => {
+    execBack.classList.remove('pressing');
     document.getElementById('stop-dialog').classList.add('show');
   }, 500);
 }
-function cancelPress() { clearTimeout(pressTimer); }
+function cancelPress() {
+  clearTimeout(pressTimer);
+  execBack.classList.remove('pressing');
+}
 execBack.addEventListener('mousedown', startPress);
 execBack.addEventListener('touchstart', startPress, { passive: true });
 execBack.addEventListener('mouseup', cancelPress);
@@ -1543,18 +1589,20 @@ function completeScene() {
 }
 function launchConfetti() {
   const wrap = document.getElementById('confetti-wrap');
+  if (!wrap) return;
   wrap.innerHTML = '';
-  const palette = [C.outfit, C.pink, C.blue, C.yellow];
-  for (let i = 0; i < 24; i++) {
+  // LP のブランドカラーに合わせた紙吹雪
+  const palette = ['#00B894', '#FFB6B6', '#0073cc', '#FFE7A0'];
+  for (let i = 0; i < 36; i++) {
     const p = document.createElement('div');
     p.className = 'confetti';
     p.style.left = (Math.random() * 100) + '%';
     p.style.background = palette[i % palette.length];
-    p.style.animationDelay = (Math.random() * 0.5) + 's';
-    p.style.animationDuration = (1.6 + Math.random() * 1) + 's';
+    p.style.animationDelay = (Math.random() * 0.6) + 's';
+    p.style.animationDuration = (1.8 + Math.random() * 1.2) + 's';
     wrap.appendChild(p);
   }
-  setTimeout(() => wrap.innerHTML = '', 3200);
+  setTimeout(() => { if (wrap) wrap.innerHTML = ''; }, 3600);
 }
 
 /* ========== EVENT WIRING ========== */
