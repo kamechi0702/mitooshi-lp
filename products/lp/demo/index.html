@@ -340,6 +340,31 @@
     color: var(--text-sub);
     margin-right: 4px;
   }
+  .list-row .edit-btn {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-sub);
+    flex-shrink: 0;
+    cursor: pointer;
+    padding: 0;
+    margin-right: 2px;
+    transition: background 120ms, transform 120ms, border-color 120ms;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .list-row .edit-btn:active {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+    transform: scale(0.92);
+  }
+  .list-row .edit-btn .icon {
+    stroke: var(--text-sub);
+    width: 16px; height: 16px;
+    pointer-events: none;
+  }
+  .list-row .edit-btn:active .icon { stroke: var(--primary); }
   .list-row .chev {
     color: var(--primary);
     stroke: var(--primary);
@@ -1615,22 +1640,45 @@ function sceneRow(scene) {
 
   row.appendChild(h('span', { class: 'name' }, scene.name));
   row.appendChild(h('span', { class: 'count' }, `${scene.cards.length}件`));
+
+  // 編集ボタン（鉛筆）— 明示的な編集導線
+  const editBtn = h('button', {
+    type: 'button',
+    class: 'edit-btn',
+    'aria-label': 'リストを編集',
+  });
+  editBtn.appendChild(icon('i-pencil'));
+  const openEdit = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    state.workingScene = {
+      id: scene.id,
+      name: scene.name,
+      cards: scene.cards.slice(),
+      isNew: false,
+    };
+    go('S5');
+  };
+  editBtn.addEventListener('click', openEdit);
+  editBtn.addEventListener('touchend', openEdit);
+  row.appendChild(editBtn);
+
   const chev = icon('i-chevron-right', 'icon chev');
   row.appendChild(chev);
 
   // tap → execute
-  // long press → edit
+  // long press → edit（バックアップ導線）
   let pressTimer = null;
   let longPressed = false;
   let startY = 0;
 
-  const isStarTarget = (e) => {
+  const isExcludedTarget = (e) => {
     const t = e.target;
-    return t && (t.closest && t.closest('.star-btn'));
+    return t && t.closest && (t.closest('.star-btn') || t.closest('.edit-btn'));
   };
 
   const down = (e) => {
-    if (isStarTarget(e)) return; // star 領域は行タップ対象外
+    if (isExcludedTarget(e)) return; // star / edit 領域は行タップ対象外
     longPressed = false;
     if (e.touches) startY = e.touches[0].clientY;
     row.classList.add('long-press');
@@ -1652,7 +1700,7 @@ function sceneRow(scene) {
   const up = (e) => {
     clearTimeout(pressTimer);
     row.classList.remove('long-press');
-    if (isStarTarget(e)) return; // star 領域は行タップ対象外
+    if (isExcludedTarget(e)) return; // star / edit 領域は行タップ対象外
     if (!longPressed) {
       // normal tap → run
       state.runSceneId = scene.id;
@@ -1966,12 +2014,18 @@ function renderS4c(screen) {
 
   cta.addEventListener('click', () => {
     if (cta.classList.contains('disabled')) return;
-    state.draftCard = {
+    // 時計カードは時刻とキャプションを同一画面で確認済みのため、
+    // 確認画面（S4confirm）はスキップして S5 へ直接追加する
+    const newCard = {
+      id: 'card_' + Date.now(),
       type: 'clock',
       label: input.value.trim(),
       clockTime: { h: state.clockHour, m: state.clockMin },
     };
-    go('S4confirm');
+    state.workingScene.cards.push(newCard);
+    state.draftCard = null;
+    showToast('カードを追加しました');
+    go('S5');
   });
 }
 
