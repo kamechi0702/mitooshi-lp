@@ -45,7 +45,7 @@ UI・モック・LP・プロトタイプ・スライド等の**ビジュアル�
 
 ## 具体仕様の参照先
 
-- **現行PRD（最重要）**: `/mitooshi/pdm/PRD_v2_MVP.md`
+- **現行PRD（最重要）**: `/mitooshi/pdm/PRD_v3_MVP.md`
 - **イラスト作画Skill（キャラクター系を描く前に必読）**: `/mitooshi/skills/mitooshi-illustration-style/SKILL.md`
 - デザイン参照（必須）: `shared/design-system/design-md-jp/mercari/DESIGN.md`
 - プリセットシーンのカード内訳: `/mitooshi/pdm/preset_scenes.md`

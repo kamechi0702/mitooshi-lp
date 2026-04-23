@@ -69,7 +69,7 @@ UIコンポーネント実装・モック作成・プロトタイプ着手の前
 
 ## 具体仕様の参照先
 
-- **現行PRD（最重要）**: `/mitooshi/pdm/PRD_v2_MVP.md`
+- **現行PRD（最重要）**: `/mitooshi/pdm/PRD_v3_MVP.md`
 - デザイン参照（必須）: `shared/design-system/design-md-jp/mercari/DESIGN.md`
 - プリセットシーン内訳: `/mitooshi/pdm/preset_scenes.md`
 - カードライブラリ素案: `/mitooshi/pdm/card_library_draft.md`

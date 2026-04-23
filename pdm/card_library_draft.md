@@ -6,7 +6,7 @@
 | 作成日 | 2026-04-19 |
 | 用途 | v1ローンチ時に同梱するAI生成カードの初期ラインナップを定める |
 | 目標枚数 | 60〜80枚（PRD v2.4 §11 準拠） |
-| 関連PRD | `/mitooshi/pdm/PRD_v2_MVP.md` |
+| 関連PRD | `/mitooshi/pdm/PRD_v3_MVP.md` |
 
 ## 設計方針
 
@@ -157,7 +157,7 @@
 
 ## 参照
 
-- 現行PRD: `/mitooshi/pdm/PRD_v2_MVP.md`
+- 現行PRD: `/mitooshi/pdm/PRD_v3_MVP.md`
 - プリセットシーン内訳: `/mitooshi/pdm/preset_scenes.md`
 - AI画像生成スタイルガイド: `/mitooshi/pdm/illustration_style_guide.md`
 - ラベル文言ルール: `/mitooshi/content/CLAUDE.md`

@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>療育支援のビジネスモデル詳細 | mitooshi 業界理解資料</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F7F2;
+    --mint-strong: #00806A;
+    --blue: #0073cc;
+    --blue-soft: #E8F1F9;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --pink-strong: #C94545;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --border: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-soft: #F7F7F7;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    max-width: 1280px;
+    margin: 0 auto;
+    gap: 0;
+  }
+
+  nav.toc {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 16px 32px 24px;
+    border-right: 1px solid var(--border);
+    background: var(--bg-soft);
+    font-size: 13px;
+  }
+  nav.toc .toc-title {
+    font-size: 11px;
+    color: var(--text-sub);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+  nav.toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: toc-counter;
+  }
+  nav.toc li {
+    counter-increment: toc-counter;
+    margin-bottom: 8px;
+  }
+  nav.toc a {
+    color: var(--text);
+    text-decoration: none;
+    display: block;
+    padding: 6px 8px;
+    border-radius: 4px;
+    line-height: 1.4;
+  }
+  nav.toc a:before {
+    content: counter(toc-counter) ". ";
+    color: var(--mint);
+    font-weight: 700;
+  }
+  nav.toc a:hover {
+    background: var(--mint-soft);
+    color: var(--mint-strong);
+  }
+
+  main {
+    padding: 48px 40px 96px;
+    min-width: 0;
+  }
+
+  header {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px;
+    margin-bottom: 56px;
+  }
+  header .eyebrow {
+    color: var(--mint);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    line-height: 1.3;
+  }
+  header p {
+    color: var(--text-sub);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  section {
+    margin-bottom: 64px;
+    scroll-margin-top: 24px;
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2 .sec-num {
+    display: inline-block;
+    background: var(--mint);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 32px;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  h2 + .lead {
+    color: var(--text-sub);
+    font-size: 14px;
+    margin: 12px 0 24px;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 28px 0 12px;
+  }
+
+  h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-sub);
+    margin: 20px 0 8px;
+    letter-spacing: 0.02em;
+  }
+
+  p { margin: 0 0 14px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 16px 0;
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-soft);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-sub);
+    letter-spacing: 0.02em;
+  }
+  td strong { color: var(--text); }
+  tr.highlight td { background: var(--mint-soft); }
+
+  .formula {
+    background: var(--bg-soft);
+    border-left: 3px solid var(--mint);
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .stat-box {
+    background: var(--mint-soft);
+    border: 1px solid var(--mint);
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+  }
+  .stat-number {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--mint-strong);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  .callout {
+    background: var(--blue-soft);
+    border-left: 4px solid var(--blue);
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .callout.mint {
+    background: var(--mint-soft);
+    border-left-color: var(--mint);
+  }
+  .callout.pink {
+    background: var(--pink-soft);
+    border-left-color: var(--pink);
+  }
+  .callout strong { color: var(--text); }
+
+  .quad {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .quad-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+  }
+  .quad-card .quad-tag {
+    display: inline-block;
+    background: var(--mint-soft);
+    color: var(--mint-strong);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+  }
+  .quad-card h4 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .quad-card p {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .breakdown {
+    margin: 20px 0;
+  }
+  .breakdown-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 80px;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+  .breakdown-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .breakdown-bar-bg {
+    background: var(--bg-soft);
+    height: 24px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .breakdown-bar-fill {
+    background: var(--mint);
+    height: 100%;
+    border-radius: 4px;
+  }
+  .breakdown-pct {
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--mint-strong);
+  }
+
+  .player-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .player-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .player-card .player-type {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .player-card h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .player-card p {
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .disclaimer {
+    margin-top: 48px;
+    padding: 16px 20px;
+    background: var(--pink-soft);
+    border-left: 4px solid var(--pink);
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-sub);
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.toc { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    main { padding: 32px 20px 64px; }
+    .stat-grid { grid-template-columns: 1fr; }
+    .quad { grid-template-columns: 1fr; }
+    .player-grid { grid-template-columns: 1fr; }
+    .breakdown-row { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- TOC -->
+<nav class="toc">
+  <div class="toc-title">CONTENTS</div>
+  <ol>
+    <li><a href="#s1">業界の全体像</a></li>
+    <li><a href="#s2">売上の仕組み（基本構造）</a></li>
+    <li><a href="#s3">報酬の詳細構造</a></li>
+    <li><a href="#s4">補助金・助成金・処遇改善</a></li>
+    <li><a href="#s5">経費構造</a></li>
+    <li><a href="#s6">業界プレイヤー</a></li>
+    <li><a href="#s7">経営の実態と利益率</a></li>
+    <li><a href="#s8">規制・監査・リスク</a></li>
+    <li><a href="#s9">ICT化の現状</a></li>
+    <li><a href="#s10">mitooshi Pro が入る余地</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<header>
+  <div class="eyebrow">mitooshi / 業界理解資料</div>
+  <h1>療育支援のビジネスモデル詳細</h1>
+  <p>売上の仕組み・報酬構造・経費・補助金・経営課題まで一貫整理</p>
+</header>
+
+<!-- Section 1 -->
+<section id="s1">
+  <h2><span class="sec-num">1</span>業界の全体像</h2>
+  <p class="lead">療育支援は児童福祉法に基づく公的サービス。事業所は国・自治体からの公費で運営される。</p>
+
+  <h3>主な事業類型</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 26%;">事業類型</th>
+        <th style="width: 14%;">対象年齢</th>
+        <th>内容</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>児童発達支援</strong>（児発）</td>
+        <td>0〜6歳（未就学）</td>
+        <td>未就学児への日常生活・社会性の支援。集団 or 個別療育</td>
+      </tr>
+      <tr>
+        <td><strong>放課後等デイサービス</strong>（放デイ）</td>
+        <td>6〜18歳</td>
+        <td>就学児への放課後・長期休暇の支援。学習・SST中心</td>
+      </tr>
+      <tr>
+        <td>児童発達支援センター</td>
+        <td>0〜6歳</td>
+        <td>地域の中核的拠点。専門性の高い支援＋他事業所への助言</td>
+      </tr>
+      <tr>
+        <td>保育所等訪問支援</td>
+        <td>0〜18歳</td>
+        <td>保育所・学校に訪問して支援。集団生活への適応サポート</td>
+      </tr>
+      <tr>
+        <td>居宅訪問型児童発達支援</td>
+        <td>重度等で外出困難</td>
+        <td>家庭訪問による支援</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>市場規模（概算）</h3>
+
+  <div class="stat-grid">
+    <div class="stat-box">
+      <div class="stat-number">約 2万事業所</div>
+      <div class="stat-label">児発 + 放デイ の事業所数</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">約 50万人</div>
+      <div class="stat-label">利用児童数（児発+放デイ合計）</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">約 1兆円規模</div>
+      <div class="stat-label">業界全体の売上規模（公費＋自己負担）</div>
+    </div>
+  </div>
+
+  <p>過去10年で<strong>事業所数は約3倍</strong>に急増。一方で人材不足・質のばらつき・指定取消の増加など課題も顕在化。</p>
+</section>
+
+<!-- Section 2 -->
+<section id="s2">
+  <h2><span class="sec-num">2</span>売上の仕組み（基本構造）</h2>
+  <p class="lead">事業所の売上は「公費9割 + 保護者自己負担1割」で構成される。</p>
+
+  <div class="formula">
+    事業所の売上 = 給付費（公費）+ 保護者自己負担<br>
+    給付費 = 利用報酬 × 90%<br>
+    自己負担 = 利用報酬 × 10%（ただし所得別の月額上限あり）
+  </div>
+
+  <h3>保護者の自己負担上限（所得別）</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>世帯所得区分</th>
+        <th>月額自己負担上限</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>生活保護世帯・市町村民税非課税世帯</td>
+        <td><strong>0円</strong>（無料）</td>
+      </tr>
+      <tr>
+        <td>市町村民税課税世帯（所得割28万円未満）</td>
+        <td><strong>4,600円</strong>／月</td>
+      </tr>
+      <tr>
+        <td>上記以上（所得割28万円以上）</td>
+        <td><strong>37,200円</strong>／月</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout mint">
+    <strong>ポイント：</strong>多くの利用者は月額4,600円までに収まる。<strong>事業所にとって「保護者は支払い意思の壁が低い顧客」</strong>。価格競争はほぼ起きず、質と空き状況で選ばれる構造になっている。
+  </div>
+
+  <h3>料金の決まり方：単位制</h3>
+
+  <p>報酬は「<strong>単位</strong>」で表示され、1単位 ≒ 10〜11円（地域単価）で円換算される。地域単価は都道府県・市町村ごとに定められ、東京都心部などは高め、地方は低め。</p>
+
+  <div class="formula">
+    例：単位数 800単位 × 地域単価 10.7円 = 8,560円／日
+  </div>
+</section>
+
+<!-- Section 3 -->
+<section id="s3">
+  <h2><span class="sec-num">3</span>報酬の詳細構造</h2>
+  <p class="lead">基本報酬 + 加算 の組み合わせで月商が決まる。</p>
+
+  <h3>基本報酬（令和6年改定後）</h3>
+
+  <p>令和6年4月の改定で、基本報酬は<strong>支援時間別の区分</strong>に見直された。短時間＝低単価、長時間＝高単価の傾向。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>支援時間区分（児発の例）</th>
+        <th>1人1日あたりの単位数（概算）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>30分以上1時間30分以下</td>
+        <td>約 500単位（≒ 5,000円）</td>
+      </tr>
+      <tr>
+        <td>1時間30分超〜3時間以下</td>
+        <td>約 700〜800単位（≒ 7,000〜8,000円）</td>
+      </tr>
+      <tr>
+        <td>3時間超〜5時間以下</td>
+        <td>約 800〜900単位（≒ 8,000〜9,000円）</td>
+      </tr>
+      <tr>
+        <td>5時間超</td>
+        <td>約 1,000単位以上（≒ 10,000円超）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>加算の4系統</h3>
+
+  <div class="quad">
+    <div class="quad-card">
+      <div class="quad-tag">系統 A</div>
+      <h4>個別支援の中身で取る加算</h4>
+      <p>家庭連携加算、事業所内相談支援加算、関係機関連携加算など。「やった証拠を残す」ことが鍵。記録負荷が高く取り逃がしが起きやすい。</p>
+    </div>
+    <div class="quad-card">
+      <div class="quad-tag">系統 B</div>
+      <h4>児童の特性で取る加算</h4>
+      <p>個別サポート加算I・II、強度行動障害児支援加算など。対象児童の認定が前提。記録の網羅性で監査耐性が決まる。</p>
+    </div>
+    <div class="quad-card">
+      <div class="quad-tag">系統 C</div>
+      <h4>専門職の関与で取る加算</h4>
+      <p>専門的支援加算（配置）、専門的支援実施加算など。OT・ST・心理士等の関与で算定。実施加算は1対1の支援記録が鍵。</p>
+    </div>
+    <div class="quad-card">
+      <div class="quad-tag">系統 D</div>
+      <h4>体制・運営で取る加算</h4>
+      <p>児童指導員等加配加算、送迎加算、延長支援加算など。人員配置や運営体制で取る加算。記録より体制が要件。</p>
+    </div>
+  </div>
+
+  <h3>主要加算の単位数（概算）</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>加算名</th>
+        <th>単位数</th>
+        <th>算定上限</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>家庭連携加算（50分以上）</td>
+        <td>300単位／回</td>
+        <td>月4回</td>
+      </tr>
+      <tr>
+        <td>事業所内相談支援加算I（個別）</td>
+        <td>100単位／回</td>
+        <td>月4回</td>
+      </tr>
+      <tr>
+        <td>関係機関連携加算I</td>
+        <td>250単位／回</td>
+        <td>月1回</td>
+      </tr>
+      <tr>
+        <td>専門的支援加算（配置）</td>
+        <td>123単位／日</td>
+        <td>通所児全員</td>
+      </tr>
+      <tr>
+        <td>専門的支援実施加算</td>
+        <td>150単位／回</td>
+        <td>月4回</td>
+      </tr>
+      <tr>
+        <td>個別サポート加算I</td>
+        <td>100単位／日</td>
+        <td>該当児通所日</td>
+      </tr>
+      <tr>
+        <td>個別サポート加算II</td>
+        <td>125単位／日</td>
+        <td>該当児通所日</td>
+      </tr>
+      <tr>
+        <td>強度行動障害児支援加算</td>
+        <td>200単位／日</td>
+        <td>該当児通所日</td>
+      </tr>
+      <tr>
+        <td>送迎加算</td>
+        <td>54単位／片道</td>
+        <td>送迎実施毎</td>
+      </tr>
+      <tr>
+        <td>保育・教育等移行支援加算</td>
+        <td>500単位／回</td>
+        <td>1回限り</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Section 4 -->
+<section id="s4">
+  <h2><span class="sec-num">4</span>補助金・助成金・処遇改善</h2>
+  <p class="lead">通常報酬の他に、運営を支える複数の補助金・処遇改善加算がある。</p>
+
+  <h3>処遇改善加算（職員給与の改善）</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>加算名</th>
+        <th>内容</th>
+        <th>規模</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>福祉・介護職員処遇改善加算</strong></td>
+        <td>キャリアアップ計画に基づく職員給与改善</td>
+        <td>基本報酬の数%加算</td>
+      </tr>
+      <tr>
+        <td><strong>福祉・介護職員等特定処遇改善加算</strong></td>
+        <td>経験・技能ある職員への重点配分</td>
+        <td>基本報酬の数%加算</td>
+      </tr>
+      <tr>
+        <td><strong>福祉・介護職員等ベースアップ等支援加算</strong></td>
+        <td>職員のベースアップ（基本給上昇）の原資</td>
+        <td>基本報酬の数%加算</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>これらは令和6年改定で<strong>一本化の方向</strong>に動いている。要件はキャリアパス制度・賃金改善計画・実績報告など。</p>
+
+  <h3>開設・運営支援の補助金</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>補助金名</th>
+        <th>主体</th>
+        <th>内容</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>障害福祉サービス事業所等の開設支援</td>
+        <td>自治体</td>
+        <td>新規開設時の設備・備品購入費</td>
+      </tr>
+      <tr>
+        <td>ICT導入支援事業</td>
+        <td>厚労省・自治体</td>
+        <td>業務効率化のためのICT機器・ソフト導入費</td>
+      </tr>
+      <tr>
+        <td>業務改善助成金</td>
+        <td>厚労省</td>
+        <td>賃金引上げ＋設備投資を組み合わせた助成</td>
+      </tr>
+      <tr>
+        <td>キャリアアップ助成金</td>
+        <td>厚労省</td>
+        <td>非正規職員の正社員化等</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout mint">
+    <strong>mitooshi Pro と関連が深いのは「ICT導入支援事業」。</strong>事業所が mitooshi Pro 導入時に、補助金を活用できる可能性がある。Discovery で確認すべきポイント。
+  </div>
+</section>
+
+<!-- Section 5 -->
+<section id="s5">
+  <h2><span class="sec-num">5</span>経費構造</h2>
+  <p class="lead">人件費が圧倒的。労働集約型ビジネスの典型。</p>
+
+  <h3>典型的な経費内訳（月商200万円規模の事業所）</h3>
+
+  <div class="breakdown">
+    <div class="breakdown-row">
+      <div class="breakdown-label">人件費</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: 70%;"></div></div>
+      <div class="breakdown-pct">約 70%</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-label">物件費（家賃）</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: 10%;"></div></div>
+      <div class="breakdown-pct">約 10%</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-label">水道光熱・通信</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: 4%;"></div></div>
+      <div class="breakdown-pct">約 4%</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-label">送迎車両費</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: 4%;"></div></div>
+      <div class="breakdown-pct">約 4%</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-label">教材・消耗品</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: 3%;"></div></div>
+      <div class="breakdown-pct">約 3%</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-label">システム・ICT</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: 2%;"></div></div>
+      <div class="breakdown-pct">約 2%</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-label">その他（保険・広告等）</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: 3%;"></div></div>
+      <div class="breakdown-pct">約 3%</div>
+    </div>
+    <div class="breakdown-row" style="border-top: 2px solid var(--mint); border-bottom: none; padding-top: 16px;">
+      <div class="breakdown-label" style="color: var(--mint-strong);">営業利益</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: 4%; background: var(--pink);"></div></div>
+      <div class="breakdown-pct" style="color: var(--pink-strong);">約 4%</div>
+    </div>
+  </div>
+
+  <div class="callout pink">
+    <strong>残念ながら：</strong>営業利益率は3〜8%程度（事業所による）。高単価ビジネスではなく、<strong>稼働率と加算取得で利益が左右される</strong>構造。固定費（人件費・家賃）が高いため、稼働率が10%下がると利益はほぼ消える。
+  </div>
+
+  <h3>人件費の中身</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>職種</th>
+        <th>役割</th>
+        <th>月給目安</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>児童発達支援管理責任者</strong>（児発管）</td>
+        <td>個別支援計画・運営責任</td>
+        <td>30〜45万円</td>
+      </tr>
+      <tr>
+        <td>児童指導員</td>
+        <td>日々の療育支援</td>
+        <td>22〜30万円</td>
+      </tr>
+      <tr>
+        <td>保育士</td>
+        <td>日々の療育支援</td>
+        <td>22〜30万円</td>
+      </tr>
+      <tr>
+        <td>OT/ST/心理士（非常勤）</td>
+        <td>専門的支援</td>
+        <td>時給3,000〜6,000円</td>
+      </tr>
+      <tr>
+        <td>送迎ドライバー（パート）</td>
+        <td>送迎</td>
+        <td>時給1,000〜1,500円</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Section 6 -->
+<section id="s6">
+  <h2><span class="sec-num">6</span>業界プレイヤー</h2>
+  <p class="lead">大手チェーンから個人経営まで多様。チェーン化が進行中。</p>
+
+  <div class="player-grid">
+    <div class="player-card">
+      <div class="player-type">大手チェーン</div>
+      <h4>LITALICO</h4>
+      <p>LITALICOジュニア（児発・放デイ）、LITALICOワンダー、LITALICOワークス。発達ナビ運営。教育大手。</p>
+    </div>
+    <div class="player-card">
+      <div class="player-type">大手チェーン</div>
+      <h4>コペル / コペルプラス</h4>
+      <p>幼児教育のコペル系列。コペルプラスは児発特化。FC展開も。</p>
+    </div>
+    <div class="player-card">
+      <div class="player-type">大手チェーン</div>
+      <h4>てらぴぁぽけっと</h4>
+      <p>ABA（応用行動分析）特化の児発・放デイ。FC展開。</p>
+    </div>
+    <div class="player-card">
+      <div class="player-type">大手チェーン</div>
+      <h4>ハッピーテラス</h4>
+      <p>放デイ中心、SST重視。直営＋FC。</p>
+    </div>
+    <div class="player-card">
+      <div class="player-type">中堅・地域</div>
+      <h4>地域中堅事業者</h4>
+      <p>各都道府県に存在する2〜10事業所規模の事業者。地域特性に合わせた運営。</p>
+    </div>
+    <div class="player-card">
+      <div class="player-type">個人経営</div>
+      <h4>1〜3拠点の小規模事業者</h4>
+      <p>業界の数として最大。人材不足・経営知識不足が課題。</p>
+    </div>
+  </div>
+
+  <h3>運営主体の構造</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>運営主体</th>
+        <th>特徴</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>株式会社（営利）</td>
+        <td>業界の主流。FC展開・チェーン展開しやすい。利益最大化志向</td>
+      </tr>
+      <tr>
+        <td>社会福祉法人（非営利）</td>
+        <td>歴史ある法人。地域密着、信頼性高い。経営革新は遅め</td>
+      </tr>
+      <tr>
+        <td>NPO法人</td>
+        <td>地域・特定領域に特化。資金調達が課題</td>
+      </tr>
+      <tr>
+        <td>一般社団法人</td>
+        <td>近年増加。柔軟な運営</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Section 7 -->
+<section id="s7">
+  <h2><span class="sec-num">7</span>経営の実態と利益率</h2>
+  <p class="lead">公費ベースで安定だが、利益率は薄い。経営課題は明確。</p>
+
+  <div class="stat-grid">
+    <div class="stat-box">
+      <div class="stat-number">月商 150〜300万円</div>
+      <div class="stat-label">1事業所あたりの典型的月商</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">営業利益率 3〜8%</div>
+      <div class="stat-label">業界平均（チェーンは高め）</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">稼働率 80%超</div>
+      <div class="stat-label">黒字化の目安ライン</div>
+    </div>
+  </div>
+
+  <h3>主な経営課題</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">課題</th>
+        <th>内容</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>人材不足</strong></td>
+        <td>特に児発管の確保が困難。1人退職で事業所運営が立ち行かなくなるリスク</td>
+      </tr>
+      <tr>
+        <td><strong>離職率の高さ</strong></td>
+        <td>業務負荷・低賃金感・キャリアパスの不明確さで離職率20%超</td>
+      </tr>
+      <tr>
+        <td><strong>記録業務の負担</strong></td>
+        <td>個別支援計画・モニタリング・連絡帳・加算記録で残業常態化</td>
+      </tr>
+      <tr>
+        <td><strong>加算取得の取り逃がし</strong></td>
+        <td>記録時間がなく、取れる加算を取り逃がす機会損失</td>
+      </tr>
+      <tr>
+        <td><strong>監査リスク</strong></td>
+        <td>記録不十分での加算返還・指定取消リスク</td>
+      </tr>
+      <tr>
+        <td><strong>稼働率の管理</strong></td>
+        <td>欠席・退所のコントロールが利益を左右</td>
+      </tr>
+      <tr>
+        <td><strong>支援の質のばらつき</strong></td>
+        <td>属人化・ベテラン依存。新人育成に時間がかかる</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Section 8 -->
+<section id="s8">
+  <h2><span class="sec-num">8</span>規制・監査・リスク</h2>
+  <p class="lead">公費ベースの事業ゆえ、規制と監査が経営を左右する。</p>
+
+  <h3>指定基準（運営要件）</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th>要件</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>人員基準</td>
+        <td>児発管1名以上、児童指導員 or 保育士の配置基準（児童数による）</td>
+      </tr>
+      <tr>
+        <td>設備基準</td>
+        <td>指導訓練室・相談室・洗面所・便所・収納設備</td>
+      </tr>
+      <tr>
+        <td>運営基準</td>
+        <td>個別支援計画作成、運営規程整備、苦情対応体制、虐待防止</td>
+      </tr>
+      <tr>
+        <td>記録の整備</td>
+        <td>支援記録、加算算定記録、業務日誌、契約書類等の保管</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>実地指導・監査</h3>
+
+  <p>都道府県・市町村が<strong>2〜3年に1回程度</strong>実施する。指導内容は：</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>指摘内容</th>
+        <th>結果</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>軽微な記録不備</td>
+        <td>口頭指導・改善報告書提出</td>
+      </tr>
+      <tr>
+        <td>加算算定要件不備</td>
+        <td><strong>過去5年遡及して加算返還</strong>（数百万円規模になる場合あり）</td>
+      </tr>
+      <tr>
+        <td>虚偽請求・重大不正</td>
+        <td><strong>指定取消</strong>（事業所閉鎖）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout pink">
+    <strong>監査リスクの実感：</strong>多くの事業所経営者にとって、実地指導は<strong>最も緊張する経営イベント</strong>。記録の網羅性・正確性が、事業継続を左右する。mitooshi Pro が「記録の自動蓄積」で安心感を提供できる領域。
+  </div>
+</section>
+
+<!-- Section 9 -->
+<section id="s9">
+  <h2><span class="sec-num">9</span>ICT化の現状</h2>
+  <p class="lead">業界全体でICT化は進みつつあるが、現場の生産性には直結していない。</p>
+
+  <h3>既存のICTサービス</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>カテゴリ</th>
+        <th>主要サービス</th>
+        <th>導入率（推定）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>連絡帳・保護者連携</td>
+        <td>コドモン、HUG、BLEND</td>
+        <td>30〜50%（増加中）</td>
+      </tr>
+      <tr>
+        <td>請求業務（レセプト）</td>
+        <td>HUG、ほのぼの、給管帳</td>
+        <td>70%以上</td>
+      </tr>
+      <tr>
+        <td>個別支援計画作成</td>
+        <td>HUG、ほのぼの</td>
+        <td>50%程度</td>
+      </tr>
+      <tr>
+        <td>視覚支援・カードアプリ</td>
+        <td>LITALICOやることカード、絵カードプリント、各種DL素材</td>
+        <td>10〜20%（紙併用が主）</td>
+      </tr>
+      <tr>
+        <td><strong>見通しボード（デジタル）</strong></td>
+        <td><strong>該当製品ほぼなし</strong></td>
+        <td><strong>1%未満</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout mint">
+    <strong>機会：</strong>デジタル見通しボード市場は<strong>ほぼ空白</strong>。請求・連絡帳・計画書はSaaSが立ち上がっているが、<strong>「日々の支援を可視化＆記録する」領域は手付かず</strong>。mitooshi Pro が狙う場所。
+  </div>
+
+  <h3>ICT化の壁</h3>
+
+  <p>導入率が低い背景には以下の構造がある：</p>
+
+  <ul style="font-size: 14px; line-height: 1.8;">
+    <li>現場職員のITリテラシーがばらつく（ベテラン中心の現場ほど抵抗あり）</li>
+    <li>ICT導入の意思決定者（経営者）と利用者（現場）が分離</li>
+    <li>導入コスト（初期費用＋月額）と効果が見えづらい</li>
+    <li>現場の業務フローを変える負担</li>
+    <li>既存の紙文化への愛着</li>
+  </ul>
+</section>
+
+<!-- Section 10 -->
+<section id="s10">
+  <h2><span class="sec-num">10</span>mitooshi Pro が入る余地</h2>
+  <p class="lead">業界構造から見て、mitooshi Pro の戦略的ポジションが見える。</p>
+
+  <h3>業界構造から導かれる4つの示唆</h3>
+
+  <div class="quad">
+    <div class="quad-card">
+      <div class="quad-tag">示唆 1</div>
+      <h4>「払えるお金」は限定的</h4>
+      <p>営業利益率3〜8%、月商200万円規模。月額1〜2万円が現実的なサブスク価格帯。それ以上は加算増収などの明確なROI提示が必要。</p>
+    </div>
+    <div class="quad-card">
+      <div class="quad-tag">示唆 2</div>
+      <h4>加算と監査が「払う理由」</h4>
+      <p>事業所経営者が最も気にするのは「加算取得 / 監査対応 / 人材定着」。mitooshi Pro はこの3つに直接効かないと、月額費用の正当化が難しい。</p>
+    </div>
+    <div class="quad-card">
+      <div class="quad-tag">示唆 3</div>
+      <h4>競争空白地帯がある</h4>
+      <p>請求・連絡帳・計画書はSaaSが存在するが、「見通しボード × 行動記録」は空白。先行者利益を取れる可能性。</p>
+    </div>
+    <div class="quad-card">
+      <div class="quad-tag">示唆 4</div>
+      <h4>意思決定者と利用者の分離</h4>
+      <p>経営者（払う側）と現場（使う側）が別。営業トークは経営者向け（加算・監査・利益）と現場向け（業務負担減・育成）の両軸が必要。</p>
+    </div>
+  </div>
+
+  <h3>mitooshi Pro のポジション</h3>
+
+  <div class="callout mint">
+    <strong>戦略的ポジション：</strong>「個別療育の体験を可視化＆記録する、空白地帯の専用ツール」。請求や連絡帳の機能を狙わず、<strong>支援の質と記録の網羅性に特化</strong>することで、既存ICTと競合せず、補完関係になる。月額1〜2万円のサブスクで、加算増収月数万円＋監査リスク低減＋現場負担削減を同時に提供する。
+  </div>
+
+  <h3>Discovery で必ず確認すべきこと</h3>
+
+  <ul style="font-size: 14px; line-height: 1.8;">
+    <li>事業所の現在の月商規模・営業利益率・稼働率</li>
+    <li>取得している加算と取り逃がしている加算</li>
+    <li>記録業務に費やしている時間</li>
+    <li>過去の実地指導での指摘事項</li>
+    <li>既存ICT（連絡帳・請求・計画書）の利用状況</li>
+    <li>ICT導入の意思決定プロセス（経営者・児発管・現場の関与度）</li>
+    <li>ICT導入支援補助金の活用経験</li>
+    <li>職員の離職・採用状況</li>
+  </ul>
+</section>
+
+<div class="disclaimer">
+  <strong>※ 注記：</strong>本資料の単位数・金額・統計データは令和6年4月報酬改定時点での概算値および業界一般的な推計を含みます。事業所タイプ・地域・規模により実態は大きく異なるため、Discovery フェーズで個別事業所への具体ヒアリングを通じて精度を上げる必要があります。また、補助金・助成金は各自治体・年度により要件が変動します。
+</div>
+
+<footer>
+  <span>mitooshi — 療育支援ビジネスモデル詳細 v0.1 / 2026-04-20</span>
+  <span>HuX Inc. / Document for internal discussion</span>
+</footer>
+
+</main>
+
+</div>
+
+</body>
+</html>

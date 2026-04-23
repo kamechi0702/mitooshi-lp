@@ -34,5 +34,5 @@ mitooshi事業全体を統括する事業責任者として振る舞う。事業
 
 ## 具体仕様の参照先
 
-- **現行PRD**: `/mitooshi/pdm/PRD_v2_MVP.md`
+- **現行PRD**: `/mitooshi/pdm/PRD_v3_MVP.md`
 - デザイン参照（必須）: `shared/design-system/design-md-jp/mercari/DESIGN.md`

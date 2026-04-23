@@ -229,7 +229,7 @@ v1.1 ラベル（名詞＋動詞形式）への対応マップは `card_library_
 
 ## 参照
 
-- 現行PRD: `/mitooshi/pdm/PRD_v2_MVP.md` §12
+- 現行PRD: `/mitooshi/pdm/PRD_v3_MVP.md` §12
 - 詳細版スタイルガイド: `/mitooshi/pdm/illustration_style_guide.md`
 - プリセットシーン内訳: `/mitooshi/pdm/preset_scenes.md`
 - カードライブラリ素案: `/mitooshi/pdm/card_library_draft.md`

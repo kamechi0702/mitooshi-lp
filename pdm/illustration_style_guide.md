@@ -5,7 +5,7 @@
 | バージョン | v2.3（方向A：LP完全継承／既存カードを image-to-image で一括変換） |
 | 作成日 | 2026-04-19 |
 | 用途 | カードイラスト・LP挿絵・OG画像のスタイル統一指針 |
-| 関連PRD | `/mitooshi/pdm/PRD_v2_MVP.md` §12 |
+| 関連PRD | `/mitooshi/pdm/PRD_v3_MVP.md` §12 |
 | 採用方向 | **方向A：mitooshi.jp LP 完全継承**（ミニマル・フラット・ベクター・線画なし） |
 | 関連Skill | [`/mitooshi/skills/mitooshi-illustration-style/SKILL.md`](../skills/mitooshi-illustration-style/SKILL.md) |
 
@@ -218,7 +218,7 @@ Midjourney / DALL-E / Firefly 等への切替は、**ブランドトーン分断
 ## 参照
 
 - **Skill（要件の圧縮版）**: [`/mitooshi/skills/mitooshi-illustration-style/SKILL.md`](../skills/mitooshi-illustration-style/SKILL.md)
-- 現行PRD: `/mitooshi/pdm/PRD_v2_MVP.md`
+- 現行PRD: `/mitooshi/pdm/PRD_v3_MVP.md`
 - カードライブラリ素案: `/mitooshi/pdm/card_library_draft.md`
 - プリセットシーン内訳: `/mitooshi/pdm/preset_scenes.md`
 - デザイン参照（必須）: `shared/design-system/design-md-jp/mercari/DESIGN.md`

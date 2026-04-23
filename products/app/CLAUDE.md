@@ -6,7 +6,7 @@ React Native + Expo で実装する mitooshi 本番アプリのソースコー�
 
 ## 着手前に読むもの
 
-1. **体験仕様の正本**：[`../../pdm/PRD_v2_MVP.md`](../../pdm/PRD_v2_MVP.md)（v2.6）
+1. **体験仕様の正本**：[`../../pdm/PRD_v3_MVP.md`](../../pdm/PRD_v3_MVP.md)（v2.6）
 2. **デザイン参照（必須）**：[`../../shared/design-system/design-md-jp/mercari/DESIGN.md`](../../shared/design-system/design-md-jp/mercari/DESIGN.md)
 3. **開発ガイド**：[`../../development/CLAUDE.md`](../../development/CLAUDE.md)
 4. **イラスト作画 Skill**：[`../../skills/mitooshi-illustration-style/SKILL.md`](../../skills/mitooshi-illustration-style/SKILL.md)

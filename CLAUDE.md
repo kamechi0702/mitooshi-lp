@@ -49,7 +49,7 @@ mitooshi/
 │
 ├── pdm/                              PdM成果物（プロダクト横断）
 │   ├── CLAUDE.md                     PdM 視点ガイド
-│   ├── PRD_v2_MVP.md                 現行PRD（v2.6）
+│   ├── PRD_v3_MVP.md                 現行PRD（v3.0）
 │   ├── DESIGN_HANDOFF.md             デザイン刷新ブリーフ
 │   ├── preset_scenes.md              プリセット3シーンのカード内訳
 │   ├── card_library_draft.md         カードライブラリ素案
@@ -87,7 +87,7 @@ mitooshi/
 ### App（products/app/）
 - 本番アプリ。React Native + Expo（予定）
 - カードイラストは `shared/illust/mitooshi/` を同梱想定
-- 着手時は `pdm/PRD_v2_MVP.md` と `pdm/DESIGN_HANDOFF.md` を必読
+- 着手時は `pdm/PRD_v3_MVP.md` と `pdm/DESIGN_HANDOFF.md` を必読
 
 ## 横断資産の参照ルール
 
@@ -129,7 +129,7 @@ CNAME は `products/lp/CNAME` に移動済み。mitooshi.jp の DNS 設定は変
 
 各ディレクトリの CLAUDE.md は、その職種の役割で作業するときに参照する。具体的な仕様はそれぞれ以下に集約：
 
-- 体験仕様・機能要件 → `pdm/PRD_v2_MVP.md`
+- 体験仕様・機能要件 → `pdm/PRD_v3_MVP.md`
 - カードライブラリ・プリセット内訳 → `pdm/card_library_draft.md` / `pdm/preset_scenes.md`
 - イラストルール → `pdm/illustration_style_guide.md` / `skills/mitooshi-illustration-style/SKILL.md`
 - LP コンテンツ・文言 → `content/CLAUDE.md` / `marketing/CLAUDE.md`

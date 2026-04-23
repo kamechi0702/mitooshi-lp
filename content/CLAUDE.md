@@ -59,7 +59,7 @@ LP・ストア説明文・noteなどの**ビジュアルを伴うコンテンツ
 
 ## 具体仕様の参照先
 
-- **現行PRD**: `/mitooshi/pdm/PRD_v2_MVP.md`
+- **現行PRD**: `/mitooshi/pdm/PRD_v3_MVP.md`
 - デザイン参照（必須）: `shared/design-system/design-md-jp/mercari/DESIGN.md`
 - カードライブラリ素案: `/mitooshi/pdm/card_library_draft.md`
 - マーケティング方針: `/mitooshi/marketing/CLAUDE.md`

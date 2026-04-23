@@ -5,14 +5,14 @@
 | バージョン | v1.0 |
 | 作成日 | 2026-04-19 |
 | 受け渡し対象 | Claude Code / Agent SDK ベースの専用デザインエージェント |
-| 現行PRD（Source of Truth） | [`/mitooshi/pdm/PRD_v2_MVP.md`](./PRD_v2_MVP.md)（v2.4） |
+| 現行PRD（Source of Truth） | [`/mitooshi/pdm/PRD_v3_MVP.md`](./PRD_v3_MVP.md)（v2.4） |
 | 目的 | 体験仕様は維持したまま、ビジュアルデザイン層を刷新するプロセスへ移行する |
 
 ---
 
 ## 1. このドキュメントの役割
 
-mitooshi v1(MVP) の体験仕様はすでに PRD_v2_MVP.md で固まっている。**このブリーフはその PRD をベースにデザインエージェントへ渡すための入口**として機能する。
+mitooshi v1(MVP) の体験仕様はすでに PRD_v3_MVP.md で固まっている。**このブリーフはその PRD をベースにデザインエージェントへ渡すための入口**として機能する。
 
 - デザインエージェントは PRD を読み込むだけで、作るべき体験・画面・機能・制約を把握できる
 - このブリーフは「PRD のどこを読むか」「どこが変更可能／不可か」「何を成果物として期待するか」をエージェントに指示する
@@ -23,10 +23,10 @@ mitooshi v1(MVP) の体験仕様はすでに PRD_v2_MVP.md で固まっている
 
 | レイヤー | 扱い | 場所 |
 |---|---|---|
-| **体験仕様** | **維持（変更不可）** | PRD_v2_MVP.md §1〜§11, §13〜§17 |
-| **データモデル・機能要件・画面要件** | **維持（変更不可）** | PRD_v2_MVP.md §8〜§10 |
+| **体験仕様** | **維持（変更不可）** | PRD_v3_MVP.md §1〜§11, §13〜§17 |
+| **データモデル・機能要件・画面要件** | **維持（変更不可）** | PRD_v3_MVP.md §8〜§10 |
 | **文言ルール・ラベル形式** | **維持（変更不可）** | content/CLAUDE.md／PRD §13 |
-| **ビジュアル方針（mercari DESIGN.md ベース・#00B894）** | **刷新対象** | PRD_v2_MVP.md §12 |
+| **ビジュアル方針（mercari DESIGN.md ベース・#00B894）** | **刷新対象** | PRD_v3_MVP.md §12 |
 | **イラストスタイルガイド** | **刷新対象** | pdm/illustration_style_guide.md |
 | **プロトタイプのHTML/SVG実装** | **参考扱い（差し替え可）** | prototype/index.html |
 
@@ -127,7 +127,7 @@ mitooshi v1(MVP) の体験仕様はすでに PRD_v2_MVP.md で固まっている
 PdM視点での提案。エージェント自体の構築はデザイン側で行ってよい。
 
 ### エージェントの入力
-- `PRD_v2_MVP.md`（必須読み込み）
+- `PRD_v3_MVP.md`（必須読み込み）
 - `preset_scenes.md` / `card_library_draft.md`（カード情報）
 - `content/CLAUDE.md`（文言ルール）
 - このブリーフ（`DESIGN_HANDOFF.md`）
@@ -166,7 +166,7 @@ PdM視点での提案。エージェント自体の構築はデザイン側で�
 
 ## 9. 参照
 
-- **現行PRD（Source of Truth）**: [`./PRD_v2_MVP.md`](./PRD_v2_MVP.md)
+- **現行PRD（Source of Truth）**: [`./PRD_v3_MVP.md`](./PRD_v3_MVP.md)
 - プリセットシーン内訳: [`./preset_scenes.md`](./preset_scenes.md)
 - カードライブラリ素案: [`./card_library_draft.md`](./card_library_draft.md)
 - 現イラストスタイルガイド（刷新対象）: [`./illustration_style_guide.md`](./illustration_style_guide.md)

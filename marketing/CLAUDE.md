@@ -61,7 +61,7 @@ LP・SNS素材・広告クリエイティブ・OG画像など、**ビジュア�
 
 ## 具体仕様の参照先
 
-- **現行PRD**: `/mitooshi/pdm/PRD_v2_MVP.md`
+- **現行PRD**: `/mitooshi/pdm/PRD_v3_MVP.md`
 - デザイン参照（必須）: `shared/design-system/design-md-jp/mercari/DESIGN.md`
 - AI画像生成スタイルガイド: `/mitooshi/pdm/illustration_style_guide.md`
 - コンテンツ方針（文言ルール）: `/mitooshi/content/CLAUDE.md`

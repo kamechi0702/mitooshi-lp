@@ -5,7 +5,7 @@
 | バージョン | v1.0（PRD v2.2に紐づく初版） |
 | 作成日 | 2026-04-19 |
 | 用途 | 初回起動時にTOPに並ぶ3シーンのカード構成を確定する |
-| 関連PRD | `/mitooshi/pdm/PRD_v2_MVP.md` （Q10の回答ドラフト） |
+| 関連PRD | `/mitooshi/pdm/PRD_v3_MVP.md` （Q10の回答ドラフト） |
 
 ## 背景
 
@@ -77,6 +77,6 @@ PRD v2.2では「初回起動時にTOPに人気シーン3つ＋もっとつく�
 
 ## 参照
 
-- 現行PRD: `/mitooshi/pdm/PRD_v2_MVP.md`
+- 現行PRD: `/mitooshi/pdm/PRD_v3_MVP.md`
 - カードライブラリ素案: `/mitooshi/pdm/card_library_draft.md`
 - AI画像生成スタイルガイド: `/mitooshi/pdm/illustration_style_guide.md`

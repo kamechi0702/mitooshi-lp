@@ -43,6 +43,6 @@ const ILLUST_BASE = '../../shared/illust/mitooshi/';
 
 ## 関連
 
-- 体験仕様の正本: `../../pdm/PRD_v2_MVP.md`
+- 体験仕様の正本: `../../pdm/PRD_v3_MVP.md`
 - プリセット3シーン内訳: `../../pdm/preset_scenes.md`
 - カードライブラリ対応表: `../../pdm/card_library_draft.md`
