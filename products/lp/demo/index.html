@@ -1081,18 +1081,6 @@
     overflow: hidden;
   }
   .preview-card .preview-img-area img { width: 100%; height: 100%; object-fit: cover; }
-  .preview-card .preview-img-area .placeholder-icon { stroke: var(--text-muted); width: 56px; height: 56px; }
-  .preview-card .preview-img-area.clock {
-    background: #fff;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .preview-card .preview-img-area.clock .big-time {
-    font-size: 48px;
-    font-weight: 900;
-    color: var(--text);
-    letter-spacing: 1px;
-  }
   .preview-card .preview-label-area {
     background: var(--primary);
     color: #fff;
@@ -1101,6 +1089,10 @@
     font-weight: 900;
     font-size: 16px;
     letter-spacing: 1px;
+  }
+  /* 写真プレビュー：ラベル帯なし・角丸を全周に */
+  .preview-card.photo-only .preview-img-area {
+    border-radius: 10px;
   }
 
   .note {
@@ -2060,11 +2052,16 @@ function renderS4d(screen) {
 
   cta.addEventListener('click', () => {
     if (cta.classList.contains('disabled')) return;
-    state.draftCard = {
+    // 文字カードは S4d 入力時点で内容が確定しているため、確認画面はスキップ
+    const newCard = {
+      id: 'card_' + Date.now(),
       type: 'text',
       label: input.value.trim(),
     };
-    go('S4confirm');
+    state.workingScene.cards.push(newCard);
+    state.draftCard = null;
+    showToast('カードを追加しました');
+    go('S5');
   });
 
   setTimeout(() => input.focus(), 100);
@@ -2072,6 +2069,7 @@ function renderS4d(screen) {
 
 // ============================================================
 // S4 confirm — preview the card and allow text tweak
+// （現状は illust / photo のみ通る：clock / text はスキップして直接 S5）
 // ============================================================
 function renderS4confirm(screen) {
   const header = h('div', { class: 'header' });
@@ -2097,26 +2095,21 @@ function renderS4confirm(screen) {
   ]));
 
   // preview card
-  const card = h('div', { class: 'preview-card' });
-  const imgArea = h('div', { class: 'preview-img-area' + (draft.type === 'clock' ? ' clock' : '') });
+  const card = h('div', { class: 'preview-card' + (draft.type === 'photo' ? ' photo-only' : '') });
+  const imgArea = h('div', { class: 'preview-img-area' });
   if (draft.type === 'illust') {
     imgArea.appendChild(h('img', { src: ILLUST_BASE + draft.illustFile }));
   } else if (draft.type === 'photo') {
     imgArea.appendChild(h('img', { src: draft.photoUrl }));
-  } else if (draft.type === 'clock') {
-    const hh = String(draft.clockTime.h).padStart(2, '0');
-    const mm = String(draft.clockTime.m).padStart(2, '0');
-    imgArea.appendChild(h('div', { class: 'big-time' }, `${hh}:${mm}`));
-  } else {
-    // text only
-    const ic = icon('i-text');
-    ic.classList.add('placeholder-icon');
-    imgArea.appendChild(ic);
   }
   card.appendChild(imgArea);
 
-  const labelArea = h('div', { class: 'preview-label-area' }, draft.label || '（ラベル未設定）');
-  card.appendChild(labelArea);
+  // ラベル帯：写真タイプでは省略（画像だけ確認すればよいため）
+  let labelArea = null;
+  if (draft.type !== 'photo') {
+    labelArea = h('div', { class: 'preview-label-area' }, draft.label || '（ラベル未設定）');
+    card.appendChild(labelArea);
+  }
   body.appendChild(card);
 
   // editable label
@@ -2129,7 +2122,7 @@ function renderS4confirm(screen) {
   });
   input.addEventListener('input', () => {
     draft.label = input.value.trim();
-    labelArea.textContent = draft.label || '（ラベル未設定）';
+    if (labelArea) labelArea.textContent = draft.label || '（ラベル未設定）';
   });
   body.appendChild(input);
 
