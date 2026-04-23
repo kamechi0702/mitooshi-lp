@@ -292,20 +292,42 @@
     transform: scale(0.98);
   }
   .list-row .star-btn {
-    width: 28px; height: 28px;
+    width: 40px; height: 40px;
+    padding: 0;
+    margin: -6px -4px -6px -8px;
+    border: none;
+    background: transparent;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
     cursor: pointer;
+    border-radius: 20px;
+    transition: background 120ms, transform 120ms;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .list-row .star-btn:active {
+    background: rgba(255,209,102,0.18);
+    transform: scale(0.9);
+  }
+  .list-row .star-btn.pulse {
+    animation: star-pulse 240ms ease-out;
+  }
+  @keyframes star-pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.4); }
+    100% { transform: scale(1); }
   }
   .list-row .star-btn .icon {
-    width: 20px; height: 20px;
+    width: 22px; height: 22px;
     stroke: #bbb;
     fill: none;
     stroke-width: 1.8;
+    pointer-events: none;
+    transition: stroke 160ms, fill 160ms;
   }
   .list-row .star-btn.active .icon {
     fill: var(--star-yellow);
     stroke: var(--star-yellow-border);
+    stroke-width: 1.6;
   }
   .list-row .name {
     flex: 1;
@@ -373,11 +395,23 @@
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 12px rgba(0,184,148,0.35);
     margin-bottom: 2px;
-    transition: transform 120ms, box-shadow 120ms;
+    transition: transform 120ms, box-shadow 120ms, background 160ms;
   }
   .tab.center .fab:active {
     transform: scale(0.94);
     box-shadow: 0 2px 6px rgba(0,184,148,0.5);
+  }
+  /* 中央FABの＋アイコンは常に白（active時に親tab色に飲まれないように優先度を上げる） */
+  .tab.center .fab .icon,
+  .tab.center.active .fab .icon {
+    stroke: #fff !important;
+    width: 28px; height: 28px;
+    stroke-width: 2.6;
+  }
+  /* active時のFABをわずかに濃く */
+  .tab.center.active .fab {
+    background: var(--primary-hover);
+    box-shadow: 0 6px 16px rgba(0,184,148,0.5);
   }
 
   /* ============ CTA ============ */
@@ -633,12 +667,13 @@
   .edit-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px;
+    gap: 12px;
+    padding: 14px 14px;
+    min-height: 68px;
     background: var(--bg-soft);
-    border-radius: 10px;
-    margin-bottom: 8px;
-    font-size: 13px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
     user-select: none;
   }
   .edit-row.removing {
@@ -649,8 +684,8 @@
   .edit-row .trash {
     background: var(--danger);
     color: #fff;
-    width: 32px; height: 32px;
-    border-radius: 6px;
+    width: 40px; height: 40px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -659,11 +694,11 @@
     transition: transform 120ms;
   }
   .edit-row .trash:active { transform: scale(0.9); }
-  .edit-row .trash .icon { stroke: #fff; width: 14px; height: 14px; stroke-width: 2.2; }
+  .edit-row .trash .icon { stroke: #fff; width: 18px; height: 18px; stroke-width: 2.2; }
   .edit-row .thumb {
-    width: 36px; height: 36px;
+    width: 52px; height: 52px;
     background: #fff;
-    border-radius: 4px;
+    border-radius: 6px;
     border: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -672,27 +707,28 @@
     flex-shrink: 0;
   }
   .edit-row .thumb img { width: 100%; height: 100%; object-fit: cover; }
-  .edit-row .thumb.text-only .icon { stroke: var(--text-sub); width: 16px; height: 16px; }
+  .edit-row .thumb.text-only .icon { stroke: var(--text-sub); width: 22px; height: 22px; }
   .edit-row .thumb.clock {
-    font-size: 10px; font-weight: 700;
+    font-size: 14px; font-weight: 800;
     background: #fff; color: var(--text);
     line-height: 1;
+    letter-spacing: 0.5px;
   }
   .edit-row .name {
     flex: 1;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-weight: 600;
+    font-weight: 700;
   }
   .edit-row .edit-icon,
   .edit-row .handle {
-    width: 28px; height: 28px;
+    width: 36px; height: 36px;
     border: 1px solid var(--border);
     background: #fff;
-    border-radius: 4px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -703,7 +739,7 @@
   .edit-row .edit-icon:active,
   .edit-row .handle:active { background: var(--bg-soft); }
   .edit-row .edit-icon .icon,
-  .edit-row .handle .icon { stroke: var(--text-sub); width: 14px; height: 14px; }
+  .edit-row .handle .icon { stroke: var(--text-sub); width: 18px; height: 18px; }
 
   .edit-footer {
     display: flex;
@@ -750,67 +786,31 @@
 
   /* ============ S6: execute ============ */
   .exec-top {
-    padding: 10px 16px;
+    padding: 6px 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border);
-    min-height: 56px;
-  }
-  .exec-back-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  .exec-back-col .back {
-    width: 32px; height: 32px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-sub);
-    cursor: pointer;
-    transition: background 120ms, border-color 120ms;
-    position: relative;
-    overflow: hidden;
-  }
-  .exec-back-col .back .fill {
-    position: absolute; inset: 0;
-    background: var(--primary);
-    transform: scaleY(0);
-    transform-origin: bottom;
-    transition: transform 0s linear;
-    z-index: 0;
-  }
-  .exec-back-col .back.pressing .fill {
-    transform: scaleY(1);
-    transition: transform 800ms linear;
-  }
-  .exec-back-col .back .icon {
-    position: relative; z-index: 1;
-    transition: stroke 80ms;
-  }
-  .exec-back-col .back.pressing .icon { stroke: #fff; }
-  .exec-back-hint {
-    font-size: 9px;
-    color: var(--text-sub);
-    font-weight: 600;
+    min-height: 52px;
+    gap: 8px;
   }
   .exec-title {
-    font-size: 14px;
+    flex: 1;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .exec-progress {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--primary);
-    min-width: 40px;
+    min-width: 48px;
     text-align: right;
+    padding-right: 4px;
   }
 
   .exec-body {
@@ -1400,6 +1400,7 @@ function presetScene(id, name, illustIds, isFavorite = false) {
     name,
     cards,
     isFavorite,
+    favoriteSetAt: isFavorite ? Date.now() : null,
     createdAt: Date.now(),
     lastUsedAt: null,
   };
@@ -1557,8 +1558,14 @@ function renderS1(screen) {
 
   const body = h('div', { class: 'body' });
 
-  const favScenes = state.scenes.filter(s => s.isFavorite);
-  const norScenes = state.scenes.filter(s => !s.isFavorite);
+  // お気に入り：最近★にした順で上位表示
+  const favScenes = state.scenes
+    .filter(s => s.isFavorite)
+    .sort((a, b) => (b.favoriteSetAt || b.createdAt || 0) - (a.favoriteSetAt || a.createdAt || 0));
+  // 通常：最終使用順、次いで作成順
+  const norScenes = state.scenes
+    .filter(s => !s.isFavorite)
+    .sort((a, b) => (b.lastUsedAt || b.createdAt || 0) - (a.lastUsedAt || a.createdAt || 0));
 
   if (favScenes.length > 0) {
     body.appendChild(h('div', { class: 'section-label' }, 'よく使うリスト'));
@@ -1583,17 +1590,27 @@ function renderS1(screen) {
 function sceneRow(scene) {
   const row = h('div', { class: 'list-row', dataset: { sceneId: scene.id } });
 
-  // star button
-  const starBtn = h('span', {
+  // star button (お気に入り切り替え — タップで即上位に)
+  const starBtn = h('button', {
+    type: 'button',
     class: 'star-btn' + (scene.isFavorite ? ' active' : ''),
+    'aria-label': scene.isFavorite ? 'お気に入り解除' : 'お気に入りに追加',
   });
   starBtn.appendChild(icon('i-star'));
-  starBtn.addEventListener('click', e => {
+  const toggleFavorite = (e) => {
+    e.preventDefault();
     e.stopPropagation();
     scene.isFavorite = !scene.isFavorite;
-    render();
-    showToast(scene.isFavorite ? '★ よく使うに追加' : '☆ 通常リストに戻しました');
-  });
+    scene.favoriteSetAt = scene.isFavorite ? Date.now() : null;
+    // アニメーション後 render
+    starBtn.classList.add('pulse');
+    setTimeout(() => {
+      render();
+      showToast(scene.isFavorite ? '★ よく使うに追加しました' : '☆ 通常リストに戻しました');
+    }, 120);
+  };
+  starBtn.addEventListener('click', toggleFavorite);
+  starBtn.addEventListener('touchend', toggleFavorite);
   row.appendChild(starBtn);
 
   row.appendChild(h('span', { class: 'name' }, scene.name));
@@ -1607,7 +1624,13 @@ function sceneRow(scene) {
   let longPressed = false;
   let startY = 0;
 
+  const isStarTarget = (e) => {
+    const t = e.target;
+    return t && (t.closest && t.closest('.star-btn'));
+  };
+
   const down = (e) => {
+    if (isStarTarget(e)) return; // star 領域は行タップ対象外
     longPressed = false;
     if (e.touches) startY = e.touches[0].clientY;
     row.classList.add('long-press');
@@ -1626,9 +1649,10 @@ function sceneRow(scene) {
       showToast('リストを編集モードにしました');
     }, 600);
   };
-  const up = () => {
+  const up = (e) => {
     clearTimeout(pressTimer);
     row.classList.remove('long-press');
+    if (isStarTarget(e)) return; // star 領域は行タップ対象外
     if (!longPressed) {
       // normal tap → run
       state.runSceneId = scene.id;
@@ -2361,17 +2385,14 @@ function renderS6(screen) {
   const scene = state.scenes.find(s => s.id === state.runSceneId);
   if (!scene) { go('S1'); return; }
 
-  // Top bar with long-press back
+  // Top bar with tap-to-back
   const top = h('div', { class: 'exec-top' });
-  const backCol = h('div', { class: 'exec-back-col' });
-  const back = h('div', { class: 'back' });
-  const fill = h('div', { class: 'fill' });
-  const backIcon = icon('i-chevron-left', 'icon sm');
-  back.appendChild(fill);
-  back.appendChild(backIcon);
-  backCol.appendChild(back);
-  backCol.appendChild(h('div', { class: 'exec-back-hint' }, 'ながおし'));
-  top.appendChild(backCol);
+  const back = backButton(() => {
+    state.runSceneId = null;
+    state.runDoneIds = new Set();
+    go('S1');
+  });
+  top.appendChild(back);
 
   top.appendChild(h('div', { class: 'exec-title' }, scene.name));
 
@@ -2381,41 +2402,6 @@ function renderS6(screen) {
   top.appendChild(h('div', { class: 'exec-progress' }, `${doneCount} / ${total}`));
   screen.appendChild(top);
 
-  // long-press back (tap は子どもの誤操作防止のためヒント表示のみ)
-  let backTimer = null;
-  let backLongPressed = false;
-  let backDownAt = 0;
-  const startBack = () => {
-    backLongPressed = false;
-    backDownAt = Date.now();
-    back.classList.add('pressing');
-    backTimer = setTimeout(() => {
-      backLongPressed = true;
-      back.classList.remove('pressing');
-      navigator.vibrate && navigator.vibrate(30);
-      state.runSceneId = null;
-      state.runDoneIds = new Set();
-      go('S1');
-    }, 800);
-  };
-  const endBack = () => {
-    back.classList.remove('pressing');
-    clearTimeout(backTimer);
-    if (!backLongPressed && Date.now() - backDownAt < 800) {
-      // short tap — show hint
-      showToast('もどるには長押ししてね', 1400);
-    }
-  };
-  const cancelBack = () => {
-    back.classList.remove('pressing');
-    clearTimeout(backTimer);
-  };
-  back.addEventListener('mousedown', startBack);
-  back.addEventListener('mouseup', endBack);
-  back.addEventListener('mouseleave', cancelBack);
-  back.addEventListener('touchstart', (e) => { e.preventDefault(); startBack(); });
-  back.addEventListener('touchend', endBack);
-  back.addEventListener('touchcancel', cancelBack);
 
   // body list
   const body = h('div', { class: 'exec-body' });
