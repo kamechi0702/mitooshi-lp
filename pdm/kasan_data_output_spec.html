@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>加算別データ取得 × 出力ドキュメント仕様</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --yellow: #FFE082;
+    --yellow-soft: #FFF8E1;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+    --paper: #FCFAF7;
+    --paper-line: #DCD7CD;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px; line-height: 1.7;
+    color: var(--text); background: var(--bg);
+  }
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 240px; flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    font-size: 13px; background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text); text-decoration: none;
+    padding: 4px 8px; display: block; border-radius: 4px; line-height: 1.4;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+  aside.toc .sub { padding-left: 14px; font-size: 12px; color: var(--text-sub); }
+
+  main { flex: 1; padding: 48px 56px; max-width: 940px; }
+  header.doc {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px; margin-bottom: 40px;
+  }
+  header.doc .eyebrow {
+    color: var(--mint); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  header.doc h1 {
+    font-size: 28px; font-weight: 700; line-height: 1.3; margin-bottom: 8px;
+  }
+  header.doc .lead { color: var(--text-sub); font-size: 15px; }
+
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 22px; font-weight: 700; margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint); font-size: 14px; font-weight: 700;
+  }
+  section h2 .units {
+    margin-left: auto; font-size: 13px; font-weight: 700;
+    color: var(--mint-dark); background: var(--mint-soft);
+    padding: 4px 12px; border-radius: 12px;
+  }
+  section h3 { font-size: 17px; font-weight: 700; margin: 24px 0 8px; }
+  section h4 {
+    font-size: 13px; font-weight: 700; margin: 16px 0 6px;
+    color: var(--text-sub); letter-spacing: 0.02em;
+  }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* データテーブル（生データ） */
+  table.data-schema {
+    width: 100%; border-collapse: collapse;
+    font-size: 11px; margin: 12px 0;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  table.data-schema th, table.data-schema td {
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  table.data-schema th {
+    background: #2C3E50;
+    color: white;
+    font-weight: 700;
+    font-size: 10px;
+  }
+  table.data-schema tbody tr:nth-child(odd) { background: var(--bg-alt); }
+  table.data-schema td.field { color: var(--blue); }
+  table.data-schema td.value { color: var(--mint-dark); font-weight: 700; }
+
+  /* セッション例 */
+  .session-log {
+    background: #1E2733;
+    color: #C5D6E5;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .session-log .key { color: #87CEEB; }
+  .session-log .value { color: #98D8B8; }
+  .session-log .num { color: #F4BF75; }
+  .session-log .comment { color: #6B7B89; font-style: italic; }
+  .session-log .alert { color: #FF8A8A; font-weight: 700; }
+
+  /* ドキュメントモック（紙の帳票風） */
+  .doc-mock {
+    background: var(--paper);
+    border: 1px solid var(--paper-line);
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin: 16px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .doc-mock .doc-hdr {
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--text);
+    margin-bottom: 20px;
+  }
+  .doc-mock .doc-hdr h3 {
+    font-size: 18px;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  .doc-mock .doc-hdr .doc-meta {
+    font-size: 10px;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+  }
+  .doc-mock .doc-section {
+    margin: 16px 0;
+  }
+  .doc-mock .doc-section h4 {
+    font-size: 12px;
+    background: var(--text);
+    color: white;
+    padding: 4px 12px;
+    margin: 0 0 8px;
+    display: inline-block;
+    letter-spacing: 0.05em;
+  }
+  .doc-mock .doc-section .row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 12px;
+    border-bottom: 1px dotted var(--paper-line);
+  }
+  .doc-mock .doc-section .row .lbl { color: var(--text-sub); }
+  .doc-mock .doc-section .row .val { color: var(--text); }
+  .doc-mock .doc-section .row .val.alert { color: #B91C1C; font-weight: 700; }
+  .doc-mock .doc-section .row .val.good { color: var(--mint-dark); font-weight: 700; }
+
+  .doc-mock .source-tag {
+    display: inline-block;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.05em;
+  }
+  .doc-mock .source-tag.auto { background: var(--mint-soft); color: var(--mint-dark); border: 1px solid var(--mint); }
+  .doc-mock .source-tag.semi { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue); }
+  .doc-mock .source-tag.hand { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
+
+  .doc-mock .narrative-box {
+    border: 1px solid var(--paper-line);
+    background: white;
+    padding: 12px 14px;
+    margin: 8px 0;
+    min-height: 80px;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .doc-mock .narrative-box.empty {
+    color: var(--text-mute);
+    font-style: italic;
+    background: var(--bg-alt);
+  }
+
+  .doc-mock .sign-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--paper-line);
+  }
+  .doc-mock .sign-row .sign-box {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+  .doc-mock .sign-row .sign-line {
+    border-bottom: 1px solid var(--text);
+    margin-bottom: 4px;
+    height: 30px;
+  }
+
+  /* グラフ */
+  .chart-svg {
+    background: white;
+    border-radius: 4px;
+    padding: 16px;
+    margin: 12px 0;
+  }
+  .chart-svg svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* インサイト */
+  .insight {
+    background: var(--mint-soft);
+    border-left: 4px solid var(--mint);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .insight strong {
+    display: block;
+    color: var(--mint-dark);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* 監査チェックボックス */
+  .audit-check {
+    background: var(--yellow-soft);
+    border: 1px solid var(--warn);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 12px 0;
+  }
+  .audit-check .a-title {
+    font-size: 11px;
+    color: var(--warn);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .audit-check ul {
+    margin: 0;
+    padding-left: 22px;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  /* データフロー図 */
+  .data-flow {
+    background: var(--bg-alt);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .data-flow .stage {
+    display: grid;
+    grid-template-columns: 110px 30px 1fr;
+    gap: 10px;
+    align-items: center;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+  .data-flow .stage .src {
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+    padding: 8px 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 11px;
+  }
+  .data-flow .stage .arrow {
+    text-align: center;
+    color: var(--text-mute);
+  }
+  .data-flow .stage .dst {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 12px;
+    line-height: 1.4;
+  }
+
+  /* 出力フォーマット一覧 */
+  .output-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .output-item {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 14px;
+    background: var(--bg);
+  }
+  .output-item .freq {
+    font-size: 9px;
+    background: var(--mint);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+  }
+  .output-item .name { font-size: 13px; font-weight: 700; }
+  .output-item .desc { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
+  .output-item .format {
+    font-size: 10px;
+    color: var(--text-mute);
+    margin-top: 4px;
+    font-family: monospace;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 24px 20px; }
+    .output-list { grid-template-columns: 1fr; }
+    .data-flow .stage { grid-template-columns: 1fr; }
+    .data-flow .stage .arrow { transform: rotate(90deg); }
+    .doc-mock { padding: 16px 18px; }
+    .doc-mock .doc-section .row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#purpose">本書の目的</a></li>
+    <li><a href="#raw-schema">1. 生データのスキーマ</a></li>
+    <li><a href="#kasan1">2. 強度行動障害児支援加算</a>
+      <ul>
+        <li class="sub"><a href="#k1-data">取得データ</a></li>
+        <li class="sub"><a href="#k1-daily">日次行動記録票</a></li>
+        <li class="sub"><a href="#k1-monthly">月次パターン分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#kasan2">3. 個別サポート加算Ⅰ</a>
+      <ul>
+        <li class="sub"><a href="#k2-data">取得データ</a></li>
+        <li class="sub"><a href="#k2-daily">日次個別対応記録</a></li>
+        <li class="sub"><a href="#k2-monthly">月次集計</a></li>
+      </ul>
+    </li>
+    <li><a href="#kasan3">4. 集中的支援加算</a>
+      <ul>
+        <li class="sub"><a href="#k3-data">取得データ</a></li>
+        <li class="sub"><a href="#k3-report">3か月効果検証レポート</a></li>
+      </ul>
+    </li>
+    <li><a href="#data-mapping">5. データ → 加算 マッピング</a></li>
+    <li><a href="#csv-export">6. CSV エクスポート仕様</a></li>
+    <li><a href="#audit-strength">7. 監査での強さ</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">mitooshi Pro ／ Data & Output Spec</div>
+  <h1>加算別データ取得 × 出力ドキュメント仕様</h1>
+  <p class="lead">
+    強度行動障害児支援加算（155単位）／個別サポート加算Ⅰ（100単位）／集中的支援加算（1,000単位）
+    の3つについて、サンドイッチ構造で<strong>具体的にどのデータが取れて、どの帳票に出力されるか</strong>を実物イメージで示す。
+  </p>
+</header>
+
+<section id="purpose">
+  <h2><span class="num">▶</span>本書の目的</h2>
+  <p>
+    前書 <a href="indirect_entry_design.html">indirect_entry_design.html</a> で示した「サンドイッチ構造」（朝の見通し＋切り替え＋振り返り）から、
+    実際に何のデータが・どの粒度で・どの帳票として出力されるかを具体化する。
+    Discovery の現場で「これが具体的に出ます」と見せられる成果物。
+  </p>
+  <div class="insight">
+    <strong>3つの加算で異なる出力スタイル</strong>
+    <p>
+      強度行動障害児支援加算 → <strong>日次行動記録票</strong>（毎日の証跡）<br>
+      個別サポートⅠ → <strong>月次集計表</strong>（月20日の累計）<br>
+      集中的支援加算 → <strong>3か月効果検証レポート</strong>（時系列グラフ＋所見）
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 1. 生データのスキーマ ===================== -->
+<section id="raw-schema">
+  <h2><span class="num">01</span>生データのスキーマ（サンドイッチ構造）</h2>
+  <p>3つの侵入点（朝の見通し／切り替え／振り返り）から取得される構造化データ。</p>
+
+  <h4>① 朝の見通し（Morning Brief）</h4>
+  <table class="data-schema">
+    <thead>
+      <tr><th>フィールド</th><th>型</th><th>例</th><th>用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="field">brief_id</td><td>UUID</td><td class="value">"a1b2c3..."</td><td>一意ID</td></tr>
+      <tr><td class="field">child_id</td><td>UUID</td><td class="value">"A0001"</td><td>児童紐付け</td></tr>
+      <tr><td class="field">arrived_at</td><td>datetime</td><td class="value">"2026-04-29T14:02:35"</td><td>登所時刻</td></tr>
+      <tr><td class="field">scene_preview_cards</td><td>array</td><td class="value">["学習", "SST", "個別", "帰宅"]</td><td>その日の流れ</td></tr>
+      <tr><td class="field">brief_duration_sec</td><td>int</td><td class="value">187</td><td>所要時間（秒）</td></tr>
+      <tr><td class="field">retry_count</td><td>int</td><td class="value">3</td><td>不安サインとして集計</td></tr>
+      <tr><td class="field">self_mood</td><td>enum</td><td class="value">"so-so"</td><td>good／so-so／bad の3択</td></tr>
+      <tr><td class="field">env_weather</td><td>string</td><td class="value">"rain"</td><td>外部API取得</td></tr>
+      <tr><td class="field">env_temp_c</td><td>float</td><td class="value">18.5</td><td>外部API取得</td></tr>
+      <tr><td class="field">env_pressure_hpa</td><td>float</td><td class="value">1008</td><td>気圧（前日比も計算）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>② 切り替え（Transition）</h4>
+  <table class="data-schema">
+    <thead>
+      <tr><th>フィールド</th><th>型</th><th>例</th><th>用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="field">transition_id</td><td>UUID</td><td class="value">"t1234..."</td><td>一意ID</td></tr>
+      <tr><td class="field">child_id</td><td>UUID</td><td class="value">"A0001"</td><td></td></tr>
+      <tr><td class="field">from_scene</td><td>string</td><td class="value">"個別"</td><td>切替元</td></tr>
+      <tr><td class="field">to_scene</td><td>string</td><td class="value">"帰宅"</td><td>切替先</td></tr>
+      <tr><td class="field">started_at</td><td>datetime</td><td class="value">"2026-04-29T16:00:12"</td><td></td></tr>
+      <tr><td class="field">elapsed_sec</td><td>int</td><td class="value">45</td><td>切替所要</td></tr>
+      <tr><td class="field">completion</td><td>enum</td><td class="value">"completed"</td><td>completed/interrupted/panic</td></tr>
+      <tr><td class="field">interrupt_reason</td><td>enum</td><td class="value">null</td><td>panic/leave/lose_interest 等</td></tr>
+      <tr><td class="field">panic_duration_sec</td><td>int</td><td class="value">0</td><td>パニック持続時間</td></tr>
+      <tr><td class="field">specialist_present</td><td>enum</td><td class="value">"none"</td><td>研修修了者の関与</td></tr>
+      <tr><td class="field">cards_used</td><td>array</td><td class="value">["かたづけ","くつをはく"]</td><td>使用カード列</td></tr>
+      <tr><td class="field">operator_pattern</td><td>enum</td><td class="value">"child_self"</td><td>self/staff_assist/unknown</td></tr>
+    </tbody>
+  </table>
+
+  <h4>③ 振り返り（Self Check-out）</h4>
+  <table class="data-schema">
+    <thead>
+      <tr><th>フィールド</th><th>型</th><th>例</th><th>用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="field">checkout_id</td><td>UUID</td><td class="value">"c5678..."</td><td>一意ID</td></tr>
+      <tr><td class="field">child_id</td><td>UUID</td><td class="value">"A0001"</td><td></td></tr>
+      <tr><td class="field">menu_evaluations</td><td>array</td><td class="value">[{name:"学習",eval:"again"},{name:"SST",eval:"hard"}]</td><td>メニュー別3択評価</td></tr>
+      <tr><td class="field">overall_mood</td><td>enum</td><td class="value">"hard"</td><td>fun/hard/again の総合評価</td></tr>
+      <tr><td class="field">voice_memo_url</td><td>string</td><td class="value">"s3://..."</td><td>子どもの音声（任意）</td></tr>
+      <tr><td class="field">staff_observation_tag</td><td>enum</td><td class="value">"growth_seen"</td><td>職員1タップ</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== 2. 強度行動障害児支援加算 ===================== -->
+<section id="kasan1">
+  <h2><span class="num">02</span>強度行動障害児支援加算<span class="units">155単位／日</span></h2>
+
+  <h3 id="k1-data">取得データ</h3>
+  <p>
+    この加算の本質は「<strong>強度行動障害児への専門的支援を、研修修了者が、確かに行ったこと</strong>」の証跡。
+    mitooshi のサンドイッチ構造から取れる<strong>パニック前後の文脈・切り替え失敗パターン・環境相関</strong>が直接の根拠になる。
+  </p>
+
+  <h4>1日のセッションログ例（児童 A0001 ●●ちゃん／2026年4月29日 月曜）</h4>
+  <div class="session-log">
+<span class="comment"># === 朝の見通し ===</span>
+<span class="key">14:02:35</span> arrived           <span class="value">child_id=A0001</span>
+<span class="key">14:02:40</span> brief_started     <span class="value">cards=[学習,SST,個別,帰宅]</span>
+<span class="key">14:05:42</span> brief_completed   <span class="value">elapsed=187s, retry_count=3</span>  <span class="alert">⚠ unease_signal</span>
+<span class="key">14:05:43</span> self_mood         <span class="value">"so-so"</span>
+<span class="key">14:05:44</span> env_snapshot      <span class="value">weather=rain, temp=18.5°C, pressure=1008hPa (Δ-6)</span>
+
+<span class="comment"># === カリキュラム本体（mitooshi 触れない 14:05〜16:00）===</span>
+
+<span class="comment"># === 切り替え#1: 学習 → SST ===</span>
+<span class="key">15:00:08</span> transition_started <span class="value">from=学習, to=SST</span>
+<span class="key">15:00:53</span> transition_done    <span class="value">elapsed=<span class="num">45</span>s, status=completed</span>  <span class="value">✓</span>
+                                          <span class="comment"># 前週平均 60s から改善傾向</span>
+
+<span class="comment"># === 切り替え#2: SST → 個別 ===</span>
+<span class="key">16:00:14</span> transition_started <span class="value">from=SST, to=個別</span>
+<span class="key">16:00:42</span> <span class="alert">PANIC_DETECTED</span>      <span class="value">staff_tap=panic, prev_cards=[個別おわり,うつる]</span>
+<span class="key">16:08:15</span> panic_resolved    <span class="value">duration=<span class="num">453</span>s, recovery_cards=[のむ,すわる]</span>
+<span class="key">16:09:00</span> transition_done    <span class="value">elapsed=525s, status=panic, completion_after=true</span>
+                                          <span class="comment"># 研修修了者(児童指導員 田中) 関与記録あり</span>
+
+<span class="comment"># === 振り返り ===</span>
+<span class="key">16:55:30</span> checkout_started
+<span class="key">16:55:45</span> menu_eval         <span class="value">学習="fun", SST="hard", 個別="hard"</span>
+<span class="key">16:56:20</span> overall_mood      <span class="value">"hard"</span>
+<span class="key">16:56:25</span> voice_memo        <span class="value">"せんせい いっぱい おしゃべりした"</span>
+  </div>
+
+  <h3 id="k1-daily">日次行動記録票（自動生成）</h3>
+  <p>上記セッションログから自動で1ページの帳票が生成される。これが <strong>強度行動障害児支援加算の毎日の算定根拠</strong>。</p>
+
+  <div class="doc-mock">
+    <div class="doc-hdr">
+      <h3>強度行動障害児 支援実施記録票</h3>
+      <div class="doc-meta">事業所名：ABC児童発達支援センター ／ 2026年4月29日（月）</div>
+    </div>
+
+    <div class="doc-section">
+      <h4>1. 基本情報</h4>
+      <div class="row"><span class="lbl">児童ID</span><span class="val">A0001 ●●ちゃん（8歳）<span class="source-tag auto">AUTO</span></span></div>
+      <div class="row"><span class="lbl">支援者</span><span class="val">児童指導員 田中花子<span class="source-tag auto">AUTO</span>（強度行動障害支援者養成研修修了 2024年3月）<span class="source-tag semi">SEMI</span></span></div>
+      <div class="row"><span class="lbl">利用時間</span><span class="val">14:02 〜 16:58（2時間56分）<span class="source-tag auto">AUTO</span></span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>2. 環境情報</h4>
+      <div class="row"><span class="lbl">天候</span><span class="val">雨／18.5℃／1008hPa（前日比 -6hPa）<span class="source-tag auto">AUTO</span></span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>3. 行動観察記録</h4>
+      <div class="row"><span class="lbl">朝の状態</span><span class="val alert">不安サイン あり（リトライ 3回・所要187秒・気分 so-so）<span class="source-tag auto">AUTO</span></span></div>
+      <div class="row"><span class="lbl">切替#1 (学習→SST) 15:00</span><span class="val good">スムーズに完了 45秒（前週平均 60秒から改善）<span class="source-tag auto">AUTO</span></span></div>
+      <div class="row"><span class="lbl">切替#2 (SST→個別) 16:00</span><span class="val alert">パニック発生 持続7分33秒<span class="source-tag auto">AUTO</span></span></div>
+      <div class="row"><span class="lbl">パニック前カード列</span><span class="val">「個別おわり」→「うつる」<span class="source-tag auto">AUTO</span></span></div>
+      <div class="row"><span class="lbl">対応・回復カード</span><span class="val">「のむ」「すわる」（職員介添）<span class="source-tag auto">AUTO</span></span></div>
+      <div class="row"><span class="lbl">本人の振り返り</span><span class="val">「せんせい いっぱい おしゃべりした」（音声）<span class="source-tag auto">AUTO</span></span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>4. 専門的視点からの所見<span class="source-tag hand">HAND（研修修了者記述）</span></h4>
+      <div class="narrative-box empty">
+        ［研修修了者が記述：本児の特性を踏まえた専門的所見、最低200字以上］<br><br>
+        例：気圧低下と疲労の相互作用がパニック誘因。次回は SST 後に短いクールダウン時間を確保する方針で対応予定。本児の「個別→集団」への切替は引き続き要観察。
+      </div>
+    </div>
+
+    <div class="doc-section">
+      <h4>5. 今後の対応方針<span class="source-tag hand">HAND</span></h4>
+      <div class="narrative-box empty">
+        ［研修修了者記述］
+      </div>
+    </div>
+
+    <div class="sign-row">
+      <div class="sign-box"><div class="sign-line"></div>記録者（研修修了者）</div>
+      <div class="sign-box"><div class="sign-line"></div>児発管確認</div>
+      <div class="sign-box"><div class="sign-line"></div>事業所長</div>
+    </div>
+  </div>
+
+  <h3 id="k1-monthly">月次パターン分析（自動生成）</h3>
+  <p>30日分の日次記録を自動集計し、<strong>環境要因との相関分析</strong>まで含めた月次レポートを生成。</p>
+
+  <div class="doc-mock">
+    <div class="doc-hdr">
+      <h3>強度行動障害児 月次パターン分析</h3>
+      <div class="doc-meta">A0001 ●●ちゃん ／ 2026年4月（4/1〜4/30 通所20日）</div>
+    </div>
+
+    <div class="doc-section">
+      <h4>1. 月次サマリ<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">パニック総回数</span><span class="val alert">3回（前月 2回）</span></div>
+      <div class="row"><span class="lbl">切替平均所要</span><span class="val">52秒（前月 48秒）</span></div>
+      <div class="row"><span class="lbl">自発めくり率</span><span class="val">73%（前月 75%）</span></div>
+      <div class="row"><span class="lbl">朝の不安サイン日数</span><span class="val">8日 / 20日</span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>2. 環境要因の相関<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">雨の日</span><span class="val alert">パニック率 33%（晴の日 8%）</span></div>
+      <div class="row"><span class="lbl">気圧変化</span><span class="val alert">前日比 -5hPa以下の日にパニック60%集中</span></div>
+      <div class="row"><span class="lbl">曜日傾向</span><span class="val">月曜にパニック多発（週末ブランクの影響）</span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>3. 切替パターン分析<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">最も困難な切替</span><span class="val alert">SST → 個別（パニック率 21%）</span></div>
+      <div class="row"><span class="lbl">最もスムーズ</span><span class="val good">学習 → SST（成功率 95%）</span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>4. 算定実績<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">算定日数</span><span class="val">20日 × 155単位 = 3,100単位</span></div>
+      <div class="row"><span class="lbl">月額</span><span class="val good">31,000円（地域加算なしの場合）</span></div>
+    </div>
+  </div>
+
+  <div class="audit-check">
+    <div class="a-title">▼ 監査でこのドキュメントが強い理由</div>
+    <ul>
+      <li>「<strong>確かに支援を行った</strong>」を示す<strong>時刻付き客観ログ</strong>が完備</li>
+      <li>研修修了者の関与が<strong>システム上で識別</strong>されている（名義貸しでないことの証跡）</li>
+      <li>パニック前後のカード列が残り、<strong>「専門的視点からの対応」の具体性</strong>が証明される</li>
+      <li>環境相関分析が「<strong>本児の特性把握</strong>」の根拠になる（個別性の担保）</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== 3. 個別サポート加算Ⅰ ===================== -->
+<section id="kasan2">
+  <h2><span class="num">03</span>個別サポート加算Ⅰ<span class="units">100単位／日</span></h2>
+
+  <h3 id="k2-data">取得データ</h3>
+  <p>
+    この加算の本質は「<strong>当該児童に対し、その子だけのための個別対応を毎日行ったこと</strong>」。
+    実地指導で「<strong>集団記録だけだと減算</strong>」と指摘される定番の領域。
+    mitooshi の<strong>個別ボード設計の差分・個別対応時間・個別性の客観データ</strong>がそのまま証跡になる。
+  </p>
+
+  <h3 id="k2-daily">日次個別対応記録（自動生成）</h3>
+  <p>毎日、当該児童について自動で生成される最小限の証跡。職員はサインのみ。</p>
+
+  <div class="doc-mock">
+    <div class="doc-hdr">
+      <h3>個別サポート加算Ⅰ 実施記録</h3>
+      <div class="doc-meta">A0001 ●●ちゃん ／ 2026年4月29日（月）</div>
+    </div>
+
+    <div class="doc-section">
+      <h4>1. 個別対応の事実<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">対象児</span><span class="val">A0001 ●●ちゃん（個別支援計画上の該当児）</span></div>
+      <div class="row"><span class="lbl">個別ボード使用</span><span class="val good">あり（朝の見通し・切替#1#2・振り返り）</span></div>
+      <div class="row"><span class="lbl">個別対応時間（合計）</span><span class="val">23分（朝5分＋切替計4分＋振返14分）</span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>2. 個別性の証跡（共通プリセットとの差分）<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">使用カードセット</span><span class="val">本児専用カード 12種（共通8種＋個別調整4種）</span></div>
+      <div class="row"><span class="lbl">個別調整カード</span><span class="val">「ふかいこきゅう」「のむ」「すわる」「うちのにおい」</span></div>
+      <div class="row"><span class="lbl">シーン構成</span><span class="val">本児用に2シーン追加（落ち着きスペース／クールダウン）</span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>3. 当日の個別対応の中身<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">特記事項</span><span class="val">切替#2 でパニック → 個別調整カードで対応・回復</span></div>
+      <div class="row"><span class="lbl">本児の自発率</span><span class="val">73%（共通プリセット児童平均 88% との差＝個別配慮の必要性）</span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>4. 算定情報<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">算定区分</span><span class="val">個別サポート加算Ⅰ（行動関連項目該当）</span></div>
+      <div class="row"><span class="lbl">単位数</span><span class="val good">100単位（1,000円）</span></div>
+    </div>
+
+    <div class="sign-row">
+      <div class="sign-box"><div class="sign-line"></div>担当職員<span class="source-tag semi">SEMI（タップ承認）</span></div>
+      <div class="sign-box"><div class="sign-line"></div>児発管確認</div>
+      <div class="sign-box"></div>
+    </div>
+  </div>
+
+  <h3 id="k2-monthly">月次集計表（自動生成）</h3>
+  <p>1か月の累計を1ページに集約。請求担当が HUG にインポートする <strong>CSV のもと</strong>になる。</p>
+
+  <div class="doc-mock">
+    <div class="doc-hdr">
+      <h3>個別サポート加算Ⅰ 月次集計</h3>
+      <div class="doc-meta">2026年4月分 ／ ABC児童発達支援センター</div>
+    </div>
+
+    <div class="doc-section">
+      <h4>該当児童別集計<span class="source-tag auto">AUTO</span></h4>
+      <table class="data-schema">
+        <thead>
+          <tr><th>児童ID</th><th>名前</th><th>算定日数</th><th>個別対応時間/月</th><th>単位数</th><th>金額</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>A0001</td><td>●●ちゃん</td><td>20日</td><td>460分</td><td>2,000</td><td>20,000円</td></tr>
+          <tr><td>A0002</td><td>▲▲くん</td><td>18日</td><td>342分</td><td>1,800</td><td>18,000円</td></tr>
+          <tr><td>A0003</td><td>■■ちゃん</td><td>19日</td><td>418分</td><td>1,900</td><td>19,000円</td></tr>
+          <tr><td>A0004</td><td>★★くん</td><td>20日</td><td>500分</td><td>2,000</td><td>20,000円</td></tr>
+          <tr><td>A0005</td><td>○○ちゃん</td><td>17日</td><td>289分</td><td>1,700</td><td>17,000円</td></tr>
+          <tr style="background:var(--mint-soft);font-weight:700;"><td colspan="4">合計</td><td>9,400</td><td class="value">94,000円</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <h4>取りこぼし防止情報<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">未算定検知</span><span class="val good">該当日に個別ボード使用がない日 → 0日</span></div>
+      <div class="row"><span class="lbl">⚠ 注意</span><span class="val">A0005 ○○ちゃん：3日間個別対応時間が短い（要確認）</span></div>
+    </div>
+  </div>
+
+  <div class="audit-check">
+    <div class="a-title">▼ 監査でこのドキュメントが強い理由</div>
+    <ul>
+      <li>「<strong>個別性</strong>」を客観データ（カード差分・対応時間）で立証できる</li>
+      <li>「<strong>毎日の実施</strong>」を時刻付きログで証明（集団記録の流用ではない）</li>
+      <li><strong>個別支援計画書との整合性</strong>が自動でチェックされる</li>
+      <li>未算定や算定漏れも自動検知 → <strong>取りこぼし防止</strong>に直結</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== 4. 集中的支援加算 ===================== -->
+<section id="kasan3">
+  <h2><span class="num">04</span>集中的支援加算<span class="units">1,000単位／日（月4回上限）</span></h2>
+
+  <h3 id="k3-data">取得データ</h3>
+  <p>
+    この加算の本質は「<strong>3か月間の集中支援プログラムが、計画通り実施され、効果があったこと</strong>」を示すこと。
+    令和6年新設のため算定率が低く、要件記録のハードルが高い。
+    mitooshi の<strong>3か月の時系列行動データ</strong>がそのまま効果検証の根拠になる。
+    <strong>これが mitooshi が独占できる最大の差別化領域</strong>。
+  </p>
+
+  <h3 id="k3-report">3か月効果検証レポート（自動生成 → 児発管所見）</h3>
+
+  <div class="doc-mock">
+    <div class="doc-hdr">
+      <h3>集中的支援加算 効果検証レポート</h3>
+      <div class="doc-meta">A0001 ●●ちゃん ／ 集中支援期間：2026年2月1日 〜 4月30日（3か月）</div>
+    </div>
+
+    <div class="doc-section">
+      <h4>1. プログラム概要<span class="source-tag semi">SEMI（児発管承認）</span></h4>
+      <div class="row"><span class="lbl">対象児童</span><span class="val">A0001 ●●ちゃん（8歳・強度行動障害）</span></div>
+      <div class="row"><span class="lbl">担当者</span><span class="val">児発管 山田太郎 ／ 強度行動障害支援者養成研修修了 田中花子</span></div>
+      <div class="row"><span class="lbl">集中支援目標（計画時）</span><span class="val">
+        ① 切替時のパニック頻度 月8回 → 月3回以下<br>
+        ② 切替平均所要 72秒 → 60秒以内<br>
+        ③ 自発めくり率 45% → 70%以上
+      </span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>2. 行動データ実績（自動集計）<span class="source-tag auto">AUTO</span></h4>
+      <table class="data-schema">
+        <thead>
+          <tr><th>指標</th><th>ベースライン<br>(2026/1月)</th><th>1か月後<br>(2月末)</th><th>2か月後<br>(3月末)</th><th>3か月後<br>(4月末)</th><th>判定</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>パニック頻度（回/月）</td>
+            <td>8</td>
+            <td>6</td>
+            <td>4</td>
+            <td>3</td>
+            <td class="value">✓ 達成</td>
+          </tr>
+          <tr>
+            <td>切替平均所要（秒）</td>
+            <td>72</td>
+            <td>65</td>
+            <td>58</td>
+            <td>52</td>
+            <td class="value">✓ 達成</td>
+          </tr>
+          <tr>
+            <td>自発めくり率（%）</td>
+            <td>45</td>
+            <td>58</td>
+            <td>68</td>
+            <td>73</td>
+            <td class="value">✓ 達成</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="doc-section">
+      <h4>3. 改善曲線（自動グラフ生成）<span class="source-tag auto">AUTO</span></h4>
+      <div class="chart-svg">
+        <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg">
+          <!-- 背景グリッド -->
+          <line x1="60" y1="40" x2="660" y2="40" stroke="#E5E5E5"/>
+          <line x1="60" y1="100" x2="660" y2="100" stroke="#E5E5E5"/>
+          <line x1="60" y1="160" x2="660" y2="160" stroke="#E5E5E5"/>
+          <line x1="60" y1="200" x2="660" y2="200" stroke="#666"/>
+          <!-- Y軸 -->
+          <line x1="60" y1="40" x2="60" y2="200" stroke="#666"/>
+          <text x="50" y="44" text-anchor="end" font-size="10" fill="#666">100%</text>
+          <text x="50" y="104" text-anchor="end" font-size="10" fill="#666">75%</text>
+          <text x="50" y="164" text-anchor="end" font-size="10" fill="#666">50%</text>
+          <text x="50" y="204" text-anchor="end" font-size="10" fill="#666">25%</text>
+          <!-- X軸ラベル -->
+          <text x="120" y="220" text-anchor="middle" font-size="10" fill="#666">1月（基準）</text>
+          <text x="280" y="220" text-anchor="middle" font-size="10" fill="#666">2月末</text>
+          <text x="440" y="220" text-anchor="middle" font-size="10" fill="#666">3月末</text>
+          <text x="600" y="220" text-anchor="middle" font-size="10" fill="#666">4月末</text>
+
+          <!-- 自発めくり率（緑・上昇） -->
+          <polyline points="120,168 280,140 440,116 600,104"
+            fill="none" stroke="#00B894" stroke-width="3"/>
+          <circle cx="120" cy="168" r="5" fill="#00B894"/>
+          <circle cx="280" cy="140" r="5" fill="#00B894"/>
+          <circle cx="440" cy="116" r="5" fill="#00B894"/>
+          <circle cx="600" cy="104" r="5" fill="#00B894"/>
+          <text x="610" y="100" font-size="11" fill="#00876d" font-weight="700">自発めくり率 73% ✓</text>
+
+          <!-- パニック頻度（赤・下降） -->
+          <polyline points="120,72 280,96 440,128 600,152"
+            fill="none" stroke="#DC2626" stroke-width="3"/>
+          <circle cx="120" cy="72" r="5" fill="#DC2626"/>
+          <circle cx="280" cy="96" r="5" fill="#DC2626"/>
+          <circle cx="440" cy="128" r="5" fill="#DC2626"/>
+          <circle cx="600" cy="152" r="5" fill="#DC2626"/>
+          <text x="610" y="148" font-size="11" fill="#B91C1C" font-weight="700">パニック 3回 ✓</text>
+
+          <!-- 切替時間（青・下降） -->
+          <polyline points="120,90 280,104 440,118 600,128"
+            fill="none" stroke="#0073cc" stroke-width="3" stroke-dasharray="4,2"/>
+          <circle cx="120" cy="90" r="5" fill="#0073cc"/>
+          <circle cx="280" cy="104" r="5" fill="#0073cc"/>
+          <circle cx="440" cy="118" r="5" fill="#0073cc"/>
+          <circle cx="600" cy="128" r="5" fill="#0073cc"/>
+          <text x="610" y="124" font-size="11" fill="#0073cc" font-weight="700">切替 52秒 ✓</text>
+
+          <!-- 集中支援開始ライン -->
+          <line x1="180" y1="30" x2="180" y2="200" stroke="#FFB6B6" stroke-width="2" stroke-dasharray="4,4"/>
+          <text x="184" y="36" font-size="9" fill="#B85555">集中支援開始</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="doc-section">
+      <h4>4. 環境要因分析<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">期間中の特記</span><span class="val">雨の日のパニック率が大幅減少（33% → 8%）／本児が雨予報日に深呼吸カードを自発使用するようになった</span></div>
+      <div class="row"><span class="lbl">介入の効果</span><span class="val good">朝の不安サインが当日のパニックに繋がる確率が下がった（72% → 35%）</span></div>
+    </div>
+
+    <div class="doc-section">
+      <h4>5. 児発管所見<span class="source-tag hand">HAND（最低 600字必須・テンプレ提示なし）</span></h4>
+      <div class="narrative-box empty">
+        ［児発管が記述：本児固有の所見、3か月の成長エビデンス、次期の方針］<br><br>
+        例：「本児は集中支援開始時、朝の登所時から不安サインが顕著で、特に雨の日のパニック発生率は33%に達していた…（中略）…『深呼吸』『うちのにおい』など、本児が自分から選ぶカードが増え、自己調整力の伸長が見られる。次期は SST 後のクールダウン時間を短縮しつつ、自発調整カードの選択肢を広げていく方針で進めたい。」
+      </div>
+    </div>
+
+    <div class="doc-section">
+      <h4>6. 算定実績<span class="source-tag auto">AUTO</span></h4>
+      <div class="row"><span class="lbl">集中支援実施回数</span><span class="val">2月 4回 ／ 3月 4回 ／ 4月 4回</span></div>
+      <div class="row"><span class="lbl">合計算定単位</span><span class="val good">12回 × 1,000単位 = 12,000単位 = 120,000円（3か月）</span></div>
+    </div>
+
+    <div class="sign-row">
+      <div class="sign-box"><div class="sign-line"></div>児発管</div>
+      <div class="sign-box"><div class="sign-line"></div>研修修了者</div>
+      <div class="sign-box"><div class="sign-line"></div>事業所長</div>
+    </div>
+  </div>
+
+  <div class="audit-check">
+    <div class="a-title">▼ 監査でこのドキュメントが強い理由</div>
+    <ul>
+      <li>「集中支援が<strong>計画通り実施された</strong>」を時系列ログで証明</li>
+      <li>「<strong>効果があった</strong>」を客観グラフで可視化（主観文章ではない）</li>
+      <li>環境要因分析で「<strong>専門的視点での介入</strong>」が示せる</li>
+      <li>児発管所見はテンプレ非提示 → <strong>本児固有の言葉で書ける</strong>仕組み（コピペ減算回避）</li>
+      <li>1事業所あたり <strong>月最大 4 回 × 1,000単位 × 該当児数 ＝ 数十万円</strong>のポテンシャル</li>
+    </ul>
+  </div>
+
+  <div class="insight">
+    <strong>★ 競合では作れない最大の差別化ドキュメント</strong>
+    <p>
+      AI 計画作成系（co-mii・AI-PAC）は<strong>事前に計画書を AI で書く</strong>ツール。
+      しかし「<strong>3か月後に効果があったか</strong>」を客観データで示すには、<strong>毎日の行動ログが必要</strong>。
+      この日々のログは mitooshi にしか取れない。
+      → <strong>3か月効果検証レポートは mitooshi だけが作れる帳票</strong>。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 5. データ → 加算マッピング ===================== -->
+<section id="data-mapping">
+  <h2><span class="num">05</span>データ → 加算マッピング</h2>
+  <p>サンドイッチ構造の3つの侵入点で取れたデータが、それぞれの加算ドキュメントにどう流れるかを示す。</p>
+
+  <div class="data-flow">
+    <div class="stage">
+      <div class="src">朝の見通し</div>
+      <div class="arrow">→</div>
+      <div class="dst"><strong>強度行動障害児支援加算</strong>：不安サイン（リトライ・所要・気分）／環境スナップショット<br>
+      <strong>個別サポートⅠ</strong>：個別ボード使用の証跡</div>
+    </div>
+    <div class="stage">
+      <div class="src">切り替え</div>
+      <div class="arrow">→</div>
+      <div class="dst"><strong>強度行動障害児支援加算</strong>：パニック前後カード列／対応・回復記録／研修修了者関与<br>
+      <strong>集中的支援加算</strong>：3か月の切替時間推移グラフ</div>
+    </div>
+    <div class="stage">
+      <div class="src">振り返り</div>
+      <div class="arrow">→</div>
+      <div class="dst"><strong>個別サポートⅠ</strong>：本人参加型支援の証跡（自己評価）<br>
+      <strong>集中的支援加算</strong>：自発めくり率の時系列推移<br>
+      <strong>家庭連携加算</strong>：お便り→家庭への報告連携</div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>1日のデータが3つの加算ドキュメントに流れる</strong>
+    <p>
+      同じセッションログが、<strong>強度行動障害（日次）／個別サポートⅠ（月次集計）／集中的支援（3か月レポート）</strong>
+      の3つに自動分配される。重複入力なし、全部自動。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 6. CSV エクスポート ===================== -->
+<section id="csv-export">
+  <h2><span class="num">06</span>CSV エクスポート仕様（HUG等への連携）</h2>
+  <p>請求 SaaS にインポートできる標準的な列構成。</p>
+
+  <table class="data-schema">
+    <thead>
+      <tr><th>列名</th><th>型</th><th>例</th><th>用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="field">facility_id</td><td>string</td><td class="value">"ABC001"</td><td>事業所識別</td></tr>
+      <tr><td class="field">child_id</td><td>string</td><td class="value">"A0001"</td><td>児童識別（HUG 側 ID とマッピング）</td></tr>
+      <tr><td class="field">service_date</td><td>date</td><td class="value">"2026-04-29"</td><td>提供日</td></tr>
+      <tr><td class="field">kasan_code</td><td>string</td><td class="value">"K_INDIVIDUAL_1"</td><td>加算コード</td></tr>
+      <tr><td class="field">kasan_name</td><td>string</td><td class="value">"個別サポート加算Ⅰ"</td><td>加算名</td></tr>
+      <tr><td class="field">units</td><td>int</td><td class="value">100</td><td>単位数</td></tr>
+      <tr><td class="field">evidence_doc_url</td><td>string</td><td class="value">"https://..."</td><td>根拠ドキュメントへのリンク</td></tr>
+      <tr><td class="field">specialist_present</td><td>string</td><td class="value">"研修修了者:田中"</td><td>関与者</td></tr>
+      <tr><td class="field">notes</td><td>string</td><td class="value">"パニック1回・対応済"</td><td>特記事項</td></tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:12px;color:var(--text-mute);margin-top:8px;">
+    ※ HUG・カイポケ等の請求 SaaS が標準で読める列構成。請求担当の作業は<strong>朝1回のインポートのみ</strong>。
+  </p>
+</section>
+
+<!-- ===================== 7. 監査での強さ ===================== -->
+<section id="audit-strength">
+  <h2><span class="num">07</span>監査でこの帳票群が強い理由</h2>
+
+  <h3>「個別性」「実施事実」「効果検証」の3点を客観データで証明</h3>
+  <ul>
+    <li><strong>個別性：</strong>個別ボードのカード差分・個別対応時間が<strong>数値で立証</strong>される</li>
+    <li><strong>実施事実：</strong>時刻付きログ・操作主体（自発／補助）の自動判定で <strong>「やった」を疑えない形</strong>で残す</li>
+    <li><strong>効果検証：</strong>3か月の時系列グラフで <strong>「効果があった」を客観化</strong></li>
+  </ul>
+
+  <h3>コピペ減算リスクを構造的に回避</h3>
+  <ul>
+    <li>所見欄は<strong>テンプレ提示なし</strong>、本児固有データを横にチラ見せして書く</li>
+    <li>研修修了者・児発管の<strong>サインを必須化</strong>し、AI 自動執筆を防ぐ</li>
+    <li>同じセッションログを使い回しても、<strong>所見の文言が必ず人の手で違う</strong>ため類似性が出ない</li>
+  </ul>
+
+  <h3>取りこぼし防止の自動検知</h3>
+  <ul>
+    <li>該当児に個別ボード使用がない日 → <strong>未算定アラート</strong></li>
+    <li>個別対応時間が短い児童 → <strong>要確認フラグ</strong></li>
+    <li>専門的支援実施加算の月4回上限未満 → <strong>残回数通知</strong></li>
+  </ul>
+
+  <div class="insight">
+    <strong>戦略的意味</strong>
+    <p>
+      これら3つの帳票は <strong>mitooshi のサンドイッチ構造があって初めて作れる</strong>。
+      AI 計画作成系（co-mii・AI-PAC）は事前計画は作れても、<strong>毎日の行動データに裏打ちされた実施記録・効果検証</strong>は作れない。
+      ここに mitooshi の<strong>恒久的な差別化価値</strong>がある。
+    </p>
+  </div>
+</section>
+
+<footer>
+  作成：2026-04-29 ／ 関連：indirect_entry_design.html, kasan_evidence_map.html, mitooshi_pro_feature_spec.html<br>
+  本書のサンプル数値は仮定値。Discovery 検証を経て、実際のフィールド値・帳票レイアウトを確定する。
+</footer>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mitooshi Pro 機能仕様 ／ めくりログ → 加算エビデンス生成</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 240px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    font-size: 13px;
+    background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text);
+    text-decoration: none;
+    line-height: 1.4;
+    display: block;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+
+  main { flex: 1; padding: 48px 56px; max-width: 940px; }
+  header.doc {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  header.doc .eyebrow {
+    color: var(--mint);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header.doc h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  header.doc .lead { color: var(--text-sub); font-size: 15px; line-height: 1.7; }
+
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  section h3 { font-size: 17px; font-weight: 700; margin: 24px 0 8px; }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* 4層パイプライン */
+  .pipeline {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin: 20px 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .stage {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .stage:last-child { border-bottom: none; }
+  .stage.s1 { background: linear-gradient(90deg, var(--mint-soft) 0%, var(--bg) 100%); }
+  .stage.s2 { background: linear-gradient(90deg, var(--blue-soft) 0%, var(--bg) 100%); }
+  .stage.s3 { background: linear-gradient(90deg, var(--pink-soft) 0%, var(--bg) 100%); }
+  .stage.s4 { background: linear-gradient(90deg, #FFF8E1 0%, var(--bg) 100%); }
+  .stage .num {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 13px;
+    margin-right: 10px;
+    color: white;
+  }
+  .stage.s1 .num { background: var(--mint); }
+  .stage.s2 .num { background: var(--blue); }
+  .stage.s3 .num { background: #B85555; }
+  .stage.s4 .num { background: var(--warn); }
+  .stage h4 { display: inline-block; font-size: 16px; font-weight: 700; margin: 0; }
+  .stage .desc { margin-top: 8px; padding-left: 38px; font-size: 13px; color: var(--text-sub); }
+  .stage .examples {
+    padding-left: 38px;
+    font-size: 12px;
+    color: var(--text);
+    margin-top: 6px;
+  }
+  .stage .examples code {
+    background: var(--bg-alt);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--text);
+  }
+  .stage .role-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    background: white;
+    border: 1px solid var(--line);
+    color: var(--text-sub);
+  }
+
+  /* データソース vs ドキュメント */
+  .flow-diagram {
+    margin: 16px 0;
+    padding: 20px;
+    background: var(--bg-alt);
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+  .flow-row {
+    display: grid;
+    grid-template-columns: 220px 60px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .flow-row:last-child { border-bottom: none; }
+  .flow-row .src {
+    background: white;
+    border: 1px solid var(--mint);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--mint-dark);
+  }
+  .flow-row .arrow { text-align: center; color: var(--text-mute); font-size: 14px; }
+  .flow-row .dst {
+    background: white;
+    border: 1px solid var(--blue);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--blue);
+  }
+
+  /* ドキュメント生成カード */
+  .doc-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin: 14px 0;
+    overflow: hidden;
+  }
+  .doc-card .head {
+    padding: 14px 18px;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .doc-card .head .name { font-size: 15px; font-weight: 700; }
+  .doc-card .head .freq {
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+    padding: 3px 10px;
+    border-radius: 10px;
+  }
+  .doc-card .head .target-kasan {
+    font-size: 10px;
+    color: var(--text-mute);
+    flex-basis: 100%;
+    margin-top: 4px;
+  }
+  .doc-card .body { padding: 16px 18px; }
+  .doc-flow {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .doc-flow .col {
+    background: var(--bg-alt);
+    border-radius: 4px;
+    padding: 10px 12px;
+  }
+  .doc-flow .col h6 {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-mute);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .doc-flow .col.auto h6 { color: var(--mint-dark); }
+  .doc-flow .col.semi h6 { color: var(--blue); }
+  .doc-flow .col.hand h6 { color: #B85555; }
+  .doc-flow .col ul { padding-left: 16px; margin: 0; font-size: 11px; }
+  .doc-flow .col li { margin: 2px 0; line-height: 1.4; }
+
+  /* タイムライン */
+  .timeline {
+    margin: 16px 0;
+    border-left: 3px solid var(--mint);
+    padding-left: 24px;
+  }
+  .tl-item { margin-bottom: 20px; position: relative; }
+  .tl-item::before {
+    content: "";
+    position: absolute;
+    left: -32px;
+    top: 6px;
+    width: 13px;
+    height: 13px;
+    background: var(--mint);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--mint);
+  }
+  .tl-item .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--mint-dark);
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .tl-item .title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .tl-item .body { font-size: 13px; color: var(--text-sub); }
+  .tl-item .actor {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+    background: var(--bg-alt);
+    color: var(--text-sub);
+    border: 1px solid var(--line);
+  }
+  .tl-item .actor.child { background: var(--mint-soft); color: var(--mint-dark); border-color: var(--mint); }
+  .tl-item .actor.staff { background: var(--blue-soft); color: var(--blue); border-color: var(--blue); }
+  .tl-item .actor.mgr { background: var(--pink-soft); color: #B85555; border-color: var(--pink); }
+  .tl-item .actor.system { background: #FFF8E1; color: var(--warn); border-color: var(--warn); }
+
+  /* 機能カード */
+  .feat-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    background: var(--bg);
+  }
+  .feat-card.core { border-left: 4px solid var(--mint); }
+  .feat-card .name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .feat-card .role { font-size: 11px; color: var(--mint-dark); margin-bottom: 8px; font-weight: 700; }
+  .feat-card .desc { font-size: 13px; line-height: 1.6; color: var(--text); margin-bottom: 8px; }
+  .feat-card .uses { font-size: 12px; color: var(--text-sub); }
+  .feat-card .uses ul { padding-left: 16px; }
+
+  /* テーブル */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+  th, td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-alt);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-sub);
+    border-bottom: 2px solid var(--line);
+  }
+
+  .insight {
+    background: var(--mint-soft);
+    border-left: 4px solid var(--mint);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .insight strong {
+    display: block;
+    color: var(--mint-dark);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .warn-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .warn-box strong { color: var(--warn); display: block; margin-bottom: 4px; }
+
+  /* UI モック */
+  .mock {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    background: white;
+    margin: 12px 0;
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--text);
+  }
+  .mock .mock-head {
+    background: var(--mint);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .mock .mock-card {
+    background: var(--bg-alt);
+    border-radius: 8px;
+    padding: 10px;
+    margin: 6px 0;
+    border-left: 3px solid var(--mint);
+  }
+  .mock .mock-pip {
+    background: rgba(0, 184, 148, 0.1);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-top: 8px;
+    font-size: 10px;
+    color: var(--text-sub);
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 24px 20px; }
+    .doc-flow { grid-template-columns: 1fr; }
+    .flow-row { grid-template-columns: 1fr; }
+    .flow-row .arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#purpose">本書の目的</a></li>
+    <li><a href="#pipeline">1. 4層パイプライン</a></li>
+    <li><a href="#raw-data">2. 生データ仕様</a></li>
+    <li><a href="#docs">3. 加算別ドキュメント生成</a>
+      <ul>
+        <li><a href="#doc-a">日次サマリ</a></li>
+        <li><a href="#doc-b">専門的支援実施記録</a></li>
+        <li><a href="#doc-c">個別サポート加算Ⅰ証跡</a></li>
+        <li><a href="#doc-d">集中的支援3か月レポート</a></li>
+        <li><a href="#doc-e">家庭連携加算記録</a></li>
+        <li><a href="#doc-f">モニタリング下書き</a></li>
+        <li><a href="#doc-g">個別支援計画見直し</a></li>
+        <li><a href="#doc-h">引継ぎ書（移行支援）</a></li>
+      </ul>
+    </li>
+    <li><a href="#timeline">4. 1日の運用フロー</a></li>
+    <li><a href="#monthly">5. 月次・3か月・6か月運用</a></li>
+    <li><a href="#features">6. 機能群（5モジュール）</a></li>
+    <li><a href="#hand-write">7. 手書きとの分業</a></li>
+    <li><a href="#integrations">8. HUG等との連携</a></li>
+    <li><a href="#anti-pattern">9. アンチパターン</a></li>
+    <li><a href="#prd-update">10. PRD反映項目</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">mitooshi Pro ／ Feature Spec v0.1</div>
+  <h1>めくりログ → 加算エビデンス生成の機能仕様</h1>
+  <p class="lead">
+    「カードめくり体験の<strong>副産物</strong>として、加算根拠ドキュメントが自動生成される」
+    という mitooshi Pro の中核ロジックを、データ層・運用フロー・機能仕様まで具体化する。
+    AI 自動生成は<strong>下書きまで</strong>、最終判断は児発管が行う設計を貫く。
+  </p>
+</header>
+
+<section id="purpose">
+  <h2><span class="num">▶</span>本書の目的</h2>
+  <p>
+    競合分析で見えた「mitooshi だけが生成できる4種類のデータ」を、
+    どうやって<strong>加算ごとの根拠ドキュメント</strong>に変換するかを設計する。
+    あわせて<strong>手書き運用との分業</strong>を明確にし、現場が無理なく使える運用像を示す。
+  </p>
+  <div class="insight">
+    <strong>設計原則</strong>
+    <p>① 自動化は<strong>下書きまで</strong>。最終確定は人間。<br>
+    ② 手書きは<strong>排除しない</strong>。デジタル強要はしない。<br>
+    ③ 児発管の<strong>専門的判断は人が言葉で書く</strong>。AI 代筆しない。<br>
+    ④ HUG 等の請求 SaaS とは <strong>CSV 連携</strong>で並列導入を前提とする。</p>
+  </div>
+</section>
+
+<!-- ===================== 1. 4層パイプライン ===================== -->
+<section id="pipeline">
+  <h2><span class="num">01</span>4層パイプライン</h2>
+  <p>めくりログから加算ドキュメントが生成される全体構造。データの「どこまでを誰が触るか」を明確化する。</p>
+
+  <div class="pipeline">
+    <div class="stage s1">
+      <span class="num">1</span>
+      <h4>Layer 1：自動収集</h4>
+      <span class="role-tag">mitooshi 完結</span>
+      <div class="desc">子どものめくり操作から自動で生成される構造化データ。職員の入力は一切不要。</div>
+      <div class="examples">
+        例：<code>operator_id</code>, <code>card_seq</code>, <code>flip_time</code>, <code>elapsed_sec</code>, <code>scene_id</code>, <code>completion_flag</code>
+      </div>
+    </div>
+    <div class="stage s2">
+      <span class="num">2</span>
+      <h4>Layer 2：半構造化入力</h4>
+      <span class="role-tag">職員：1〜2タップ</span>
+      <div class="desc">職員がワンタップで付与する観察タグ・中断理由。入力負荷は1児童あたり日5秒以内を目標。</div>
+      <div class="examples">
+        例：中断理由（パニック／離席／興味薄れ／眠気／他）、専門職立合トグル、観察タグ（成長／いつもと違う）
+      </div>
+    </div>
+    <div class="stage s3">
+      <span class="num">3</span>
+      <h4>Layer 3：自由記述（児発管・専門職）</h4>
+      <span class="role-tag">児発管・PT/OT/ST</span>
+      <div class="desc">専門的判断・本人/家族の意向・所見など、人が言葉で書くべき領域。テンプレ流用は意図的に難しくする。</div>
+      <div class="examples">
+        例：個別支援計画の本児の特性記述、モニタリング所見、専門職の評価コメント
+      </div>
+    </div>
+    <div class="stage s4">
+      <span class="num">4</span>
+      <h4>Layer 4：ドキュメント生成</h4>
+      <span class="role-tag">AI 下書き → 人間確定</span>
+      <div class="desc">Layer 1〜3 を組み合わせ、加算別の根拠ドキュメント（PDF / Word / CSV）を出力。下書き状態で出し、児発管が必ず<strong>レビュー・加筆・サイン</strong>する。</div>
+      <div class="examples">
+        例：日次サマリ、月次専門的支援実施記録、3か月集中的支援レポート、6か月個別支援計画見直し下書き
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>核心</strong>
+    <p>
+      AI が生成するのは <strong>Layer 4 のドキュメント下書きのみ</strong>。Layer 3（児発管の所見）は人間が書く。
+      これを混ぜないことで「コピペ疑い → 減算」のリスクを構造的に回避する。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 2. 生データ仕様 ===================== -->
+<section id="raw-data">
+  <h2><span class="num">02</span>生データ仕様</h2>
+  <p>Layer 1〜2 で生成されるデータの実際のスキーマ（簡略版）。</p>
+
+  <h3>セッション単位（カード組み開始〜終了）</h3>
+  <table>
+    <thead>
+      <tr><th>フィールド</th><th>例</th><th>用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>session_id</td><td>uuid</td><td>一意識別</td></tr>
+      <tr><td>child_id</td><td>uuid</td><td>児童紐付け</td></tr>
+      <tr><td>scene_id</td><td>登園 / 朝の会 / 着替え / 個別療育 / 帰宅 等</td><td>シーン分類</td></tr>
+      <tr><td>started_at / ended_at</td><td>2026-04-29 09:03:12</td><td>所要時間算出</td></tr>
+      <tr><td>card_sequence</td><td>[手洗い, 連絡帳出す, 朝の会へ]</td><td>個別性の証跡</td></tr>
+      <tr><td>completion_flag</td><td>completed / interrupted / abandoned</td><td>完了率指標</td></tr>
+      <tr><td>interrupt_reason</td><td>panic / leave / lose_interest / sleepy / other</td><td>中断パターン分析</td></tr>
+      <tr><td>specialist_present</td><td>PT / OT / ST / 心理 / なし</td><td>専門的支援加算根拠</td></tr>
+      <tr><td>support_mode</td><td>group / individual</td><td>個別サポート加算根拠</td></tr>
+    </tbody>
+  </table>
+
+  <h3>めくりイベント（カード1枚ごと）</h3>
+  <table>
+    <thead>
+      <tr><th>フィールド</th><th>例</th><th>用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>event_id</td><td>uuid</td><td>一意識別</td></tr>
+      <tr><td>card_id</td><td>uuid</td><td>カード紐付け</td></tr>
+      <tr><td>flipped_at</td><td>09:03:24</td><td>時刻記録</td></tr>
+      <tr><td>elapsed_from_prev_sec</td><td>32</td><td>前カードからの所要秒</td></tr>
+      <tr><td>operator</td><td>child_self / staff_assist / unknown</td><td>主体性の証跡</td></tr>
+      <tr><td>retry_count</td><td>0 / 1 / 2..</td><td>困難度指標</td></tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:12px;color:var(--text-mute);">
+    ※ <code>operator</code> の判定は、めくり方（押下圧・速さ・パターン）と職員のタッチ識別から推定。
+    判定不能時は <code>unknown</code> として記録し、職員が後付け修正可能にする。
+  </p>
+</section>
+
+<!-- ===================== 3. ドキュメント生成 ===================== -->
+<section id="docs">
+  <h2><span class="num">03</span>加算別ドキュメント生成フロー</h2>
+  <p>各ドキュメントについて、<strong>自動生成パート ／ 半構造化パート ／ 手書き（児発管記述）パート</strong>の3列で示す。</p>
+
+  <!-- A. 日次サマリ -->
+  <div class="doc-card" id="doc-a">
+    <div class="head">
+      <span class="name">A. 日次サマリ</span>
+      <span class="freq">毎日（自動）</span>
+      <span class="target-kasan">対象加算：個別サポート加算Ⅰ／専門的支援実施加算／延長支援加算 等の日次根拠</span>
+    </div>
+    <div class="body">
+      <p style="font-size:13px;color:var(--text-sub);">
+        その日に各児童について生成された全データを1ページにまとめる。HUG 等への CSV エクスポート元。
+      </p>
+      <div class="doc-flow">
+        <div class="col auto">
+          <h6>① 自動生成</h6>
+          <ul>
+            <li>各シーンのカード使用ログ</li>
+            <li>所要時間・自発めくり率</li>
+            <li>完了/中断の集計</li>
+            <li>専門職立合の有無</li>
+          </ul>
+        </div>
+        <div class="col semi">
+          <h6>② 職員1タップ</h6>
+          <ul>
+            <li>中断理由の選択</li>
+            <li>「特記すべき」フラグ</li>
+            <li>音声10秒メモ（任意）</li>
+          </ul>
+        </div>
+        <div class="col hand">
+          <h6>③ 手書き許容</h6>
+          <ul>
+            <li>必要なし（自動完結）</li>
+            <li>気になる子のみ追加メモ可（紙でもOK）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B. 専門的支援実施記録 -->
+  <div class="doc-card" id="doc-b">
+    <div class="head">
+      <span class="name">B. 専門的支援実施記録</span>
+      <span class="freq">該当回（PT/OT/ST/心理立合時）</span>
+      <span class="target-kasan">対象加算：専門的支援実施加算（150単位／回・月4回上限）</span>
+    </div>
+    <div class="body">
+      <div class="doc-flow">
+        <div class="col auto">
+          <h6>① 自動生成</h6>
+          <ul>
+            <li>専門職ログイン時刻</li>
+            <li>立合時に使用したカードセット</li>
+            <li>子どもの反応データ（所要・完了）</li>
+            <li>計画カードとの突合</li>
+          </ul>
+        </div>
+        <div class="col semi">
+          <h6>② 専門職タップ</h6>
+          <ul>
+            <li>支援内容タグ（言語訓練／粗大運動／感覚統合 等）</li>
+            <li>効果評価（5段階）</li>
+          </ul>
+        </div>
+        <div class="col hand">
+          <h6>③ 専門職が書く</h6>
+          <ul>
+            <li>所見（最低 200 字）</li>
+            <li>次回への引継ぎ事項</li>
+            <li>サイン（電子）</li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-mute);margin-top:8px;">
+        ※ 所見はテンプレ提示なし。空白から書く UI にする（個別性担保）。
+      </p>
+    </div>
+  </div>
+
+  <!-- C. 個別サポート加算Ⅰ証跡 -->
+  <div class="doc-card" id="doc-c">
+    <div class="head">
+      <span class="name">C. 個別サポート加算Ⅰ 日次証跡</span>
+      <span class="freq">毎日（該当児のみ自動）</span>
+      <span class="target-kasan">対象加算：個別サポート加算Ⅰ（100単位／日）</span>
+    </div>
+    <div class="body">
+      <div class="doc-flow">
+        <div class="col auto">
+          <h6>① 自動生成</h6>
+          <ul>
+            <li>当該児童専用カードボードの使用ログ</li>
+            <li>個別調整の差分（共通プリセットとの差）</li>
+            <li>個別対応時間の集計</li>
+          </ul>
+        </div>
+        <div class="col semi">
+          <h6>② 職員タップ</h6>
+          <ul>
+            <li>該当日の対応強度（軽／中／重）</li>
+          </ul>
+        </div>
+        <div class="col hand">
+          <h6>③ 手書き許容</h6>
+          <ul>
+            <li>不要</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D. 集中的支援3か月レポート -->
+  <div class="doc-card" id="doc-d">
+    <div class="head">
+      <span class="name">D. 集中的支援 3か月効果検証レポート</span>
+      <span class="freq">3か月毎（該当児のみ）</span>
+      <span class="target-kasan">対象加算：集中的支援加算（1,000単位／日・新設）</span>
+    </div>
+    <div class="body">
+      <div class="doc-flow">
+        <div class="col auto">
+          <h6>① 自動生成</h6>
+          <ul>
+            <li>集中支援期間の毎日のカード使用ログ</li>
+            <li>切り替え失敗回数の時系列推移</li>
+            <li>自発めくり率の変化</li>
+            <li>パニック頻度の変化グラフ</li>
+            <li>事前比較期間との対比</li>
+          </ul>
+        </div>
+        <div class="col semi">
+          <h6>② 児発管タップ</h6>
+          <ul>
+            <li>当初目標の達成度（5段階）</li>
+            <li>継続/終了の判定</li>
+          </ul>
+        </div>
+        <div class="col hand">
+          <h6>③ 児発管が書く</h6>
+          <ul>
+            <li>本児への所見（最低 400 字）</li>
+            <li>次期の方針</li>
+            <li>家族への説明予定</li>
+          </ul>
+        </div>
+      </div>
+      <div class="warn-box" style="margin-top:10px;">
+        <strong>差別化のキードキュメント</strong>
+        このレポートは <strong>競合 SaaS では構造的に作れない</strong>。3か月の行動データを時系列でグラフ化し、
+        効果検証の客観エビデンスにできるのは mitooshi だけ。
+      </div>
+    </div>
+  </div>
+
+  <!-- E. 家庭連携加算記録 -->
+  <div class="doc-card" id="doc-e">
+    <div class="head">
+      <span class="name">E. 家庭連携加算 面談記録</span>
+      <span class="freq">月1〜4回（該当児・面談時）</span>
+      <span class="target-kasan">対象加算：家庭連携加算（300〜1,000単位／回・月4回上限）</span>
+    </div>
+    <div class="body">
+      <div class="doc-flow">
+        <div class="col auto">
+          <h6>① 自動生成</h6>
+          <ul>
+            <li>家庭での mitooshi 使用ログ（toC連携）</li>
+            <li>「家庭で効いた／効かなかった」カードのリスト</li>
+            <li>面談時の画面共有スクショ自動保存</li>
+            <li>面談時間（開始〜終了）</li>
+          </ul>
+        </div>
+        <div class="col semi">
+          <h6>② 児発管タップ</h6>
+          <ul>
+            <li>面談形式（来所／訪問／オンライン）</li>
+            <li>議題タグ</li>
+          </ul>
+        </div>
+        <div class="col hand">
+          <h6>③ 児発管が書く</h6>
+          <ul>
+            <li>相談内容の要旨</li>
+            <li>合意事項</li>
+            <li>次回までのアクション</li>
+            <li>保護者サイン取得欄</li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-mute);margin-top:8px;">
+        ※ toC との連携データが入る点が <strong>競合では真似できない</strong>領域。
+      </p>
+    </div>
+  </div>
+
+  <!-- F. モニタリング下書き -->
+  <div class="doc-card" id="doc-f">
+    <div class="head">
+      <span class="name">F. 3か月モニタリング下書き</span>
+      <span class="freq">3か月毎（全児童）</span>
+      <span class="target-kasan">対象加算：基本報酬の前提（モニタリング不実施は減算）</span>
+    </div>
+    <div class="body">
+      <div class="doc-flow">
+        <div class="col auto">
+          <h6>① 自動生成</h6>
+          <ul>
+            <li>3か月の使用カードランキング</li>
+            <li>シーン別の所要時間推移</li>
+            <li>自発めくり率の変化</li>
+            <li>前期目標カードの達成率</li>
+          </ul>
+        </div>
+        <div class="col semi">
+          <h6>② 児発管タップ</h6>
+          <ul>
+            <li>各目標の達成度（5段階）</li>
+            <li>継続／変更／追加の判定</li>
+          </ul>
+        </div>
+        <div class="col hand">
+          <h6>③ 児発管が書く</h6>
+          <ul>
+            <li>本児固有の所見（最低 300 字）</li>
+            <li>次期目標の言語化</li>
+            <li>保護者と共有する内容</li>
+          </ul>
+        </div>
+      </div>
+      <div class="warn-box" style="margin-top:10px;">
+        <strong>テンプレ提示なし</strong>
+        所見欄はテンプレを提示しない。「Aくんは…」と書き始めると過去のAくん固有データが下にチラ見えする UI で、
+        コピペでなく本児の言葉で書ける構造にする。
+      </div>
+    </div>
+  </div>
+
+  <!-- G. 個別支援計画見直し -->
+  <div class="doc-card" id="doc-g">
+    <div class="head">
+      <span class="name">G. 6か月個別支援計画見直し下書き</span>
+      <span class="freq">6か月毎（全児童）</span>
+      <span class="target-kasan">対象：制度上必須／返還リスク最大の書類</span>
+    </div>
+    <div class="body">
+      <div class="doc-flow">
+        <div class="col auto">
+          <h6>① 自動生成</h6>
+          <ul>
+            <li>6か月の行動データ要約</li>
+            <li>3か月モニタリング 2 回分の差分</li>
+            <li>家族との面談記録（家庭連携記録から）</li>
+            <li>専門職所見の集約</li>
+          </ul>
+        </div>
+        <div class="col semi">
+          <h6>② 児発管タップ</h6>
+          <ul>
+            <li>項目別の継続／変更</li>
+          </ul>
+        </div>
+        <div class="col hand">
+          <h6>③ 児発管が書く</h6>
+          <ul>
+            <li>本児の特性（最低 500 字）</li>
+            <li>家族の意向（家族と協議）</li>
+            <li>次期目標</li>
+            <li>本人・家族の同意（電子署名 or 紙）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- H. 引継ぎ書 -->
+  <div class="doc-card" id="doc-h">
+    <div class="head">
+      <span class="name">H. 引継ぎ書（移行支援）</span>
+      <span class="freq">進級・進学時（該当時）</span>
+      <span class="target-kasan">対象加算：保育・教育等移行支援加算（500単位／回）</span>
+    </div>
+    <div class="body">
+      <div class="doc-flow">
+        <div class="col auto">
+          <h6>① 自動生成</h6>
+          <ul>
+            <li>本児のカードセット一式</li>
+            <li>シーン別の効果的な対応パターン</li>
+            <li>「困った時のカード列」</li>
+          </ul>
+        </div>
+        <div class="col semi">
+          <h6>② 児発管タップ</h6>
+          <ul>
+            <li>移行先タイプ（保育園／幼稚園／小学校／支援学校）</li>
+            <li>共有レベル選択</li>
+          </ul>
+        </div>
+        <div class="col hand">
+          <h6>③ 児発管が書く</h6>
+          <ul>
+            <li>「先生に伝えたい3つのこと」</li>
+            <li>家族との合意確認</li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-mute);margin-top:8px;">
+        ※ 引継ぎ書＝<strong>「子どもの取扱説明書」として持ち運べる資産</strong>。
+        次の先生が「この子はこう接するといい」を理解する時間を劇的に短縮する。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 4. 1日の運用フロー ===================== -->
+<section id="timeline">
+  <h2><span class="num">04</span>1日の運用フロー</h2>
+  <p>典型的な児発・放デイの1日で、mitooshi Pro がどう使われるかを時系列で示す。定員10名・職員3名・児発管1名のモデル。</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="time">08:30</div>
+      <div class="title">朝の準備</div>
+      <div class="body">
+        <span class="actor staff">職員</span>
+        その日のシーン構成を確認。プリセット（登園／朝の会／個別／帰宅）はデフォルトで読み込み済み。
+        前日の中断児童には自動で「フォロータグ」が付与されている。
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="time">09:00 〜 09:30</div>
+      <div class="title">登園シーン</div>
+      <div class="body">
+        <span class="actor child">子ども</span>
+        各児童がボードを開き「手洗い → 連絡帳 → 自席へ」をめくっていく。
+        <span class="actor system">mitooshi</span>
+        操作主体（自発／補助）と所要時間を自動記録。Aくんが2回リトライ → リトライカウント自動増。
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="time">10:00 〜 10:30</div>
+      <div class="title">個別療育（PT立合）</div>
+      <div class="body">
+        <span class="actor staff">PT</span>
+        ログイン → 専門職立合フラグ自動 ON。Bくんに合わせて感覚統合系カードを組む。
+        <span class="actor child">B</span>
+        15分のセッション。途中で離席1回 → <span class="actor staff">職員</span>「離席：環境音」をタップ。
+        <span class="actor system">mitooshi</span>
+        専門的支援実施加算の根拠データが自動蓄積。
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="time">11:30</div>
+      <div class="title">パニック発生</div>
+      <div class="body">
+        <span class="actor child">C</span>
+        切り替え時にパニック。
+        <span class="actor staff">職員</span>
+        「中断：パニック」をタップ、音声10秒メモ「雨で気圧低い、いつもより敏感」。
+        <span class="actor system">mitooshi</span>
+        強度行動障害児支援加算の根拠ログに紐付け。前後のカード列も保存。
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="time">14:00 〜 14:30</div>
+      <div class="title">帰宅シーン</div>
+      <div class="body">
+        <span class="actor child">子ども</span>
+        全員が帰宅準備のカードをめくる。
+        <span class="actor system">mitooshi</span>
+        日次データが完成。
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="time">15:00 〜 16:00</div>
+      <div class="title">職員の振り返り</div>
+      <div class="body">
+        <span class="actor mgr">児発管</span>
+        ダッシュボードで全児童の日次サマリを15分で俯瞰。
+        フォローが必要な3名（B：継続様子見／C：保護者連絡／D：明日の集中支援）を特定。
+        <span class="actor staff">職員</span>
+        Cの保護者へ電話。手書きの記録ノートに5行メモ → <span class="actor staff">職員</span>スマホで写真撮影 →
+        mitooshi に紐付けアップロード（OCRで日付児童名自動付与）。
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="time">17:00</div>
+      <div class="title">退所</div>
+      <div class="body">
+        <span class="actor system">mitooshi</span>
+        日次サマリ生成。HUG 用 CSV を出力（請求担当が翌朝確認）。
+        専門職立合があった日は <strong>専門的支援実施加算ドラフト</strong>を生成し、PT に通知。
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>運用のポイント</strong>
+    <p>
+      職員のタップ操作は <strong>1日あたり累計 1〜2分</strong>に抑える。
+      「めくりログ収集のために職員が忙しくなる」という本末転倒を避ける。
+      手書きの記録は紙のままでOK。写真アップで mitooshi に紐付くだけ。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 5. 月次・3か月・6か月運用 ===================== -->
+<section id="monthly">
+  <h2><span class="num">05</span>月次・3か月・6か月の運用</h2>
+
+  <h3>月末（最終営業日 ＋ 翌月初）</h3>
+  <ul>
+    <li><strong>自動：</strong> 月次サマリ／加算別の月次集計／HUG 用 CSV を生成</li>
+    <li><strong>専門職：</strong> 月内の実施記録ドラフト（4回分）を確認・所見追記・電子サイン</li>
+    <li><strong>請求担当：</strong> CSV を HUG にインポート、加算算定の整合性チェック</li>
+    <li><strong>児発管：</strong> 月次レビュー20分。気になる子3名を特定、保護者連絡計画</li>
+  </ul>
+
+  <h3>3か月毎（モニタリング期）</h3>
+  <ul>
+    <li><strong>自動：</strong> 全児童のモニタリング下書き＋集中支援児童の効果検証レポートを生成</li>
+    <li><strong>児発管：</strong> 1児童あたり 30〜45分で所見を記述（mitooshi のデータが画面横にチラ見え）</li>
+    <li><strong>家族：</strong> 必要児童は家庭連携面談実施、合意取得</li>
+  </ul>
+
+  <h3>6か月毎（個別支援計画見直し期）</h3>
+  <ul>
+    <li><strong>自動：</strong> 6か月分の行動データ＋3か月モニタリング2回分＋面談記録を集約した見直し下書きを生成</li>
+    <li><strong>児発管：</strong> 1児童あたり 60〜90分で計画書を仕上げる（書き上げ時間が現状の半分目安）</li>
+    <li><strong>家族：</strong> 計画書ドラフトを共有、面談で同意取得</li>
+    <li><strong>本人：</strong> 同意（年齢・発達段階に応じて）</li>
+  </ul>
+
+  <h3>進級・進学時（該当時）</h3>
+  <ul>
+    <li><strong>自動：</strong> 引継ぎ書（カードセット＋使い方ガイド＋効果的なシーン対応）を生成</li>
+    <li><strong>児発管：</strong> 「先生に伝えたい3つのこと」を加筆</li>
+    <li><strong>移行先：</strong> PDF を印刷 or 共有、引継ぎ会議で活用</li>
+  </ul>
+</section>
+
+<!-- ===================== 6. 機能群 ===================== -->
+<section id="features">
+  <h2><span class="num">06</span>機能群（5モジュール）</h2>
+
+  <div class="feat-card core">
+    <div class="name">M1. 子どもボード（Layer 1 の主役）</div>
+    <div class="role">CORE：競合差別化の源泉</div>
+    <div class="desc">
+      子どもが直接触る縦型カード積層UI。スワイプでめくる。
+      <strong>操作主体（自発／補助）の自動推定</strong>と <strong>シーン × カード組合せの記録</strong>がここで完結する。
+    </div>
+    <div class="uses">
+      生成データ：めくりイベント、シーン、所要時間、リトライ、完了/中断
+      <ul>
+        <li>差別化要素：「<strong>子どもが触る</strong>」を死守。職員代行は明示的なモードに</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="feat-card core">
+    <div class="name">M2. 職員ペイン（Layer 2 の主役）</div>
+    <div class="role">CORE：1日2分以内のタップで完結</div>
+    <div class="desc">
+      子どもボードの脇または別タブレットに表示される薄い操作ペイン。
+      中断理由・観察タグ・専門職立合トグル・10秒音声メモ。
+    </div>
+    <div class="uses">
+      設計原則：<strong>選択肢は 5 個以内</strong>、<strong>テキスト入力は基本なし</strong>、<strong>音声で逃がせる</strong>
+    </div>
+  </div>
+
+  <div class="feat-card core">
+    <div class="name">M3. 児発管ダッシュボード（Layer 3〜4 の起点）</div>
+    <div class="role">CORE：加算ドキュメントのハブ</div>
+    <div class="desc">
+      児発管が「いま気になる子」を発見し、ドキュメントを書き上げる場所。
+      児童一覧、行動データグラフ、加算別証跡サマリ、ドラフト生成、所見入力UI。
+    </div>
+    <div class="uses">
+      <ul>
+        <li>所見欄は<strong>テンプレ非提示</strong>。本児の固有データを横にチラ見せして書きやすくする</li>
+        <li>1日15分・1モニタリング 30〜45分・1計画書 60〜90分が目標時間</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="feat-card">
+    <div class="name">M4. 手書き連携（紙の記録を捨てさせない）</div>
+    <div class="role">補完：現場の慣性を尊重</div>
+    <div class="desc">
+      紙のメモ・連絡帳の写真をアップ → OCR で日付・児童名を自動推定 → 該当児童のタイムラインに紐付け。
+      <strong>手書きを捨てさせず</strong>、「一部紙・一部デジタル」の現実的な運用を許容する。
+    </div>
+    <div class="uses">
+      ユースケース：保護者からの紙連絡帳、職員の急ぎメモ、専門職の手書き所見
+    </div>
+  </div>
+
+  <div class="feat-card">
+    <div class="name">M5. 連携エクスポート（HUG / カイポケ / 印刷）</div>
+    <div class="role">補完：請求 SaaS と並列導入を前提</div>
+    <div class="desc">
+      日次・月次データを CSV / PDF で出力。HUG 等の請求 SaaS にインポートしやすい列構成にする。
+      家族説明用の PDF（保護者向けに整形）も別途出力。
+    </div>
+    <div class="uses">
+      <ul>
+        <li>HUG 連携：加算別の日次集計 CSV（請求と突合可能な列構成）</li>
+        <li>家族向け PDF：行動グラフを優しいトーンで（mitooshi のキャラクターが添える）</li>
+        <li>印刷PDF：個別支援計画／モニタリング／専門的支援実施記録</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 7. 手書きとの分業 ===================== -->
+<section id="hand-write">
+  <h2><span class="num">07</span>手書きとの分業ルール</h2>
+  <p>「mitooshi に全部入れろ」は現場拒絶を招く。手書き運用を残しつつ、デジタル化のメリットを取れる分業ラインを定義する。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:200px;">領域</th>
+        <th>mitooshi で完結</th>
+        <th>手書き許容</th>
+        <th>備考</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>めくりログ</td>
+        <td>◎ 完全自動</td>
+        <td>−</td>
+        <td>子どもの操作なので手書きの余地なし</td>
+      </tr>
+      <tr>
+        <td>中断理由・観察タグ</td>
+        <td>◎ タップ</td>
+        <td>△</td>
+        <td>タップで5秒、迷うときは音声メモへ</td>
+      </tr>
+      <tr>
+        <td>職員の気づきメモ</td>
+        <td>○ 音声</td>
+        <td>○ 紙メモ写真アップ</td>
+        <td>紙が早い場面は紙でOK</td>
+      </tr>
+      <tr>
+        <td>専門職の所見</td>
+        <td>○ テキスト入力</td>
+        <td>○ 紙の書面写真アップ</td>
+        <td>署名は電子 or 紙どちらも可</td>
+      </tr>
+      <tr>
+        <td>児発管の所見（モニタリング）</td>
+        <td>◎ テキスト入力</td>
+        <td>△ 紙ドラフト→転記</td>
+        <td>最終ドキュメントは PDF 保存が望ましい</td>
+      </tr>
+      <tr>
+        <td>個別支援計画書本体</td>
+        <td>◎ テキスト＋電子署名</td>
+        <td>○ 紙印刷で家族署名</td>
+        <td>家族同意は紙署名 → スキャン保存もOK</td>
+      </tr>
+      <tr>
+        <td>連絡帳（保護者⇄施設）</td>
+        <td>○ メッセージ機能</td>
+        <td>○ 紙連絡帳併用</td>
+        <td>保護者が紙派なら紙のまま、写真アップで紐付け</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight">
+    <strong>分業の哲学</strong>
+    <p>
+      <strong>「手書きを捨てさせる」のではなく「手書きを資産化する」</strong>。
+      紙メモを写真でアップしてもらえれば、児童・日付・カテゴリーに自動紐付けされ、
+      実地指導での提示にも使える。手書きを敵に回さない。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 8. HUG等との連携 ===================== -->
+<section id="integrations">
+  <h2><span class="num">08</span>HUG / カイポケ等との連携</h2>
+  <p>請求 SaaS と並列導入される前提で、データ連携を設計する。</p>
+
+  <h3>連携パターン1：CSV エクスポート（初期）</h3>
+  <ul>
+    <li>日次・月次の加算別集計を CSV 出力</li>
+    <li>HUG / カイポケが標準でインポートできる列構成（児童ID、日付、加算コード、回数、単位数）</li>
+    <li>請求担当が朝1回 CSV を取り込めば終わる運用</li>
+  </ul>
+
+  <h3>連携パターン2：API 連携（将来）</h3>
+  <ul>
+    <li>HUG が API 提供すれば直接連携。ベンダーアライアンス交渉が必要</li>
+    <li>初期は CSV で十分。実装コストとアライアンスコストを天秤にかけて判断</li>
+  </ul>
+
+  <h3>提案時のメッセージ</h3>
+  <div class="insight">
+    <strong>営業トーク</strong>
+    <p>
+      「HUG さんの請求機能はそのまま使ってください。mitooshi は CSV で連携するので、
+      請求担当の方の作業は<strong>朝1回のインポートのみ</strong>。
+      mitooshi が支援の中身の証跡を作り、HUG がそれを請求に変換する分業です」
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 9. アンチパターン ===================== -->
+<section id="anti-pattern">
+  <h2><span class="num">09</span>アンチパターン（やらないこと）</h2>
+  <p>過度な自動化が引き起こす減算・現場拒絶を避けるため、明文化する。</p>
+  <div class="warn-box">
+    <strong>① AI が個別支援計画を自動執筆する</strong>
+    児発管の所見はテンプレ提示しない。「Aくんは…」と書き始めると過去の固有データを横に並べるだけ。
+    AI 代筆は <strong>個別性の喪失 → 実地指導減算</strong>の温床になる。
+  </div>
+  <div class="warn-box">
+    <strong>② 「全部 mitooshi に入れろ」運用</strong>
+    現場拒絶を招く。紙の連絡帳・手書きメモは「写真アップで紐付け」を許容し、デジタル強要しない。
+  </div>
+  <div class="warn-box">
+    <strong>③ 「自動で加算が取れます」と謳う</strong>
+    実地指導は人による判断が入る。自動算定を強調すると現場の警戒感を生む。
+    「<strong>取りこぼし防止</strong>」「<strong>証跡が強くなる</strong>」が正しい言い方。
+  </div>
+  <div class="warn-box">
+    <strong>④ 請求機能を作る</strong>
+    HUG の領域に踏み込むと正面衝突して負ける。請求 SaaS は<strong>並列導入の補完関係</strong>を貫く。
+  </div>
+  <div class="warn-box">
+    <strong>⑤ 子どもボードに大人向け機能を載せる</strong>
+    「子どもが触る」を死守する。職員代行モードは別UIで明示的に切り替える。
+    子ども体験を侵食する toB 機能は子ども画面に出さない。
+  </div>
+</section>
+
+<!-- ===================== 10. PRD反映項目 ===================== -->
+<section id="prd-update">
+  <h2><span class="num">10</span>PRD_v3 への反映項目</h2>
+  <p>本書から PRD に反映すべき項目をリスト化。次のアクション。</p>
+  <ol>
+    <li><strong>機能スコープ：</strong> M1〜M5 の5モジュール構成を PRD に追記</li>
+    <li><strong>データモデル：</strong> セッション／めくりイベントのスキーマを PRD に明記</li>
+    <li><strong>操作主体推定：</strong> 自発／補助の判定ロジックを開発チームと詰める</li>
+    <li><strong>UI 設計原則：</strong> テンプレ提示なし／選択肢5個以内／音声逃し</li>
+    <li><strong>ドキュメント生成：</strong> A〜H の8ドキュメントを PRD の機能要件に追加</li>
+    <li><strong>連携仕様：</strong> HUG / カイポケ向け CSV の列構成を確定</li>
+    <li><strong>手書き許容：</strong> 写真アップ＋OCR で紐付けの仕様化</li>
+    <li><strong>アンチパターン：</strong> 5項目を「やらないリスト」として PRD に明文化</li>
+  </ol>
+
+  <div class="insight">
+    <strong>実装優先度の提案</strong>
+    <p>
+      Phase 1（PoC）：M1 + M2 + M3 の最小構成 ＋ ドキュメント A・C のみ自動生成。<br>
+      Phase 2：ドキュメント B（専門的支援）・E（家庭連携）を追加。M5（CSV）の HUG 連携。<br>
+      Phase 3：ドキュメント D（集中的支援）・F・G（モニタリング・計画見直し）。<br>
+      Phase 4：ドキュメント H（引継ぎ書）・M4（手書き OCR）。<br>
+      ※ Phase 1 で「子どもが触れて、最低限の証跡が残る」状態を3か月で達成、Discovery 連動で機能優先度を絞る。
+    </p>
+  </div>
+</section>
+
+<footer>
+  作成：2026-04-29 ／ 関連：competitive_kasan_map.html, kasan_evidence_map.html, ryouiku_business_model.html<br>
+  本書は仕様素案。PRD_v3 への正式反映は機能ごとに Discovery 検証を経て行う。
+</footer>
+
+</main>
+</div>
+</body>
+</html>

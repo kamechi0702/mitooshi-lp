@@ -50,7 +50,8 @@ mitooshi/
 ├── pdm/                              PdM成果物（プロダクト横断）
 │   ├── CLAUDE.md                     PdM 視点ガイド
 │   ├── PRD_v3_MVP.md                 現行PRD（v3.0）
-│   ├── DESIGN_HANDOFF.md             デザイン刷新ブリーフ
+│   ├── DESIGN_SPEC_v3.md             ★Claude Design 引き継ぎ用デザイン定義書（v3.0 確定版）
+│   ├── DESIGN_HANDOFF.md             デザイン刷新初期ブリーフ
 │   ├── preset_scenes.md              プリセット3シーンのカード内訳
 │   ├── card_library_draft.md         カードライブラリ素案
 │   └── illustration_style_guide.md   AI画像生成スタイルガイド

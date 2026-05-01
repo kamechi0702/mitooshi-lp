@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI支援計画作成系の競合分析 ／ mitooshi Pro 補論</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --yellow: #FFE082;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+    --danger: #DC2626;
+    --danger-soft: #FEE2E2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 240px; flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    font-size: 13px; background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text); text-decoration: none;
+    padding: 4px 8px; display: block; border-radius: 4px; line-height: 1.4;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+
+  main { flex: 1; padding: 48px 56px; max-width: 940px; }
+  header.doc {
+    border-bottom: 2px solid var(--danger);
+    padding-bottom: 24px; margin-bottom: 40px;
+    background: linear-gradient(180deg, var(--danger-soft) 0%, transparent 100%);
+    padding: 24px 28px;
+    border-radius: 12px;
+  }
+  header.doc .eyebrow {
+    color: var(--danger); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  header.doc h1 {
+    font-size: 28px; font-weight: 700; line-height: 1.3; margin-bottom: 8px;
+  }
+  header.doc .lead { color: var(--text); font-size: 15px; }
+
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 22px; font-weight: 700; margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint); font-size: 14px; font-weight: 700;
+  }
+  section h3 { font-size: 17px; font-weight: 700; margin: 24px 0 8px; }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* 警告ボックス */
+  .alert-box {
+    background: var(--danger-soft);
+    border-left: 4px solid var(--danger);
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 16px 0;
+  }
+  .alert-box strong {
+    display: block;
+    color: var(--danger);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* 競合カード */
+  .ai-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 14px 0;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .ai-card .head {
+    padding: 14px 18px;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .ai-card .head .name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .ai-card .head .name small {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-mute);
+    margin-left: 6px;
+  }
+  .ai-card .head .price-tag {
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+  .ai-card .body {
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .ai-card .body .col h5 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-mute);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .ai-card .body .col p {
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .ai-card .body .col ul {
+    font-size: 12px;
+    margin-left: 18px;
+  }
+  .ai-card .threat {
+    padding: 10px 18px 12px;
+    background: var(--warn-soft);
+    border-top: 1px solid var(--warn);
+    font-size: 12px;
+  }
+  .ai-card .threat strong {
+    color: var(--warn);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-right: 6px;
+  }
+
+  /* 軸マッピング */
+  .axis-map {
+    margin: 20px 0;
+    background: var(--bg-alt);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .axis-map .map-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr 1fr;
+    grid-template-rows: 60px 1fr 1fr;
+    gap: 8px;
+    height: 400px;
+  }
+  .axis-map .corner { background: transparent; }
+  .axis-map .axis-y, .axis-map .axis-x {
+    background: var(--text);
+    color: white;
+    padding: 12px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .axis-map .axis-y {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  .axis-map .quadrant {
+    background: white;
+    padding: 14px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    font-size: 11px;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+  .axis-map .quadrant.q-mit {
+    background: var(--mint-soft);
+    border-color: var(--mint);
+  }
+  .axis-map .quadrant h4 {
+    font-size: 12px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .axis-map .quadrant.q-mit h4 { color: var(--mint-dark); }
+  .axis-map .quadrant ul {
+    padding-left: 14px;
+    font-size: 11px;
+  }
+  .axis-map .quadrant li { margin: 2px 0; }
+
+  /* マトリクス */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 12px 0;
+  }
+  th, td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-alt);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--text-sub);
+    border-bottom: 2px solid var(--line);
+    line-height: 1.3;
+  }
+  td.center { text-align: center; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* インサイト */
+  .insight {
+    background: var(--mint-soft);
+    border-left: 4px solid var(--mint);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .insight strong {
+    display: block;
+    color: var(--mint-dark);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .warn-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .warn-box strong { color: var(--warn); display: block; margin-bottom: 4px; }
+
+  /* 戦略カード */
+  .strategy-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 12px 0;
+  }
+  .strategy-card.recommended { border: 2px solid var(--mint); background: var(--mint-soft); }
+  .strategy-card .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .strategy-card .name { font-size: 16px; font-weight: 700; }
+  .strategy-card .badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: var(--text-sub);
+    color: white;
+  }
+  .strategy-card.recommended .badge { background: var(--mint); }
+  .strategy-card .desc { font-size: 13px; color: var(--text-sub); margin: 8px 0; }
+  .strategy-card .pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  .strategy-card .pros, .strategy-card .cons {
+    padding: 10px 12px;
+    border-radius: 4px;
+  }
+  .strategy-card .pros { background: rgba(0, 184, 148, 0.1); }
+  .strategy-card .cons { background: rgba(220, 38, 38, 0.05); }
+  .strategy-card .pros h6 { color: var(--mint-dark); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .strategy-card .cons h6 { color: var(--danger); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 24px 20px; }
+    .ai-card .body { grid-template-columns: 1fr; }
+    .axis-map .map-grid { display: block; height: auto; }
+    .axis-map .map-grid > div { margin-bottom: 8px; }
+    .strategy-card .pros-cons { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#alert">▲ 重要発見</a></li>
+    <li><a href="#findings">1. 発見の概要</a></li>
+    <li><a href="#players">2. 6つのプレイヤー詳細</a>
+      <ul style="padding-left:14px;font-size:12px;">
+        <li><a href="#ai-pac">AI-PAC</a></li>
+        <li><a href="#co-mii">co-mii</a></li>
+        <li><a href="#dayrobo">デイロボ</a></li>
+        <li><a href="#albatros">アルバトロス</a></li>
+        <li><a href="#edeal">エデアル</a></li>
+        <li><a href="#kantan">かんたん支援記録</a></li>
+      </ul>
+    </li>
+    <li><a href="#axis">3. 2軸ポジショニング</a></li>
+    <li><a href="#matrix">4. 拡張比較マトリクス</a></li>
+    <li><a href="#impact">5. mitooshi 戦略への影響</a></li>
+    <li><a href="#options">6. 3つの戦略オプション</a></li>
+    <li><a href="#recommend">7. 推奨戦略</a></li>
+    <li><a href="#actions">8. 次のアクション</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">▲ 競合追加リサーチ ／ Critical Update</div>
+  <h1>AI支援計画作成系の競合発見</h1>
+  <p class="lead">
+    前回の競合分析で<strong>完全に見落としていた領域</strong>を特定。
+    児発管の業務AIヘルパーとして急成長している<strong>「AI支援計画作成系」6プレイヤー</strong>を発掘し、
+    mitooshi Pro の戦略への影響と対応策を整理する。
+  </p>
+</header>
+
+<!-- ===================== 警告 ===================== -->
+<section id="alert">
+  <div class="alert-box">
+    <strong>※ この発見は競合分析の認識を更新します</strong>
+    <p style="margin:0;">
+      前回の <a href="competitive_kasan_map.html">competitive_kasan_map.html</a> では、
+      競合を「業務統合系（HUG等）」「個別支援計画特化（HAGONOTE）」「視覚支援系（LITALICO等）」の3カテゴリで分類していた。<br>
+      今回のリサーチで、<strong>「AI支援計画作成系」という第4カテゴリ</strong>が急成長していることが判明。
+      慶応大学発の AI-PAC、特許出願済の co-mii など、<strong>加算特化を明示した強力なプレイヤー</strong>が複数存在する。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 発見の概要 ===================== -->
+<section id="findings">
+  <h2><span class="num">01</span>発見の概要</h2>
+  <p>
+    児発管の業務（個別支援計画書作成・モニタリング・アセスメント）を AI で半自動化するサービスが、
+    複数の事業者によって開発・提供されている。多くは<strong>令和6年報酬改定（5領域対応）に合わせて2024〜2025年に立ち上がった</strong>新興プレイヤー。
+  </p>
+
+  <h3>共通する特徴</h3>
+  <ul>
+    <li>ターゲット：<strong>児発管・職員</strong>（大人の業務AIヘルパー）</li>
+    <li>機能の中心：<strong>個別支援計画書・モニタリング記録の AI 半自動作成</strong></li>
+    <li>5領域（健康・運動・認知・言語・社会性）への対応を訴求</li>
+    <li>価格帯：<strong>無料 〜 月13,200円</strong>と幅広い</li>
+    <li>多くが<strong>専門的支援実施加算・モニタリングを意識した設計</strong></li>
+  </ul>
+
+  <h3>共通する弱点（mitooshi の差別化が守れる理由）</h3>
+  <ul>
+    <li><strong>子どもが直接触る UI を持っていない</strong>（すべて大人向けツール）</li>
+    <li><strong>子ども本人の操作データが取れない</strong></li>
+    <li>「AI が計画書を書く」ことを前面に出している → コピペ・テンプレ依存リスクを内包</li>
+    <li><strong>家庭との連続性は持っていない</strong>（toC アプリと連動しない）</li>
+    <li>「行動の客観データ」ではなく「大人が入力した文言の AI 整理」が中心</li>
+  </ul>
+</section>
+
+<!-- ===================== プレイヤー詳細 ===================== -->
+<section id="players">
+  <h2><span class="num">02</span>6つのプレイヤー詳細</h2>
+
+  <!-- AI-PAC -->
+  <div class="ai-card" id="ai-pac">
+    <div class="head">
+      <span class="name">AI-PAC <small>by ADDS（慶應義塾大学発達心理学研究室発）</small></span>
+      <span class="price-tag">価格非公開</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>機能</h5>
+        <ul>
+          <li>5領域 600+ プログラム搭載</li>
+          <li>個別支援計画作成・支援記録・グラフ化</li>
+          <li>指導動画・教材ダウンロード</li>
+          <li>保護者向け e-ラーニング</li>
+          <li>月次オンラインスーパービジョン</li>
+        </ul>
+        <h5>差別化ポイント</h5>
+        <p>
+          <strong>応用行動分析学（ABA）ベース</strong>。慶大発で学術的信頼性が高い。
+          1事業所あたり80名まで対応。スーパービジョン付きの「<strong>体制全体ソリューション</strong>」。
+        </p>
+      </div>
+      <div class="col">
+        <h5>対象加算</h5>
+        <ul>
+          <li>専門的支援実施加算（5領域対応）</li>
+          <li>モニタリング・アセスメント全般</li>
+          <li>個別支援計画見直し</li>
+        </ul>
+        <h5>対象ユーザー</h5>
+        <p>児童発達支援・放課後等デイサービス（児発管・職員）</p>
+        <h5>AI技術</h5>
+        <p>データグラフ化・記録デジタル化が中心。具体的な機械学習アルゴリズムは非公開。</p>
+      </div>
+    </div>
+    <div class="threat">
+      <strong>脅威度</strong>
+      ★★★ 学術背景 × ABA × 体制ソリューションの組み合わせは強力。療育のメインストリームに直接アプローチ。
+    </div>
+  </div>
+
+  <!-- co-mii -->
+  <div class="ai-card" id="co-mii">
+    <div class="head">
+      <span class="name">co-mii（コミー）<small>AIセラピスト・特許出願済</small></span>
+      <span class="price-tag">価格非公開</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>機能</h5>
+        <ul>
+          <li>7分野アセスメント診断（はい／いいえ式）</li>
+          <li>5領域対応の個別支援計画書 半自動作成</li>
+          <li>500種類以上の療育メニュー提示</li>
+          <li>モニタリング進捗管理</li>
+        </ul>
+        <h5>差別化ポイント</h5>
+        <p>
+          <strong>特許出願済</strong>。職員スキルに依存しない標準化された計画作成。
+          診断結果の視覚化で保護者説明効率化。
+        </p>
+      </div>
+      <div class="col">
+        <h5>対象加算（明示）</h5>
+        <ul>
+          <li><strong>専門的支援実施加算</strong>（最大効果）</li>
+          <li>専門的支援体制加算と併算定で <strong>月546単位/人</strong>（約5,500円/人）獲得を訴求</li>
+          <li>5年以上実務経験の保育士・児童指導員でも取得可能</li>
+        </ul>
+        <h5>AI技術</h5>
+        <p>診断テストの結果から支援目標と課題を自動提案・最適化</p>
+      </div>
+    </div>
+    <div class="threat">
+      <strong>脅威度</strong>
+      ★★★ <strong>「専門的支援実施加算で月いくら」を明示的に訴求</strong>している点で営業ロジックが明確。mitooshi の Path C と直接競合。
+    </div>
+  </div>
+
+  <!-- デイロボ -->
+  <div class="ai-card" id="dayrobo">
+    <div class="head">
+      <span class="name">デイロボ <small>療育サポートアプリ</small></span>
+      <span class="price-tag">月13,200円</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>機能</h5>
+        <ul>
+          <li>児童管理・出欠記録・療育記録・実績記録</li>
+          <li>個別支援計画作成・請求管理</li>
+          <li>保護者向け LINE 連携・デジタルサイン</li>
+          <li>連絡帳・利用申請</li>
+        </ul>
+        <h5>差別化ポイント</h5>
+        <p>
+          <strong>業務統合 + AI 機能 + 保護者 LINE 連携</strong>を全部入りで月13,200円。
+          初期費用無料、最大2か月無料利用可。
+        </p>
+      </div>
+      <div class="col">
+        <h5>AI技術</h5>
+        <p>
+          連絡帳・業務日誌・保護者報告データを分析し、児童の行動パターン・体調変化・気持ちの傾向を自動抽出。
+          個別支援計画では「過去の計画や連絡帳記録をもとに、長期目標・短期目標・支援内容を提案」。
+        </p>
+        <h5>対象加算</h5>
+        <p>明示なし</p>
+      </div>
+    </div>
+    <div class="threat">
+      <strong>脅威度</strong>
+      ★★ 業務統合 + AI + 保護者 LINE が13,200円は破格。<strong>mitooshi Pro の月3〜5万円との価格差が問題</strong>になる可能性。
+    </div>
+  </div>
+
+  <!-- アルバトロス -->
+  <div class="ai-card" id="albatros">
+    <div class="head">
+      <span class="name">アルバトロス <small>放課後デイ業務支援</small></span>
+      <span class="price-tag">現在無償／将来 2,500〜3,500円</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>機能</h5>
+        <ul>
+          <li>アセスメント作成 → 計画原案 → 担当者会議議事録 → 確定版の AI 一貫支援フロー</li>
+          <li>5領域カバー状況の自動チェック</li>
+          <li>関連書類の参照機能</li>
+        </ul>
+        <h5>差別化ポイント</h5>
+        <p>
+          <strong>個別支援計画作成の上流から下流までを一気通貫</strong>でAI支援。日付順の経緯理解で書類提案。
+        </p>
+      </div>
+      <div class="col">
+        <h5>対象加算</h5>
+        <p>明示なし（実質的にモニタリング・個別支援計画見直しに効く）</p>
+        <h5>注意点</h5>
+        <p>
+          現在は<strong>無償提供</strong>。将来有償化予定だが価格は2,500〜3,500円と低価格設定の見込み。
+          <strong>低価格でシェアを取る戦略</strong>と推測。
+        </p>
+      </div>
+    </div>
+    <div class="threat">
+      <strong>脅威度</strong>
+      ★★ 無償 + 一貫AIフローで <strong>市場を低価格で席巻するリスク</strong>。価格設定で苦しい競争になる。
+    </div>
+  </div>
+
+  <!-- エデアル -->
+  <div class="ai-card" id="edeal">
+    <div class="head">
+      <span class="name">エデアル <small>個別支援計画AI作成ヘルパー</small></span>
+      <span class="price-tag">完全無料・登録不要</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>機能</h5>
+        <ul>
+          <li>20項目以上の児童情報入力</li>
+          <li>ChatGPT/Gemini に投げる<strong>プロンプト生成ツール</strong></li>
+          <li>16種類の特性に対応（ASD・ADHD・知的障害ほか）</li>
+        </ul>
+        <h5>差別化ポイント</h5>
+        <p>
+          完全無料・登録不要。<strong>外部 AI（ChatGPT/Gemini）に投げる仲介ツール</strong>として位置付け。
+        </p>
+      </div>
+      <div class="col">
+        <h5>位置づけ</h5>
+        <p>
+          「補助ツール」を明示。プロダクト化された SaaS というより、<strong>個人・小規模施設が無料で使えるユーティリティ</strong>。
+          直接的な競合脅威は低いが、<strong>「無料で十分」という価格期待値を市場に植え付ける</strong>リスクあり。
+        </p>
+      </div>
+    </div>
+    <div class="threat">
+      <strong>脅威度</strong>
+      ★ 競合脅威としては小さいが、<strong>市場の価格感覚を引き下げる</strong>影響は無視できない。
+    </div>
+  </div>
+
+  <!-- かんたん支援記録 -->
+  <div class="ai-card" id="kantan">
+    <div class="head">
+      <span class="name">かんたん支援記録カンタン支援計画 <small>by 株式会社マイティアスリート</small></span>
+      <span class="price-tag">不明</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>機能</h5>
+        <ul>
+          <li>支援記録から「要約とアドバイス」生成</li>
+          <li>ChatGPT API で各項目の内容自動作成</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>差別化</h5>
+        <p>
+          ChatGPT API を直接活用。記録の AI 要約に特化。<strong>記録ベースのアプローチ</strong>。
+        </p>
+      </div>
+    </div>
+    <div class="threat">
+      <strong>脅威度</strong>
+      ★ 機能的には他のAIヘルパーと類似。差別化要素は限定的。
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2軸ポジショニング ===================== -->
+<section id="axis">
+  <h2><span class="num">03</span>2軸ポジショニング</h2>
+  <p>「データ生成主体（大人 vs 子ども）」と「機能スコープ（業務管理 vs 支援内容）」の2軸でマッピング。</p>
+
+  <div class="axis-map">
+    <div class="map-grid">
+      <div class="corner"></div>
+      <div class="axis-x">業務管理（請求・出退・記録）</div>
+      <div class="axis-x">支援内容（計画・アセス・記録の中身）</div>
+      <div class="axis-y">大人が<br>データ入力</div>
+      <div class="quadrant">
+        <h4>業務統合 SaaS</h4>
+        <ul>
+          <li>HUG（10,000施設）</li>
+          <li>カイポケ</li>
+          <li>ほのぼのNEXT</li>
+          <li>コノベル</li>
+          <li>コドモン</li>
+        </ul>
+      </div>
+      <div class="quadrant">
+        <h4>AI 支援計画作成系（新発見）</h4>
+        <ul>
+          <li>AI-PAC（慶応・ADDS）</li>
+          <li>co-mii（特許出願済）</li>
+          <li>デイロボ AI</li>
+          <li>アルバトロス</li>
+          <li>エデアル / かんたん支援記録</li>
+        </ul>
+      </div>
+      <div class="axis-y">子ども・<br>本人が<br>データ生成</div>
+      <div class="quadrant">
+        <h4>—（該当なし）</h4>
+        <ul style="color:var(--text-mute);">
+          <li>子どもの行動を業務記録に変換するツールは存在しない</li>
+        </ul>
+      </div>
+      <div class="quadrant q-mit">
+        <h4>★ mitooshi Pro（独自領域）</h4>
+        <ul>
+          <li>子どもがカードをめくる</li>
+          <li>その操作ログが支援内容の証跡</li>
+          <li>家庭 × 施設の連続性</li>
+          <li><strong>競合 0 の領域</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>重要な発見</strong>
+    <p>
+      AI 支援計画作成系の登場で、「<strong>支援内容の AI 化</strong>」というクアドラントが急成長中。
+      しかしすべて <strong>大人が入力したデータの AI 整理</strong>。
+      <strong>子ども本人が直接データを生成する mitooshi のクアドラントは依然として競合 0</strong>。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 拡張マトリクス ===================== -->
+<section id="matrix">
+  <h2><span class="num">04</span>拡張比較マトリクス</h2>
+  <p>前回マトリクスに AI 支援計画作成系を加えた完全版。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:140px;">加算 ／ ツール</th>
+        <th>HUG</th>
+        <th>コノベル</th>
+        <th>HAGONOTE</th>
+        <th>AI-PAC</th>
+        <th>co-mii</th>
+        <th>デイロボ</th>
+        <th>アルバ<br>トロス</th>
+        <th>エデアル</th>
+        <th>mitooshi<br>Pro</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>基本報酬・出退・請求</td>
+        <td class="center">◎</td>
+        <td class="center">○</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center">○</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+      </tr>
+      <tr>
+        <td>送迎・延長・欠席系</td>
+        <td class="center">◎</td>
+        <td class="center">◎</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center">○</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center">△</td>
+      </tr>
+      <tr>
+        <td>アセスメント／モニタリング</td>
+        <td class="center">○</td>
+        <td class="center">△</td>
+        <td class="center">◎</td>
+        <td class="center" style="background:#FFF3CD;">◎</td>
+        <td class="center" style="background:#FFF3CD;">◎</td>
+        <td class="center" style="background:#FFF3CD;">○</td>
+        <td class="center" style="background:#FFF3CD;">◎</td>
+        <td class="center" style="background:#FFF3CD;">○</td>
+        <td class="center" style="background:var(--mint);color:white;">◎</td>
+      </tr>
+      <tr>
+        <td>個別サポート加算Ⅰ</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center">○</td>
+        <td class="center" style="background:#FFF3CD;">○</td>
+        <td class="center" style="background:#FFF3CD;">○</td>
+        <td class="center">△</td>
+        <td class="center" style="background:#FFF3CD;">○</td>
+        <td class="center">△</td>
+        <td class="center" style="background:var(--mint);color:white;">◎</td>
+      </tr>
+      <tr>
+        <td>専門的支援実施加算</td>
+        <td class="center">△</td>
+        <td class="center">−</td>
+        <td class="center">○</td>
+        <td class="center" style="background:#FFE0E0;">◎</td>
+        <td class="center" style="background:#FFE0E0;">◎</td>
+        <td class="center">△</td>
+        <td class="center" style="background:#FFF3CD;">○</td>
+        <td class="center">△</td>
+        <td class="center" style="background:var(--mint);color:white;">◎</td>
+      </tr>
+      <tr>
+        <td>強度行動障害児支援加算</td>
+        <td class="center">△</td>
+        <td class="center">−</td>
+        <td class="center">○</td>
+        <td class="center" style="background:#FFF3CD;">○</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center" style="background:var(--mint);color:white;">◎</td>
+      </tr>
+      <tr>
+        <td>集中的支援加算（新設）</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center" style="background:var(--mint);color:white;">◎ 独占</td>
+      </tr>
+      <tr>
+        <td>家庭連携加算</td>
+        <td class="center">○</td>
+        <td class="center">○</td>
+        <td class="center">−</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center">○</td>
+        <td class="center">−</td>
+        <td class="center">−</td>
+        <td class="center" style="background:var(--mint);color:white;">◎ 独占</td>
+      </tr>
+      <tr>
+        <td>保育・教育等移行支援加算</td>
+        <td class="center">△</td>
+        <td class="center">○</td>
+        <td class="center">○</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center">△</td>
+        <td class="center" style="background:var(--mint);color:white;">◎</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:11px;color:var(--text-mute);">
+    凡例：◎ 主要証跡 ／ ○ 補助 ／ △ 限定 ／ − 機能なし<br>
+    背景：黄色＝AI支援計画作成系の主戦場 ／ 赤色＝co-mii・AI-PAC が明示的に狙う加算 ／ 緑＝mitooshi 強い領域
+  </p>
+
+  <div class="warn-box">
+    <strong>重要な変化</strong>
+    <p>
+      AI 支援計画作成系の登場で、<strong>専門的支援実施加算・モニタリング・個別サポート加算Ⅰ</strong>の領域は競争激化。
+      mitooshi の Path C（個別性の客観化ツール）は <strong>co-mii や AI-PAC との直接競合</strong>になる。<br>
+      一方、<strong>集中的支援加算・家庭連携加算は依然として mitooshi の独占領域</strong>。
+      また「子どもが触る」「行動データ」軸は<strong>誰もカバーしていない</strong>。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== mitooshi 戦略への影響 ===================== -->
+<section id="impact">
+  <h2><span class="num">05</span>mitooshi 戦略への影響</h2>
+
+  <h3>守れる領域（変化なし）</h3>
+  <ul>
+    <li><strong>家庭連携加算（Path B）</strong>：toC × toB の連続性は誰も真似できない</li>
+    <li><strong>集中的支援加算（Path A）</strong>：3か月の行動データグラフは mitooshi 独自</li>
+    <li><strong>強度行動障害児支援加算</strong>：パニック前後の操作ログは独自</li>
+    <li><strong>「子どもが触る」体験</strong>：誰もこのクアドラントに来ていない</li>
+  </ul>
+
+  <h3>競合激化する領域</h3>
+  <ul>
+    <li><strong>個別サポート加算Ⅰ（Path C）</strong>：AI-PAC・co-mii・アルバトロスが押し寄せている</li>
+    <li><strong>専門的支援実施加算</strong>：co-mii が「月546単位/人」を明示訴求</li>
+    <li><strong>モニタリング・個別支援計画見直し</strong>：AI 支援計画作成系が一斉に対応</li>
+  </ul>
+
+  <h3>新たな脅威</h3>
+  <ul>
+    <li><strong>価格圧力</strong>：デイロボ月13,200円・アルバトロス2,500〜3,500円・エデアル無料 → mitooshi Pro 月3〜5万円が割高に見える</li>
+    <li><strong>慶応大学ブランド</strong>：AI-PAC は学術背景で先生・児発管の信頼を得やすい</li>
+    <li><strong>「AI で計画書が書ける」訴求</strong>：児発管の最重要業務に直接刺さる</li>
+    <li><strong>市場期待値の変化</strong>：AI 自動化は「あって当たり前」の標準になる可能性</li>
+  </ul>
+
+  <div class="alert-box">
+    <strong>戦略的に重要なシグナル</strong>
+    <p>
+      これらの新興プレイヤーが2024〜2025年に集中して立ち上がっている事実は、
+      <strong>「療育業界の AI 化が本格化している」</strong>ことの証左。
+      mitooshi がこの波に乗らないと、「子どもが触るだけのツール」として周辺化するリスクがある。
+      逆に言えば、<strong>「子どもが触る × AI」</strong>を結び付けられれば、唯一無二のポジションを取れる。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 戦略オプション ===================== -->
+<section id="options">
+  <h2><span class="num">06</span>3つの戦略オプション</h2>
+
+  <div class="strategy-card">
+    <div class="head">
+      <span class="name">Option A：完全棲み分け（純粋差別化）</span>
+      <span class="badge">保守</span>
+    </div>
+    <p class="desc">
+      AI 支援計画作成系には触れず、<strong>「子どもが触る × 家庭連携 × 集中的支援」</strong>の独占領域だけで戦う。
+      Path B（家庭連携）と Path A（集中的支援）に絞り、Path C（個別性の客観化）は譲る。
+    </p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h6>メリット</h6>
+        ・正面衝突なし<br>
+        ・開発スコープが小さい<br>
+        ・独自価値が明確
+      </div>
+      <div class="cons">
+        <h6>デメリット</h6>
+        ・市場が狭い<br>
+        ・スケールに限界<br>
+        ・主要加算で勝負しない弱さ
+      </div>
+    </div>
+  </div>
+
+  <div class="strategy-card recommended">
+    <div class="head">
+      <span class="name">Option B：補完統合（推奨）</span>
+      <span class="badge">推奨</span>
+    </div>
+    <p class="desc">
+      AI 支援計画作成系と<strong>正面衝突せず、補完統合する</strong>。
+      mitooshi が生成する子どもの行動データを、AI-PAC や co-mii が AI で計画書化する仕組みにする。
+      <strong>「mitooshi が観察データ層、AI 計画作成系が記述層、HUG 等が請求層」</strong>の3層エコシステム。
+      パートナーアライアンス交渉も視野に。
+    </p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h6>メリット</h6>
+        ・正面衝突なし<br>
+        ・AI 計画作成系の急成長に乗れる<br>
+        ・「データ提供層」として唯一無二<br>
+        ・施設は両方使う動機がある
+      </div>
+      <div class="cons">
+        <h6>デメリット</h6>
+        ・パートナー依存リスク<br>
+        ・データ連携の API 開発が必要<br>
+        ・収益モデルが複雑化する可能性
+      </div>
+    </div>
+  </div>
+
+  <div class="strategy-card">
+    <div class="head">
+      <span class="name">Option C：直接対抗（フル統合）</span>
+      <span class="badge">挑戦</span>
+    </div>
+    <p class="desc">
+      mitooshi 自身が AI 支援計画作成機能も内製し、「<strong>子どもが触る × AI 計画作成</strong>」のフル統合プロダクトとして競う。
+      AI-PAC・co-mii と直接対決。価格は同等または上回る。
+    </p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h6>メリット</h6>
+        ・最大の差別化<br>
+        ・データの全工程を握る<br>
+        ・施設にとって1ツールで完結
+      </div>
+      <div class="cons">
+        <h6>デメリット</h6>
+        ・開発コスト大（AI 計画作成は別ドメイン）<br>
+        ・競合が学術・特許で強い<br>
+        ・コピペ減算リスクの内包
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 推奨戦略 ===================== -->
+<section id="recommend">
+  <h2><span class="num">07</span>推奨戦略</h2>
+  <p>結論：<strong>Option B（補完統合）を主軸、Option A の独占領域を初期エントリーポイント</strong>。</p>
+
+  <h3>段階的アプローチ</h3>
+  <ol>
+    <li>
+      <strong>Phase 1（Step 1：家庭連携）：</strong>
+      AI 支援計画作成系と<strong>競合しない領域から入る</strong>。
+      家庭連携加算は誰も触れていない。差別化価値の証明場面。
+    </li>
+    <li>
+      <strong>Phase 2（Step 3：個別ボード）：</strong>
+      子どもが触る独自データを蓄積。
+      この時点で「AI-PAC や co-mii の<strong>データソース層</strong>として連携できる」と位置付けを明確化。
+    </li>
+    <li>
+      <strong>Phase 3（Step 4：集中的支援）：</strong>
+      Path A（集中的支援加算）で<strong>独自価値を最大限訴求</strong>。
+      AI 計画作成系は集中的支援に対応していないので、ここは独占。
+    </li>
+    <li>
+      <strong>Phase 4：</strong>
+      AI-PAC や co-mii とのパートナーシップを模索。データ連携 API を提供して<strong>「療育エコシステムのデータ層」</strong>としての地位を確立。
+    </li>
+  </ol>
+
+  <h3>営業ポジショニングの再設計</h3>
+  <div class="insight">
+    <strong>新しいセールス・ロジック</strong>
+    <p>
+      「AI で計画書を作るツールは色々ありますよね（co-mii・AI-PAC・デイロボ）。
+      でもその AI に渡せる『<strong>本児固有の客観データ</strong>』はどこから取りますか？
+      mitooshi は<strong>子どもが触ることでその客観データを生成する唯一のツール</strong>です。
+      AI 計画作成系と組み合わせると、<strong>本当の意味で個別性のある計画書</strong>が作れます」
+    </p>
+  </div>
+
+  <h3>避けるべきポジショニング</h3>
+  <div class="warn-box">
+    <strong>NG：「mitooshi も AI で計画書を作れます」と co-mii・AI-PAC と同じ土俵に立つ</strong>
+    <p>慶応大学ブランド・特許出願済の競合と正面衝突するのは不利。「AI 計画作成」を主訴求にしない。</p>
+  </div>
+  <div class="warn-box">
+    <strong>NG：「業務統合の代替」と HUG・カイポケと並列で語る</strong>
+    <p>業務統合 SaaS は10,000施設導入の HUG が支配的。代替を狙うのは無謀。</p>
+  </div>
+</section>
+
+<!-- ===================== 次のアクション ===================== -->
+<section id="actions">
+  <h2><span class="num">08</span>次のアクション</h2>
+  <ol>
+    <li><strong>競合製品の実機テスト</strong>：co-mii・AI-PAC のデモ申し込み（特許文書も確認）</li>
+    <li><strong>パートナーシップ可能性の探索</strong>：ADDS（AI-PAC運営）への接触ルート調査</li>
+    <li><strong>API 連携の技術仕様検討</strong>：mitooshi のデータを AI 計画作成系にどう渡すか</li>
+    <li><strong>価格戦略の再検討</strong>：デイロボ月13,200円との対比で、mitooshi Pro の価格訴求ロジック再設計</li>
+    <li><strong>競合×加算マトリクスの正式更新</strong>：competitive_kasan_map.html v2 の作成</li>
+    <li><strong>Discovery インタビュー設計の修正</strong>：「AI 計画作成系を試したことがあるか」「効果は」を質問項目に追加</li>
+    <li><strong>マーケティング言語の刷新</strong>：「AI で計画書」と差別化する「子どもが残すデータ」のキャッチコピー開発</li>
+  </ol>
+
+  <div class="insight">
+    <strong>本書の戦略的意味</strong>
+    <p>
+      AI 支援計画作成系の存在を見落としていたまま PRD と Discovery を進めると、Phase 2 以降で <strong>正面衝突して敗北</strong>するリスクがあった。
+      早期に発見できたことで、<strong>補完統合戦略への舵切り</strong>が可能になった。
+      Path A（集中的支援）と Path B（家庭連携）の独占性を再確認できたことも収穫。
+    </p>
+  </div>
+</section>
+
+<footer>
+  作成：2026-04-29 ／ 関連：competitive_kasan_map.html, kasan_evidence_map.html, gradual_kasan_entry.html<br>
+  情報源：co-mii.com, adds.or.jp/ai-pac, dayrobo.com, conobell.com, edeal-soft.com, rbatos.com, mtsrb.net<br>
+  本書は2026年4月時点の公開情報に基づく。価格・機能は変動するため最新版で要確認。
+</footer>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>競合 × 加算マッピング ／ mitooshi の勝ち筋</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --line-soft: #F2F2F2;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+    --danger: #DC2626;
+    --danger-soft: #FEE2E2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 240px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    font-size: 13px;
+    background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text);
+    text-decoration: none;
+    line-height: 1.4;
+    display: block;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+
+  main { flex: 1; padding: 48px 56px; max-width: 940px; }
+  header.doc {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  header.doc .eyebrow {
+    color: var(--mint);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header.doc h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  header.doc .lead {
+    color: var(--text-sub);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  section h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 24px 0 8px;
+  }
+  section p { margin-bottom: 12px; color: var(--text); }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* 仮説ボックス */
+  .hypothesis {
+    background: var(--blue-soft);
+    border-left: 4px solid var(--blue);
+    padding: 18px 22px;
+    border-radius: 4px;
+    margin: 16px 0;
+  }
+  .hypothesis .h {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+  .hypothesis .quote {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* 競合カード */
+  .comp-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .comp-card .head {
+    padding: 14px 18px;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .comp-card .head .name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .comp-card .head .name small {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-mute);
+    margin-left: 6px;
+  }
+  .comp-card .head .position {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+  }
+  .comp-card .body {
+    padding: 14px 18px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .comp-card .body .row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .comp-card .body .row .k {
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+  .comp-card .body .row .v { color: var(--text); }
+
+  /* マトリクス */
+  table.matrix {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 12px 0;
+  }
+  table.matrix th, table.matrix td {
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    text-align: center;
+    vertical-align: middle;
+  }
+  table.matrix th {
+    background: var(--bg-alt);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--text-sub);
+    line-height: 1.3;
+  }
+  table.matrix th.row-h {
+    text-align: left;
+    background: var(--bg);
+    font-size: 12px;
+    color: var(--text);
+    width: 200px;
+  }
+  table.matrix .cell-strong { background: var(--mint-soft); color: var(--mint-dark); font-weight: 700; }
+  table.matrix .cell-mid { background: #FFF8E1; color: #B45309; }
+  table.matrix .cell-weak { color: var(--text-mute); }
+  table.matrix .cell-none { background: #F8F8F8; color: var(--text-mute); }
+  table.matrix .cell-mit { background: var(--mint); color: white; font-weight: 700; }
+
+  /* 空白地帯 */
+  .gap-box {
+    background: linear-gradient(135deg, var(--mint-soft) 0%, var(--blue-soft) 100%);
+    border: 1px solid var(--mint);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .gap-box h4 {
+    color: var(--mint-dark);
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  .gap-box .gap-num {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    background: var(--mint);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 13px;
+    margin-right: 8px;
+  }
+  .gap-box .gap-item { margin: 12px 0; }
+  .gap-box .gap-item .gap-title { font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .gap-box .gap-item .gap-detail { font-size: 13px; color: var(--text-sub); padding-left: 36px; }
+
+  /* 価値の二層構造 */
+  .layer-stack {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .layer {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .layer:last-child { border-bottom: none; }
+  .layer.top { background: var(--mint-soft); }
+  .layer.bottom { background: var(--blue-soft); }
+  .layer .label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+  .layer.top .label { background: var(--mint); color: white; }
+  .layer.bottom .label { background: var(--blue); color: white; }
+  .layer h4 { font-size: 16px; margin-bottom: 4px; }
+  .layer p { font-size: 13px; color: var(--text-sub); margin: 0; }
+  .layer ul { font-size: 13px; margin-top: 8px; }
+
+  /* Path カード */
+  .path-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 12px 0;
+  }
+  .path-card.recommended { border: 2px solid var(--mint); background: var(--mint-soft); }
+  .path-card .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .path-card .name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .path-card .badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: var(--text-sub);
+    color: white;
+  }
+  .path-card.recommended .badge { background: var(--mint); }
+  .path-card .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-top: 12px;
+    font-size: 12px;
+  }
+  .path-card .grid h5 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-mute);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .path-card .grid div p { font-size: 13px; line-height: 1.5; margin: 0; color: var(--text); }
+
+  /* インサイト */
+  .insight {
+    background: var(--bg-alt);
+    border-left: 4px solid var(--mint);
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .insight strong {
+    display: block;
+    color: var(--mint-dark);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .insight p:last-child { margin: 0; }
+
+  .warn-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .warn-box strong { color: var(--warn); display: block; margin-bottom: 4px; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 24px 20px; }
+    .path-card .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#hypothesis">出発点：仮説</a></li>
+    <li><a href="#competitors">1. 主要競合の整理</a></li>
+    <li><a href="#matrix">2. 競合 × 加算マトリクス</a></li>
+    <li><a href="#gaps">3. 空白地帯の特定</a></li>
+    <li><a href="#secret-sauce">4. mitooshi の独自データ</a></li>
+    <li><a href="#two-layer">5. 二層構造の価値</a></li>
+    <li><a href="#paths">6. 勝ち筋3パターン</a></li>
+    <li><a href="#recommend">7. 戦略的推奨</a></li>
+    <li><a href="#caveats">8. 検証すべき仮説</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">mitooshi Pro × 競合分析</div>
+  <h1>競合 × 加算マッピング ／ mitooshi の勝ち筋</h1>
+  <p class="lead">
+    既存の記録自動化 SaaS が押さえている加算と、mitooshi が「カードめくりの先」で差別化できる領域を特定する。
+    結論：mitooshi は<strong>請求 SaaS の代替ではなく、行動データ層を補完する立ち位置</strong>。
+    既存 SaaS が構造的に作れない<strong>「子ども本人の操作ログ」</strong>を加算の根拠に変えるのが勝ち筋。
+  </p>
+</header>
+
+<section id="hypothesis">
+  <h2><span class="num">▶</span>出発点：かめちの仮説</h2>
+  <div class="hypothesis">
+    <div class="h">仮説</div>
+    <p class="quote">
+      「カードをめくるだけでは補助ツールでしかなく、加算にならない。<br>
+      別の価値が必要だが、それが何かをまだ見つけていない」
+    </p>
+  </div>
+  <p>
+    この仮説は正しい。<strong>カードめくり体験そのもの</strong>は子どもへの提供価値であって、
+    事業所が加算を取る根拠にはならない。本書では「めくり体験の<strong>副産物</strong>」として何が生まれるかを掘り下げ、
+    そこに事業所価値（＝加算根拠）を見出す。
+  </p>
+</section>
+
+<!-- ===================== 1. 競合整理 ===================== -->
+<section id="competitors">
+  <h2><span class="num">01</span>主要競合の整理</h2>
+  <p>療育事業所が実際に導入している主要 SaaS を、機能の重心ごとに分類する。</p>
+
+  <h3>① 業務統合系（記録＋請求＋シフト）— 主戦場</h3>
+  <div class="comp-card">
+    <div class="head">
+      <span class="name">HUG（株式会社ネットアーツ）<small>業界最大手</small></span>
+      <span class="position">業務統合</span>
+    </div>
+    <div class="body">
+      <div class="row"><span class="k">主な機能</span><span class="v">請求／個別支援計画／出退管理／保護者連絡／記録／シフト</span></div>
+      <div class="row"><span class="k">価格</span><span class="v">月額 1.5〜3万円／事業所（推定）</span></div>
+      <div class="row"><span class="k">強み</span><span class="v">請求精度・業務全網羅・サポート手厚い</span></div>
+      <div class="row"><span class="k">弱み</span><span class="v">支援の「中身」の記録は自由記述に依存。個別性は児発管の文章力次第</span></div>
+    </div>
+  </div>
+  <div class="comp-card">
+    <div class="head">
+      <span class="name">カイポケ（エス・エム・エス）<small>介護横断</small></span>
+      <span class="position">業務統合</span>
+    </div>
+    <div class="body">
+      <div class="row"><span class="k">主な機能</span><span class="v">請求／記録／シフト／保護者連絡（介護メイン）</span></div>
+      <div class="row"><span class="k">価格</span><span class="v">月額 5,000〜2万円／事業所</span></div>
+      <div class="row"><span class="k">強み</span><span class="v">介護・福祉横断、請求の安定性</span></div>
+      <div class="row"><span class="k">弱み</span><span class="v">児発・放デイ専門ではない、療育的支援の記録は浅い</span></div>
+    </div>
+  </div>
+  <div class="comp-card">
+    <div class="head">
+      <span class="name">ほのぼのNEXT（NDソフトウェア）</span>
+      <span class="position">業務統合</span>
+    </div>
+    <div class="body">
+      <div class="row"><span class="k">主な機能</span><span class="v">請求／記録／計画書／シフト</span></div>
+      <div class="row"><span class="k">強み</span><span class="v">自治体実績多数、堅牢なシステム</span></div>
+      <div class="row"><span class="k">弱み</span><span class="v">UI が古い、若手職員から敬遠されがち</span></div>
+    </div>
+  </div>
+
+  <h3>② 個別支援計画特化系</h3>
+  <div class="comp-card">
+    <div class="head">
+      <span class="name">HAGONOTE 等</span>
+      <span class="position">計画書特化</span>
+    </div>
+    <div class="body">
+      <div class="row"><span class="k">主な機能</span><span class="v">個別支援計画／モニタリング記録／アセスメント</span></div>
+      <div class="row"><span class="k">強み</span><span class="v">テンプレ・ライブラリ豊富、児発管の時短</span></div>
+      <div class="row"><span class="k">弱み</span><span class="v">テンプレ依存で個別性が薄くなりがち（実地指導リスク）</span></div>
+    </div>
+  </div>
+
+  <h3>③ 保育・幼児教育からの越境系</h3>
+  <div class="comp-card">
+    <div class="head">
+      <span class="name">コドモン<small>保育園SaaS最大手</small></span>
+      <span class="position">隣接領域</span>
+    </div>
+    <div class="body">
+      <div class="row"><span class="k">主な機能</span><span class="v">保育記録／保護者連絡／出欠／写真共有</span></div>
+      <div class="row"><span class="k">強み</span><span class="v">保護者向け UX、写真共有のドキュメント文化</span></div>
+      <div class="row"><span class="k">弱み</span><span class="v">療育の加算ロジックには対応していない</span></div>
+    </div>
+  </div>
+
+  <h3>④ 視覚支援系（直接競合）</h3>
+  <div class="comp-card">
+    <div class="head">
+      <span class="name">LITALICOワンダー / 「やることカード」</span>
+      <span class="position">視覚支援</span>
+    </div>
+    <div class="body">
+      <div class="row"><span class="k">主な機能</span><span class="v">視覚カード／タスク管理／本部直営の事業所運営</span></div>
+      <div class="row"><span class="k">強み</span><span class="v">本社運営の囲い込み、ブランド力</span></div>
+      <div class="row"><span class="k">弱み</span><span class="v">他社事業所には基本展開しない（自社運営のみ）</span></div>
+    </div>
+  </div>
+  <div class="comp-card">
+    <div class="head">
+      <span class="name">コバリテ<small>アナログ視覚支援</small></span>
+      <span class="position">視覚支援</span>
+    </div>
+    <div class="body">
+      <div class="row"><span class="k">主な機能</span><span class="v">紙のカード・絵カード商品</span></div>
+      <div class="row"><span class="k">強み</span><span class="v">教育現場での認知度、コスト安、停電に強い</span></div>
+      <div class="row"><span class="k">弱み</span><span class="v">アナログのためデータが残らない＝加算根拠にならない</span></div>
+    </div>
+  </div>
+  <div class="comp-card">
+    <div class="head">
+      <span class="name">Goally / Lil Planner（海外）</span>
+      <span class="position">視覚支援</span>
+    </div>
+    <div class="body">
+      <div class="row"><span class="k">主な機能</span><span class="v">視覚スケジュール／タイマー／報酬システム</span></div>
+      <div class="row"><span class="k">強み</span><span class="v">機能豊富、ARC ベースの研究背景</span></div>
+      <div class="row"><span class="k">弱み</span><span class="v">日本未進出、日本の加算制度に未対応</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2. マトリクス ===================== -->
+<section id="matrix">
+  <h2><span class="num">02</span>競合 × 加算マトリクス</h2>
+  <p>各 SaaS が「どの加算の証跡をどれくらい強くカバーしているか」を可視化する。</p>
+  <table class="matrix">
+    <thead>
+      <tr>
+        <th class="row-h">加算 ／ ツール</th>
+        <th>HUG</th>
+        <th>カイポケ</th>
+        <th>ほのぼの</th>
+        <th>HAGONOTE</th>
+        <th>コドモン</th>
+        <th>コバリテ<br>(アナログ)</th>
+        <th>mitooshi<br>Pro</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th class="row-h">基本報酬（出退・請求）</th>
+        <td class="cell-strong">◎</td>
+        <td class="cell-strong">◎</td>
+        <td class="cell-strong">◎</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+      </tr>
+      <tr>
+        <th class="row-h">送迎加算</th>
+        <td class="cell-strong">◎</td>
+        <td class="cell-strong">◎</td>
+        <td class="cell-strong">◎</td>
+        <td class="cell-none">−</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+      </tr>
+      <tr>
+        <th class="row-h">延長支援加算</th>
+        <td class="cell-strong">◎</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mid">○</td>
+      </tr>
+      <tr>
+        <th class="row-h">欠席時対応加算</th>
+        <td class="cell-mid">○</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-weak">△</td>
+      </tr>
+      <tr>
+        <th class="row-h">アセスメント／モニタリング</th>
+        <td class="cell-mid">○</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-strong">◎</td>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mit">◎ (差別化)</td>
+      </tr>
+      <tr>
+        <th class="row-h">個別サポート加算Ⅰ</th>
+        <td class="cell-weak">△</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mit">◎ (差別化)</td>
+      </tr>
+      <tr>
+        <th class="row-h">専門的支援実施加算</th>
+        <td class="cell-weak">△</td>
+        <td class="cell-none">−</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mit">◎ (差別化)</td>
+      </tr>
+      <tr>
+        <th class="row-h">強度行動障害児支援加算</th>
+        <td class="cell-weak">△</td>
+        <td class="cell-none">−</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mit">◎ (差別化)</td>
+      </tr>
+      <tr>
+        <th class="row-h">集中的支援加算<br>(令和6年新設)</th>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mit">◎ (独占)</td>
+      </tr>
+      <tr>
+        <th class="row-h">家庭連携加算</th>
+        <td class="cell-mid">○</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mit">◎ (独占)</td>
+      </tr>
+      <tr>
+        <th class="row-h">保育・教育等移行支援加算</th>
+        <td class="cell-weak">△</td>
+        <td class="cell-none">−</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-mit">◎ (差別化)</td>
+      </tr>
+      <tr>
+        <th class="row-h">関係機関連携加算</th>
+        <td class="cell-mid">○</td>
+        <td class="cell-weak">△</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-mid">○</td>
+        <td class="cell-none">−</td>
+        <td class="cell-none">−</td>
+        <td class="cell-weak">△</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:var(--text-mute);">
+    凡例：◎ 主要証跡として機能 ／ ○ 補助的に貢献 ／ △ 限定的 ／ − 機能なし
+  </p>
+
+  <div class="insight">
+    <strong>マトリクスから見える事実</strong>
+    <p>
+      <strong>請求・出退・送迎の領域は HUG 等が完全に押さえている</strong>。ここで戦うのは無謀。
+      一方、<strong>「支援の中身」「個別性」「行動の経過」を必要とする加算は競合の手薄</strong>。
+      mitooshi が独占できる可能性がある領域は <strong>集中的支援加算・家庭連携加算</strong>の2つで、
+      差別化できる加算は <strong>個別サポート加算Ⅰ・専門的支援実施加算・強度行動障害児支援加算・モニタリング</strong>の4つ。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 3. 空白地帯 ===================== -->
+<section id="gaps">
+  <h2><span class="num">03</span>空白地帯の特定</h2>
+  <p>競合がカバーしていない（または弱い）領域を構造的に整理する。</p>
+
+  <div class="gap-box">
+    <div class="gap-item">
+      <div class="gap-title"><span class="gap-num">1</span>「支援の中身」の客観記録が手薄</div>
+      <div class="gap-detail">
+        既存 SaaS の支援記録欄は「自由記述」で、「今日は◯◯をしました」レベル。
+        実地指導で「何を、どう、どの程度の効果で支援したか」を問われると<strong>具体性が出ない</strong>。
+        個別支援計画と日々の記録の整合性も担保しづらい。
+      </div>
+    </div>
+    <div class="gap-item">
+      <div class="gap-title"><span class="gap-num">2</span>子ども本人の参加証跡がない</div>
+      <div class="gap-detail">
+        記録は<strong>大人の視点</strong>で書かれる。「本人参加型支援」の証跡として、
+        子ども本人が何をしたかの客観データは既存 SaaS には存在しない。
+        これが <strong>個別サポート加算Ⅰ</strong> や <strong>強度行動障害児支援加算</strong> の質的要件で減算される一因。
+      </div>
+    </div>
+    <div class="gap-item">
+      <div class="gap-title"><span class="gap-num">3</span>行動の時系列変化が定量化されない</div>
+      <div class="gap-detail">
+        「3か月でどう変化したか」を文章で書くしかない。
+        <strong>集中的支援加算</strong>の効果検証は本来定量データが望ましいが、既存 SaaS では作れない。
+        新設加算ゆえに業界全体で算定率が低く、空白地帯。
+      </div>
+    </div>
+    <div class="gap-item">
+      <div class="gap-title"><span class="gap-num">4</span>家庭支援の連続性が断絶</div>
+      <div class="gap-detail">
+        既存 SaaS の保護者連絡機能は「お知らせ送信」止まり。
+        家庭で実際にどんな支援が行われたか、その効果はどうだったかの<strong>双方向のデータ連続性</strong>はない。
+        <strong>家庭連携加算</strong>の月4回フル算定が難しい一因。
+      </div>
+    </div>
+    <div class="gap-item">
+      <div class="gap-title"><span class="gap-num">5</span>引継ぎ資産が持ち運べない</div>
+      <div class="gap-detail">
+        進級・進学時の<strong>保育・教育等移行支援加算</strong>では、引継ぎ内容の具体性が問われる。
+        既存 SaaS では「引継ぎ書」を新規作成する必要があり、児発管の時間が取られる。
+        子どもの個別性が「持ち運べる資産」として残っていない。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 4. mitooshi の独自データ ===================== -->
+<section id="secret-sauce">
+  <h2><span class="num">04</span>mitooshi だけが生成できる独自データ</h2>
+  <p>「カードをめくる体験」の<strong>副産物</strong>として、他 SaaS が構造的に作れない4種類のデータが生まれる。</p>
+
+  <h3>4種類の独自データ</h3>
+  <ol>
+    <li>
+      <strong>① 子ども本人の操作ログ</strong>
+      ：誰が、いつ、どのカードをめくったか。<strong>主体的参加の客観証跡</strong>になる。職員が代行操作した場合と区別できる。
+    </li>
+    <li>
+      <strong>② シーン × カード組み合わせ</strong>
+      ：「Aくんは登園シーンに3枚で OK、Bくんは10枚必要」など<strong>個別性が定量化</strong>される。
+      個別支援計画の「本児の特性」記述の素材になる。
+    </li>
+    <li>
+      <strong>③ 行動前後の介入文脈</strong>
+      ：パニック前にどのカードを示したか、切り替え時にどの順序で見せたか。
+      自由記述では再現できない解像度の<strong>支援プロセス記録</strong>。
+    </li>
+    <li>
+      <strong>④ 家庭 × 施設の連続性ログ</strong>
+      ：施設で組んだカードを家庭でも使う、家庭での反応を施設に持ち帰る。
+      <strong>双方向のデータ連続性</strong>は toC × toB を持つ mitooshi 独自。
+    </li>
+  </ol>
+
+  <div class="insight">
+    <strong>核心の発見</strong>
+    <p>
+      「カードめくり」自体は子どもへの体験価値だが、その<strong>操作ログ＝事業所への加算証跡</strong>になる。
+      これが「もう一つの価値」の正体。<br>
+      競合 SaaS が「大人が書く記録」しか作れないのに対し、mitooshi は「<strong>子どもが残すデータ</strong>」を生成する唯一のツール。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 5. 二層構造 ===================== -->
+<section id="two-layer">
+  <h2><span class="num">05</span>価値の二層構造</h2>
+  <p>mitooshi の価値は2層で考えると整理しやすい。</p>
+
+  <div class="layer-stack">
+    <div class="layer top">
+      <span class="label">Layer 1 ／ 子ども・保護者向け</span>
+      <h4>カードめくり体験</h4>
+      <p>子どもの不安を減らし、保護者の声かけ疲れを軽減する。<strong>UX としての提供価値</strong>。</p>
+      <ul>
+        <li>めくる楽しさ・自分で進める感覚</li>
+        <li>シーン別ボードによる予測可能性</li>
+        <li>保護者と一緒に作る共同体験</li>
+      </ul>
+    </div>
+    <div class="layer bottom">
+      <span class="label">Layer 2 ／ 事業所向け</span>
+      <h4>行動データ生成エンジン</h4>
+      <p>めくり体験の副産物として「加算根拠データ」が自動で蓄積される。<strong>事業価値としての提供価値</strong>。</p>
+      <ul>
+        <li>子ども本人の操作ログ＝主体的参加の証跡</li>
+        <li>シーン × カードの組み合わせ＝個別性の定量化</li>
+        <li>行動前後の介入文脈＝支援プロセスの記録</li>
+        <li>家庭 × 施設の連続性ログ＝双方向データ</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>
+    重要なのは <strong>Layer 1 を充実させると Layer 2 が自動で強くなる</strong>構造。
+    機能追加するときは「子ども体験を良くする」と「事業所証跡を強くする」の両方を満たすかで判断する。
+  </p>
+</section>
+
+<!-- ===================== 6. 勝ち筋 ===================== -->
+<section id="paths">
+  <h2><span class="num">06</span>勝ち筋3パターン</h2>
+  <p>独自データから生まれる3つの差別化シナリオ。</p>
+
+  <div class="path-card">
+    <div class="head">
+      <span class="name">Path A：集中的支援加算の効果検証ツール</span>
+      <span class="badge">ニッチ独占</span>
+    </div>
+    <div class="grid">
+      <div>
+        <h5>狙う加算</h5>
+        <p>集中的支援加算（1,000単位／日・新設）</p>
+      </div>
+      <div>
+        <h5>差別化の核</h5>
+        <p>3か月の行動変化グラフを自動生成。算定要件の「効果検証」を満たせる唯一のツール</p>
+      </div>
+      <div>
+        <h5>ポテンシャル</h5>
+        <p>1事業所あたり月4万円規模だが、業界全体で算定率が低く伸びしろ大</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="path-card recommended">
+    <div class="head">
+      <span class="name">Path B：家庭連携加算の連続性ツール</span>
+      <span class="badge">独自・推奨</span>
+    </div>
+    <div class="grid">
+      <div>
+        <h5>狙う加算</h5>
+        <p>家庭連携加算（300〜1,000単位 × 月4回上限）</p>
+      </div>
+      <div>
+        <h5>差別化の核</h5>
+        <p>toC × toB の双方向データ連続性。<strong>競合 SaaS では構造的に真似できない</strong></p>
+      </div>
+      <div>
+        <h5>ポテンシャル</h5>
+        <p>1事業所あたり月7万円規模。toC アプリの普及がそのまま toB の価値を押し上げる</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="path-card recommended">
+    <div class="head">
+      <span class="name">Path C：個別性の客観化ツール</span>
+      <span class="badge">横断・推奨</span>
+    </div>
+    <div class="grid">
+      <div>
+        <h5>狙う加算</h5>
+        <p>個別サポート加算Ⅰ／専門的支援実施加算／強度行動障害児支援加算／モニタリング</p>
+      </div>
+      <div>
+        <h5>差別化の核</h5>
+        <p>「個別性は児発管の文章力次第」という業界課題に対し、行動データで客観化</p>
+      </div>
+      <div>
+        <h5>ポテンシャル</h5>
+        <p>複数加算に横断的に効くため、1事業所あたり月15万円規模の取りこぼし防止が見える</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 7. 戦略推奨 ===================== -->
+<section id="recommend">
+  <h2><span class="num">07</span>戦略的推奨</h2>
+
+  <h3>結論：Path B + Path C を主軸、Path A は導入後の上振れ</h3>
+  <p>
+    Path B（家庭連携）と Path C（個別性の客観化）を <strong>提案の中心</strong>に据え、
+    Path A（集中的支援）は <strong>導入後の追加価値</strong>として後出しにする。
+  </p>
+
+  <h3>ポジショニング・ステートメント</h3>
+  <div class="insight">
+    <strong>ポジション</strong>
+    <p>
+      mitooshi Pro は <strong>請求 SaaS の代替ではない</strong>。HUG 等の業務統合 SaaS と<strong>並列で導入する補完ツール</strong>。
+      「請求事務は HUG、支援の中身は mitooshi」という分業が自然な姿。<br>
+      存在意義は <strong>「子どもが残すデータで、加算の質的要件を満たす」</strong>こと。
+    </p>
+  </div>
+
+  <h3>セールス・トーク（HUG 既導入施設向け）</h3>
+  <div class="insight">
+    <strong>セールス・トーク</strong>
+    <p>
+      「HUG さんで請求事務はバッチリやられてますよね。mitooshi はそれを置き換えるものではなく、
+      <strong>HUG だと書ききれない『支援の中身』の証跡を作るツール</strong>です。
+      子ども自身がカードをめくった事実、その日に使ったカードの組み合わせ、それが個別支援計画と一致しているか。
+      実地指導で『個別性』を問われたときに、HUG の自由記述だけでは弱い領域を、mitooshi のデータで補強する。
+      そういう関係性です」
+    </p>
+  </div>
+
+  <h3>4つの設計指針</h3>
+  <ol>
+    <li>
+      <strong>「請求機能は作らない」</strong>
+      ：HUG の領域に踏み込まない。代替ではなく補完であることを徹底する
+    </li>
+    <li>
+      <strong>「子どもが触る」を死守する</strong>
+      ：操作主体ログこそ独自価値の源泉。職員代行 UI は警戒（出すなら「代行」と明示）
+    </li>
+    <li>
+      <strong>「家庭 × 施設の連続性」を機能の柱に置く</strong>
+      ：toC mitooshi との連携機能（カード共有・反応共有）を Pro の中核機能にする
+    </li>
+    <li>
+      <strong>「行動データの可視化」を提供する</strong>
+      ：めくり所要時間・自発めくり率・離席頻度などの定量グラフを児発管に届ける
+    </li>
+  </ol>
+
+  <div class="warn-box">
+    <strong>避けるべきポジショニング</strong>
+    「療育記録 SaaS」と名乗ること。HUG 等と正面衝突して負ける。
+    「<strong>視覚支援ツール × 行動データ</strong>」「<strong>子どもが残すデータの療育プラットフォーム</strong>」
+    のような独自カテゴリを作る言い方を選ぶ。
+  </div>
+</section>
+
+<!-- ===================== 8. 検証 ===================== -->
+<section id="caveats">
+  <h2><span class="num">08</span>検証すべき仮説</h2>
+  <p>本書は仮説ベース。Discovery で検証すべき項目を明示しておく。</p>
+  <ol>
+    <li><strong>HUG 等を導入している事業所が「支援の中身の記録」に課題を感じているか</strong>（補完関係の前提）</li>
+    <li><strong>「個別性が薄い」という実地指導の指摘事例が実在するか</strong>（差別化価値の前提）</li>
+    <li><strong>集中的支援加算の算定見送り率は実際どれくらいか</strong>（Path A の前提）</li>
+    <li><strong>家庭連携加算の月4回フル算定率はどれくらいか</strong>（Path B の前提）</li>
+    <li><strong>子どもが触ることへの抵抗が現場にどれくらいあるか</strong>（操作ログ独自性の前提）</li>
+    <li><strong>HUG 等と並列導入する月額予算枠は確保可能か</strong>（価格戦略の前提）</li>
+  </ol>
+
+  <p>
+    特に重要なのは <strong>1.（補完関係の前提）</strong>。
+    HUG ユーザーが「HUG で十分」と感じているなら mitooshi の隙間はない。
+    実地指導での減算経験・個別性の悩みが具体的に語られるかがポイント。
+  </p>
+</section>
+
+<footer>
+  作成：2026-04-29 ／ 関連：kasan_evidence_map.html, ryouiku_business_model.html<br>
+  競合情報は2026年4月時点の公開情報に基づく。価格・機能は変動するため最新版で要確認。
+</footer>
+
+</main>
+</div>
+</body>
+</html>

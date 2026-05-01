@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>触らない日問題：サンプリング型データ収集の設計</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --yellow: #FFE082;
+    --yellow-soft: #FFF8E1;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px; line-height: 1.7;
+    color: var(--text); background: var(--bg);
+  }
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 240px; flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    font-size: 13px; background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text); text-decoration: none;
+    padding: 4px 8px; display: block; border-radius: 4px; line-height: 1.4;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+
+  main { flex: 1; padding: 48px 56px; max-width: 940px; }
+  header.doc {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px; margin-bottom: 40px;
+  }
+  header.doc .eyebrow {
+    color: var(--mint); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  header.doc h1 {
+    font-size: 28px; font-weight: 700; line-height: 1.3; margin-bottom: 8px;
+  }
+  header.doc .lead { color: var(--text-sub); font-size: 15px; }
+
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 22px; font-weight: 700; margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint); font-size: 14px; font-weight: 700;
+  }
+  section h3 { font-size: 17px; font-weight: 700; margin: 24px 0 8px; }
+  section h4 {
+    font-size: 13px; font-weight: 700; margin: 16px 0 6px;
+    color: var(--text-sub);
+  }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* 問題提示 */
+  .problem-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    padding: 18px 22px;
+    border-radius: 4px;
+    margin: 16px 0;
+  }
+  .problem-box .label {
+    font-size: 11px;
+    color: var(--warn);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .problem-box .question {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* 接触頻度マトリクス */
+  table.freq {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 12px 0;
+  }
+  table.freq th, table.freq td {
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  table.freq th {
+    background: var(--bg-alt);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+  table.freq td.center { text-align: center; }
+  table.freq td.kasan-name { font-weight: 700; color: var(--mint-dark); }
+  table.freq td.freq-low { background: var(--mint-soft); color: var(--mint-dark); font-weight: 700; }
+  table.freq td.freq-mid { background: var(--yellow-soft); color: #B45309; }
+  table.freq td.freq-high { background: var(--pink-soft); color: #B85555; }
+
+  /* インサイト */
+  .insight {
+    background: var(--mint-soft);
+    border-left: 4px solid var(--mint);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .insight strong {
+    display: block;
+    color: var(--mint-dark);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* フォールバックカード */
+  .fallback-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 14px 0;
+    padding: 18px 22px;
+    background: var(--bg);
+  }
+  .fallback-card .head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .fallback-card .num-tag {
+    background: var(--mint);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+  .fallback-card .name { font-size: 17px; font-weight: 700; }
+  .fallback-card .desc { font-size: 13px; color: var(--text-sub); margin-bottom: 10px; }
+  .fallback-card .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    font-size: 12px;
+  }
+  .fallback-card .grid .col {
+    background: var(--bg-alt);
+    padding: 10px 12px;
+    border-radius: 6px;
+  }
+  .fallback-card .grid .col h6 {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-mute);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* サンプリング図解 */
+  .sampling-figure {
+    background: var(--bg-alt);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+  }
+  .sampling-figure .row {
+    display: grid;
+    grid-template-columns: 100px repeat(30, 1fr);
+    gap: 2px;
+    align-items: center;
+    margin: 10px 0;
+  }
+  .sampling-figure .row .label-cell {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sub);
+  }
+  .sampling-figure .row .day {
+    height: 28px;
+    border-radius: 3px;
+    background: var(--line);
+    position: relative;
+  }
+  .sampling-figure .row .day.touch {
+    background: var(--mint);
+  }
+  .sampling-figure .row .day.touch.event::after {
+    content: "★";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+  }
+  .sampling-figure .row .day.touch.meeting {
+    background: var(--blue);
+  }
+  .sampling-figure .row .day.touch.meeting::after {
+    content: "M";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .sampling-figure .row .day.touch.specialist {
+    background: var(--warn);
+  }
+  .sampling-figure .row .day.touch.specialist::after {
+    content: "P";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .sampling-figure .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 11px;
+    color: var(--text-sub);
+    margin-top: 12px;
+  }
+  .sampling-figure .legend span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sampling-figure .legend .swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  /* UIモック */
+  .ui-mock {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .ui-mock .ui-head {
+    background: linear-gradient(135deg, var(--mint) 0%, var(--mint-dark) 100%);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .ui-mock .alert-card {
+    background: var(--mint-soft);
+    border-left: 4px solid var(--mint);
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 8px 0;
+    font-size: 12px;
+  }
+  .ui-mock .alert-card.warn {
+    background: var(--yellow-soft);
+    border-left-color: var(--warn);
+  }
+  .ui-mock .alert-card .a-title {
+    font-weight: 700;
+    color: var(--mint-dark);
+    margin-bottom: 4px;
+  }
+  .ui-mock .alert-card.warn .a-title { color: var(--warn); }
+
+  /* 警告ボックス */
+  .warn-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .warn-box strong { color: var(--warn); display: block; margin-bottom: 4px; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 24px 20px; }
+    .fallback-card .grid { grid-template-columns: 1fr; }
+    .sampling-figure { overflow-x: auto; }
+    .sampling-figure .row { min-width: 700px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#problem">課題の整理</a></li>
+    <li><a href="#discovery">1. 重要発見：毎日触る必要なし</a></li>
+    <li><a href="#freq">2. 加算別の最低接触頻度</a></li>
+    <li><a href="#sampling">3. サンプリング型モデル</a></li>
+    <li><a href="#fallback">4. 5つのフォールバック設計</a>
+      <ul style="padding-left:14px;font-size:12px;">
+        <li><a href="#fb1">① 集中接触モード</a></li>
+        <li><a href="#fb2">② 紙＋写真</a></li>
+        <li><a href="#fb3">③ 既存データ連携</a></li>
+        <li><a href="#fb4">④ 最小1回有効</a></li>
+        <li><a href="#fb5">⑤ 算定可能性アラート</a></li>
+      </ul>
+    </li>
+    <li><a href="#dashboard">5. 児発管ダッシュボード</a></li>
+    <li><a href="#minimum">6. 算定の最低ライン</a></li>
+    <li><a href="#prd">7. PRD反映項目</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">mitooshi Pro ／ Intermittent Use Design</div>
+  <h1>触らない日問題：サンプリング型データ収集の設計</h1>
+  <p class="lead">
+    「子どもや保護者が mitooshi を毎日触るとは限らない」という現実を踏まえ、
+    <strong>稀な接触でも加算根拠を確実に作る</strong>ための設計。
+    実は軽度向け加算は<strong>「毎日触る必要がない」</strong>構造になっている。
+  </p>
+</header>
+
+<!-- ===================== 課題 ===================== -->
+<section id="problem">
+  <h2><span class="num">▶</span>課題の整理</h2>
+
+  <div class="problem-box">
+    <div class="label">かめちの問い</div>
+    <p class="question">
+      「療育と家庭で必ず触るとは限らない可能性もある。<br>
+      その場合を考慮して、加算記録できるかどうかも詳細に教えてほしい」
+    </p>
+  </div>
+
+  <h3>現実認識</h3>
+  <ul>
+    <li><strong>家庭：</strong>保護者の生活ペース。毎日 mitooshi を触るとは限らない。月数回〜週数回が現実的。</li>
+    <li><strong>施設：</strong>カリキュラムの中で個別ボードを使う日と使わない日がある。職員の余裕にも左右される。</li>
+    <li><strong>子ども：</strong>気分・体調によってめくるかどうかが変わる。強制はできない。</li>
+  </ul>
+
+  <p>
+    にもかかわらず<strong>加算根拠は確実に残したい</strong>。これが両立可能か？
+    結論：<strong>Option B（軽度向け加算）の場合、両立可能</strong>。
+  </p>
+</section>
+
+<!-- ===================== 重要発見 ===================== -->
+<section id="discovery">
+  <h2><span class="num">01</span>重要発見：軽度向け加算は「毎日触る必要なし」</h2>
+  <p>
+    ファクトチェックで Option B（軽度向け加算）に絞った結果、対象となる加算はすべて<strong>「日次」ではなく「イベント駆動」</strong>であることが判明。
+    つまり<strong>毎日触る必要がない</strong>。
+  </p>
+
+  <div class="insight">
+    <strong>核となる気付き</strong>
+    <p>
+      Option A（重度向け：個別サポートⅠ・強度行動障害）は<strong>日次算定</strong>のため毎日触る必要があった。<br>
+      Option B（軽度向け：家庭連携・移行支援・関係機関連携・専門的支援実施）は<strong>イベント駆動算定</strong>のため、必要な時だけ触ればよい。<br>
+      この違いが「触らない日問題」を構造的に解決する。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 加算別の最低接触頻度 ===================== -->
+<section id="freq">
+  <h2><span class="num">02</span>加算別の最低接触頻度</h2>
+  <p>Option B 主要5加算について、算定に必要な最低限の接触頻度を整理。</p>
+
+  <table class="freq">
+    <thead>
+      <tr>
+        <th>加算</th>
+        <th>単位数</th>
+        <th>必要接触頻度</th>
+        <th>1回の接触で必要なデータ</th>
+        <th>触らない日OK？</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="kasan-name">家庭連携加算</td>
+        <td>300〜1,000単位/回<br>月4回上限</td>
+        <td class="freq-low">家庭で月4回程度<br>＋面談1回/月</td>
+        <td>家庭での評価マーク or カード使用ログ／面談時の議論記録</td>
+        <td class="center freq-low">◎ 大半の日OK</td>
+      </tr>
+      <tr>
+        <td class="kasan-name">保育・教育等移行支援加算</td>
+        <td>500単位/回</td>
+        <td class="freq-low">引継ぎ時の<br>1回のみ</td>
+        <td>本児のカードセット出力 + 引継ぎ書</td>
+        <td class="center freq-low">◎ 年数回でOK</td>
+      </tr>
+      <tr>
+        <td class="kasan-name">関係機関連携加算</td>
+        <td>150〜250単位/月</td>
+        <td class="freq-low">月1回程度</td>
+        <td>連携先（医療・相談支援）と共有したログ</td>
+        <td class="center freq-low">◎ 月1回でOK</td>
+      </tr>
+      <tr>
+        <td class="kasan-name">専門的支援実施加算</td>
+        <td>150単位/回<br>月4回上限</td>
+        <td class="freq-mid">PT/OT/ST立合時<br>月4回</td>
+        <td>立合時のカード使用ログ + 専門職の所見</td>
+        <td class="center freq-mid">○ 立合時のみ</td>
+      </tr>
+      <tr>
+        <td class="kasan-name">アセスメント／<br>モニタリング</td>
+        <td>基本報酬の前提</td>
+        <td class="freq-mid">3か月で複数回</td>
+        <td>3か月分の行動データ集計</td>
+        <td class="center freq-mid">○ 3か月で数回でOK</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight">
+    <strong>結論</strong>
+    <p>
+      Option B のすべての加算で、<strong>「特定の日・時に集中して触れば足りる」</strong>。
+      毎日の継続使用は理想だが、必須ではない。
+      <strong>連続観察ではなく、サンプリング型データ収集</strong>で十分加算根拠になる。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== サンプリング型モデル ===================== -->
+<section id="sampling">
+  <h2><span class="num">03</span>サンプリング型データ収集モデル</h2>
+  <p>1か月（30日）の中で、いつ・誰が・どれくらい触れば加算が成立するかを可視化。</p>
+
+  <h4>パターン A：理想型（毎日触る・連続観察型）</h4>
+  <div class="sampling-figure">
+    <div class="row">
+      <div class="label-cell">家庭</div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+    </div>
+    <div class="row">
+      <div class="label-cell">施設</div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day touch specialist"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+      <div class="day touch meeting"></div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day touch"></div>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--mint);"></span>使用日</span>
+      <span><span class="swatch" style="background:var(--blue);"></span>面談</span>
+      <span><span class="swatch" style="background:var(--warn);"></span>専門職立合</span>
+      <span><span class="swatch" style="background:var(--line);"></span>非使用日</span>
+    </div>
+    <p style="font-size:12px;color:var(--text-sub);margin-top:8px;">
+      毎日触る理想型。データ密度が最高、ただし現実的には保護者・職員ともに継続が難しい。
+    </p>
+  </div>
+
+  <h4>パターン B：サンプリング型（推奨・現実解）</h4>
+  <div class="sampling-figure">
+    <div class="row">
+      <div class="label-cell">家庭</div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+    </div>
+    <div class="row">
+      <div class="label-cell">施設</div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch specialist"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch"></div>
+      <div class="day touch specialist"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch meeting"></div>
+      <div class="day touch specialist"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day touch specialist"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--mint);"></span>使用日</span>
+      <span><span class="swatch" style="background:var(--blue);"></span>面談</span>
+      <span><span class="swatch" style="background:var(--warn);"></span>専門職立合</span>
+      <span><span class="swatch" style="background:var(--line);"></span>非使用日</span>
+    </div>
+    <p style="font-size:12px;color:var(--text-sub);margin-top:8px;">
+      <strong>家庭：週1回程度（月5回）／ 施設：月数回（イベント駆動）／ 面談月1回／ 専門職立合月4回</strong>。
+      これだけで Option B のすべての加算が算定可能。
+    </p>
+  </div>
+
+  <div class="insight">
+    <strong>サンプリング型の経済インパクト</strong>
+    <p>
+      家庭月5回 + 施設月8回 = 合計月13回の接触で、<strong>家庭連携加算 (4回×600=2,400単位)・関係機関連携 (250)・専門的支援実施 (4回×150=600単位)・モニタリング データ確保</strong>がすべて達成される。<br>
+      → 単純計算で <strong>3,250単位 ≒ 月32,500円のポテンシャル</strong>（地域加算別途）。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 5つのフォールバック ===================== -->
+<section id="fallback">
+  <h2><span class="num">04</span>5つのフォールバック設計</h2>
+  <p>子ども・保護者・職員が触らない日でも、加算根拠が劣化しない仕掛け。</p>
+
+  <!-- フォールバック1 -->
+  <div class="fallback-card" id="fb1">
+    <div class="head">
+      <div class="num-tag">1</div>
+      <div class="name">集中接触モード（Burst Mode）</div>
+    </div>
+    <p class="desc">
+      「面談前1週間だけ集中的に触る」「専門職立合日とその前後のみ触る」など、
+      <strong>イベント駆動で接触を集める</strong>運用。普段は触らなくてOK。
+    </p>
+    <div class="grid">
+      <div class="col">
+        <h6>UI挙動</h6>
+        次回面談まで X 日と通知。「面談で振り返れる材料を用意しよう」と促す。
+      </div>
+      <div class="col">
+        <h6>該当加算</h6>
+        家庭連携加算（面談前バースト）<br>
+        専門的支援実施加算（立合時バースト）
+      </div>
+    </div>
+  </div>
+
+  <!-- フォールバック2 -->
+  <div class="fallback-card" id="fb2">
+    <div class="head">
+      <div class="num-tag">2</div>
+      <div class="name">紙＋写真フォールバック（Paper Bridge）</div>
+    </div>
+    <p class="desc">
+      触らない日の<strong>紙メモ・連絡帳・絵カード</strong>を写真撮影して mitooshi にアップ。
+      OCRで日付・児童名を自動推定し、タイムラインに紐付ける。
+    </p>
+    <div class="grid">
+      <div class="col">
+        <h6>UI挙動</h6>
+        ホーム画面に「📷 紙の記録をアップ」ボタンを常設。1タップで撮影 → 自動紐付け。
+      </div>
+      <div class="col">
+        <h6>該当加算</h6>
+        モニタリング（過去データの追補）<br>
+        関係機関連携加算（紙の連携書類）<br>
+        全加算の補強証跡
+      </div>
+    </div>
+  </div>
+
+  <!-- フォールバック3 -->
+  <div class="fallback-card" id="fb3">
+    <div class="head">
+      <div class="num-tag">3</div>
+      <div class="name">既存データ連携（External Data Hooks）</div>
+    </div>
+    <p class="desc">
+      HUG・カイポケ等の既存記録データ、保育園からの連絡帳、相談支援事業所からの計画書など、
+      <strong>外部データを取り込んで「mitooshi 接触相当」として扱う</strong>。
+    </p>
+    <div class="grid">
+      <div class="col">
+        <h6>UI挙動</h6>
+        HUG / カイポケ から定期取り込み（CSV／API）。連携状況をダッシュボード表示。
+      </div>
+      <div class="col">
+        <h6>該当加算</h6>
+        モニタリング全般<br>
+        関係機関連携加算<br>
+        個別支援計画見直し時の素材
+      </div>
+    </div>
+  </div>
+
+  <!-- フォールバック4 -->
+  <div class="fallback-card" id="fb4">
+    <div class="head">
+      <div class="num-tag">4</div>
+      <div class="name">最小1回有効設計（Minimum Viable Touch）</div>
+    </div>
+    <p class="desc">
+      <strong>1回の接触＝1つの加算根拠</strong>として独立させる。
+      「全くゼロ」と「1回でもあり」の差を最大化。
+    </p>
+    <div class="grid">
+      <div class="col">
+        <h6>UI挙動</h6>
+        接触1回ごとに「✓ 加算根拠が1件追加されました」と即時フィードバック。<br>
+        小さな前進を可視化して継続を促す。
+      </div>
+      <div class="col">
+        <h6>該当加算</h6>
+        家庭連携加算（評価マーク1個でも有効）<br>
+        専門的支援実施加算（立合1回でも記録化）<br>
+        移行支援加算（カードセット出力1回）
+      </div>
+    </div>
+  </div>
+
+  <!-- フォールバック5 -->
+  <div class="fallback-card" id="fb5">
+    <div class="head">
+      <div class="num-tag">5</div>
+      <div class="name">算定可能性アラート（Eligibility Watcher）</div>
+    </div>
+    <p class="desc">
+      児発管ダッシュボードに、<strong>各加算の算定可能性をリアルタイム表示</strong>。
+      「あと2回触ると面談データが充実」「専門的支援実施加算 残3回算定可」と能動的に提示。
+      <strong>取りこぼし防止のレバー</strong>として最も重要。
+    </p>
+    <div class="grid">
+      <div class="col">
+        <h6>UI挙動</h6>
+        毎朝・週1の自動通知。各加算の「算定済 / 算定可能 / 不足」を3色で表示。
+      </div>
+      <div class="col">
+        <h6>該当加算</h6>
+        Option B 全加算<br>
+        特に月4回上限のあるもの（家庭連携・専門的支援実施）
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ダッシュボード ===================== -->
+<section id="dashboard">
+  <h2><span class="num">05</span>児発管ダッシュボード（算定可能性表示）</h2>
+  <p>「あと何回触れば加算が算定できるか」を能動的に提示する画面イメージ。</p>
+
+  <div class="ui-mock">
+    <div class="ui-head">📊 ●●ちゃん（A0001）／ 加算算定状況 ／ 2026年4月</div>
+    <div class="alert-card">
+      <div class="a-title">✓ 家庭連携加算：算定可能（月4回中 3回完了）</div>
+      家庭での評価マーク 12件 ・ 面談1回（4/15）。あと1回面談で月上限到達。
+      <strong>4/29 までに面談予約を推奨。</strong>
+    </div>
+    <div class="alert-card warn">
+      <div class="a-title">⚠ 専門的支援実施加算：要確認（月4回中 1回のみ）</div>
+      PT/OT/ST 立合 1回（4/8）。あと3回算定可能だが立合予定なし。
+      <strong>専門職にスケジュール確認推奨。</strong>
+    </div>
+    <div class="alert-card">
+      <div class="a-title">✓ 関係機関連携加算：算定済（4/12 主治医共有完了）</div>
+      月1回の連携要件をクリア。次月も継続予定。
+    </div>
+    <div class="alert-card">
+      <div class="a-title">✓ モニタリング素材：十分（接触15日分・3か月で50件）</div>
+      次回モニタリング 5/20 のドラフト生成準備完了。
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>このUIが解決する問題</strong>
+    <p>
+      従来：<strong>月末になって「算定できる加算を取り逃した」</strong>と気付く取りこぼしが頻発。<br>
+      mitooshi：<strong>リアルタイムで算定可能性を可視化</strong>し、月内に行動を促す。<br>
+      → これだけで <strong>取りこぼし率を 30% → 10% に圧縮できる</strong>のが提案価値の核。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 算定の最低ライン ===================== -->
+<section id="minimum">
+  <h2><span class="num">06</span>算定の最低ライン</h2>
+  <p>「これ以下になると算定できない」最低限の接触量を加算別に明示。</p>
+
+  <table class="freq">
+    <thead>
+      <tr>
+        <th>加算</th>
+        <th>最低接触ライン</th>
+        <th>これ以下だと…</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="kasan-name">家庭連携加算</td>
+        <td>家庭で月1回以上の使用 + 月1回の面談</td>
+        <td>面談時に「具体的に話せるネタ」が無くなる → 算定見送り</td>
+      </tr>
+      <tr>
+        <td class="kasan-name">保育・教育等移行支援</td>
+        <td>引継ぎ時にカードセット1セット出力</td>
+        <td>カード資産がない → 引継ぎ書を新規作成する負担に戻る</td>
+      </tr>
+      <tr>
+        <td class="kasan-name">関係機関連携加算</td>
+        <td>月1回の共有ログ</td>
+        <td>共有エビデンス不足 → 紙資料に依存</td>
+      </tr>
+      <tr>
+        <td class="kasan-name">専門的支援実施加算</td>
+        <td>立合時のカード使用ログ1回</td>
+        <td>専門職関与の客観証跡なし → 紙書類で記録要</td>
+      </tr>
+      <tr>
+        <td class="kasan-name">モニタリング</td>
+        <td>3か月で5回以上の接触</td>
+        <td>個別性の客観データ不足 → 文章のみで個別性訴求</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="warn-box">
+    <strong>注意：「算定できない」ではなく「mitooshi の貢献度が下がる」</strong>
+    <p>
+      最低ライン以下でも加算自体は事業所が紙書類で取れる。
+      ただし mitooshi の<strong>「証跡を強くする」「取りこぼしを防ぐ」価値</strong>が発揮できなくなる。
+      事業所は mitooshi を「継続する意味がない」と判断するリスクがある。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== PRD反映 ===================== -->
+<section id="prd">
+  <h2><span class="num">07</span>PRD への反映項目</h2>
+
+  <h3>必須機能（Phase 1）</h3>
+  <ul>
+    <li><strong>算定可能性ダッシュボード：</strong>各加算の月内達成状況を3色で表示</li>
+    <li><strong>面談前リマインダー：</strong>面談前1週間に家庭側通知「振り返れる材料を準備」</li>
+    <li><strong>紙写真アップロード：</strong>OCRで日付・児童名を自動推定して紐付け</li>
+    <li><strong>1回接触の即時フィードバック：</strong>接触ごとに加算根拠1件追加表示</li>
+  </ul>
+
+  <h3>連携機能（Phase 2）</h3>
+  <ul>
+    <li><strong>HUG / カイポケ CSV取り込み：</strong>外部データを mitooshi タイムラインに統合</li>
+    <li><strong>連携先（医療・保育園）への共有 URL 発行：</strong>関係機関連携加算の証跡化</li>
+    <li><strong>引継ぎ書出力：</strong>本児のカードセット + 使用ガイド + 効果的シーン</li>
+  </ul>
+
+  <h3>運用ガイド</h3>
+  <ul>
+    <li><strong>「毎日触らないとダメ」と説明しない：</strong>営業時に「月数回でも算定可能」を明示</li>
+    <li><strong>面談・立合・連携を「mitooshi の主戦場」と位置付ける：</strong>日常運用ではなくイベント時に集中</li>
+    <li><strong>取りこぼし防止アラートを継続提供：</strong>月末ではなく月内に行動を促す</li>
+  </ul>
+
+  <div class="insight">
+    <strong>戦略的意味</strong>
+    <p>
+      「触らない日問題」は、Option B 戦略の弱みに見えて<strong>実は強み</strong>。
+      <strong>「日々の業務に侵食しない・必要な時だけ使う」</strong>という導入のしやすさを生む。
+      競合 SaaS（HUG等）は日次入力前提のため、施設の業務負担を増やす。
+      mitooshi は<strong>「軽量・イベント駆動・取りこぼし防止」</strong>という独自ポジションが取れる。
+    </p>
+  </div>
+</section>
+
+<footer>
+  作成：2026-04-29 ／ 関連：kasan_data_output_spec.html, gradual_kasan_entry.html, indirect_entry_design.html<br>
+  本書は Option B（軽度向け加算戦略）を前提とした設計素案。
+</footer>
+
+</main>
+</div>
+</body>
+</html>

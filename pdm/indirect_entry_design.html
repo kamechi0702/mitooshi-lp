@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カリキュラム周辺からの間接侵入アイデア</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --yellow: #FFE082;
+    --yellow-soft: #FFF8E1;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+    --untouched: #C0C0C0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 240px; flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    font-size: 13px; background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text); text-decoration: none;
+    padding: 4px 8px; display: block; border-radius: 4px; line-height: 1.4;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+
+  main { flex: 1; padding: 48px 56px; max-width: 940px; }
+  header.doc {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px; margin-bottom: 40px;
+  }
+  header.doc .eyebrow {
+    color: var(--mint); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  header.doc h1 {
+    font-size: 28px; font-weight: 700; line-height: 1.3; margin-bottom: 8px;
+  }
+  header.doc .lead { color: var(--text-sub); font-size: 15px; }
+
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 22px; font-weight: 700; margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint); font-size: 14px; font-weight: 700;
+  }
+  section h3 { font-size: 17px; font-weight: 700; margin: 24px 0 8px; }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* 仮説提示 */
+  .hypothesis-box {
+    background: var(--blue-soft);
+    border-left: 4px solid var(--blue);
+    padding: 18px 22px;
+    border-radius: 4px;
+    margin: 16px 0;
+  }
+  .hypothesis-box .h-label {
+    font-size: 11px;
+    color: var(--blue);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .hypothesis-box .h-text {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* カリキュラム時間軸図 */
+  .timeline-figure {
+    background: var(--bg-alt);
+    border-radius: 12px;
+    padding: 28px 24px;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  .tf-title {
+    font-size: 12px;
+    color: var(--text-mute);
+    text-align: center;
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .tf-track {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px 1fr 80px 1fr 80px;
+    gap: 6px;
+    align-items: stretch;
+    min-width: 700px;
+  }
+  .tf-block {
+    padding: 12px 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .tf-block.curriculum {
+    background: var(--untouched);
+    color: white;
+    min-height: 70px;
+  }
+  .tf-block.curriculum::before {
+    content: "施設の聖域";
+    display: block;
+    font-size: 9px;
+    font-weight: 400;
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+  .tf-block.gap {
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+    border: 2px solid var(--mint);
+    min-height: 70px;
+  }
+  .tf-block.gap::before {
+    content: "★ 侵入点";
+    display: block;
+    font-size: 9px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--mint-dark);
+  }
+  .tf-time {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-mute);
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  /* アイデアカード */
+  .idea-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 14px 0;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .idea-card.recommended {
+    border: 2px solid var(--mint);
+    box-shadow: 0 2px 8px rgba(0, 184, 148, 0.1);
+  }
+  .idea-card .head {
+    padding: 14px 18px;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .idea-card.recommended .head { background: var(--mint-soft); }
+  .idea-card .head .num-tag {
+    display: inline-block;
+    background: var(--mint);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: 700;
+    font-size: 13px;
+    margin-right: 10px;
+  }
+  .idea-card .head .name {
+    font-size: 16px;
+    font-weight: 700;
+    flex: 1;
+  }
+  .idea-card .head .badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: var(--text-sub);
+    color: white;
+    letter-spacing: 0.05em;
+  }
+  .idea-card.recommended .badge { background: var(--mint); }
+  .idea-card .body {
+    padding: 16px 18px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .idea-card .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 12px;
+    font-size: 12px;
+  }
+  .idea-card .grid .col h6 {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-mute);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .idea-card .grid .col p {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text);
+    margin: 0;
+  }
+  .idea-card .meta-bar {
+    padding: 10px 18px;
+    background: var(--bg-alt);
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 11px;
+  }
+  .idea-card .meta-bar .pill {
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: white;
+    border: 1px solid var(--line);
+    color: var(--text-sub);
+  }
+  .idea-card .meta-bar .pill.kasan {
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+    border-color: var(--mint);
+  }
+  .idea-card .meta-bar .pill.cost {
+    background: var(--blue-soft);
+    color: var(--blue);
+    border-color: var(--blue);
+  }
+  .idea-card .meta-bar .pill.invasion {
+    background: var(--yellow-soft);
+    color: #B45309;
+    border-color: var(--warn);
+  }
+
+  /* サンドイッチ構造図 */
+  .sandwich {
+    background: var(--bg-alt);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+  }
+  .sandwich .layer {
+    padding: 14px 18px;
+    margin: 6px 0;
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+  }
+  .sandwich .layer.bread {
+    background: var(--mint-soft);
+    border: 2px solid var(--mint);
+  }
+  .sandwich .layer.center {
+    background: var(--untouched);
+    color: white;
+    opacity: 0.85;
+  }
+  .sandwich .layer .l-time {
+    font-size: 10px;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .sandwich .layer.bread .l-time { color: var(--mint-dark); }
+  .sandwich .layer.center .l-time { color: white; }
+  .sandwich .layer .l-name {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .sandwich .layer .l-data {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .sandwich .layer.bread .l-data { color: var(--mint-dark); }
+  .sandwich .arrow-vert {
+    text-align: center;
+    color: var(--text-mute);
+    font-size: 14px;
+    margin: -2px 0;
+  }
+
+  /* 比較マトリクス */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 12px 0;
+  }
+  th, td {
+    padding: 10px 10px;
+    border: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  th {
+    background: var(--bg-alt);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+  td.center { text-align: center; }
+  td.priority-high { background: var(--mint-soft); color: var(--mint-dark); font-weight: 700; }
+  td.priority-mid { background: var(--yellow-soft); color: #B45309; }
+  td.priority-low { color: var(--text-mute); }
+
+  /* インサイト */
+  .insight {
+    background: var(--mint-soft);
+    border-left: 4px solid var(--mint);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .insight strong {
+    display: block;
+    color: var(--mint-dark);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .warn-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .warn-box strong { color: var(--warn); display: block; margin-bottom: 4px; }
+
+  /* シーン例 */
+  .scene-example {
+    background: white;
+    border: 1px solid var(--mint);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 12px 0;
+  }
+  .scene-example .se-title {
+    font-size: 13px;
+    color: var(--mint-dark);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .scene-example .se-flow {
+    display: grid;
+    grid-template-columns: 1fr 30px 1fr 30px 1fr;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .scene-example .se-step {
+    background: var(--bg-alt);
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .scene-example .se-step.mit {
+    background: var(--mint-soft);
+    border: 1px solid var(--mint);
+    color: var(--mint-dark);
+    font-weight: 700;
+  }
+  .scene-example .se-arrow {
+    text-align: center;
+    color: var(--text-mute);
+    font-size: 14px;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 24px 20px; }
+    .idea-card .grid { grid-template-columns: 1fr; }
+    .sandwich .layer { grid-template-columns: 1fr; }
+    .scene-example .se-flow { grid-template-columns: 1fr; }
+    .scene-example .se-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#problem">課題の整理</a></li>
+    <li><a href="#concept">侵入概念図</a></li>
+    <li><a href="#ideas">7つの侵入アイデア</a>
+      <ul style="padding-left:14px;font-size:12px;">
+        <li><a href="#idea1">① 朝の見通し</a></li>
+        <li><a href="#idea2">② 切り替え専用</a></li>
+        <li><a href="#idea3">③ 振り返りシール</a></li>
+        <li><a href="#idea4">④ マイメニュー</a></li>
+        <li><a href="#idea5">⑤ 紙カードのデジタル化</a></li>
+        <li><a href="#idea6">⑥ お便り作り</a></li>
+        <li><a href="#idea7">⑦ 初日対応</a></li>
+      </ul>
+    </li>
+    <li><a href="#sandwich">サンドイッチ構造</a></li>
+    <li><a href="#priority">優先順位マトリクス</a></li>
+    <li><a href="#scenes">具体シーン例</a></li>
+    <li><a href="#design">設計指針</a></li>
+    <li><a href="#prd">PRD反映項目</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">mitooshi Pro ／ Indirect Entry Design</div>
+  <h1>カリキュラム周辺からの間接侵入アイデア</h1>
+  <p class="lead">
+    施設のカリキュラムは「聖域」。そこに踏み込まず、<strong>前後・隙間・周辺</strong>に入り込むことで、
+    最低侵襲のまま加算根拠データを生成するアイデア集。
+    「メニュー見通し」を超えて、<strong>子どもの主体的データ生成</strong>を仕掛ける7つの方法。
+  </p>
+</header>
+
+<!-- ===================== 課題 ===================== -->
+<section id="problem">
+  <h2><span class="num">▶</span>課題の整理</h2>
+
+  <div class="hypothesis-box">
+    <div class="h-label">かめちの問い</div>
+    <p class="h-text">
+      「子供に体験させる→記録と加算の体験設計が難しい。<br>
+      カリキュラムは施設ごとに決まっているが、どのように間接的に入る？<br>
+      メニューの見通しから先に踏み込むアイデアがほしい」
+    </p>
+  </div>
+
+  <h3>3つの構造的制約</h3>
+  <ol>
+    <li>
+      <strong>カリキュラムは施設の聖域：</strong>
+      児発管・児童指導員が時間をかけて練り上げた「自分たちのプログラム」。
+      これを「mitooshi のカードに置き換えてください」と頼むのは無理。アイデンティティの否定になる。
+    </li>
+    <li>
+      <strong>「メニュー見通し」だけでは加算根拠が薄い：</strong>
+      何のメニューがあるかを示すだけなら、紙の絵カード（コバリテ等）で十分。
+      <strong>「個別性」「主体性」「効果検証」</strong>のいずれかに踏み込まないと加算証跡にならない。
+    </li>
+    <li>
+      <strong>子どもにいきなり全部やらせるのは難しい：</strong>
+      集中力・操作能力・先生の負担を考えると、子どもの体験時間は<strong>1日5〜15分が現実的</strong>。
+      ここに何を仕掛けるかが勝負。
+    </li>
+  </ol>
+
+  <div class="insight">
+    <strong>解の方向性</strong>
+    <p>
+      「カリキュラム本体」には触れず、<strong>その前後・隙間・周辺</strong>に短時間で侵入する。
+      <strong>子ども体験は1日5〜15分以内</strong>に抑え、<strong>カリキュラムを上書きしないように</strong>する。
+      しかし侵入点で取れるデータは<strong>個別性・主体性・効果検証</strong>のいずれかを満たす。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 侵入概念図 ===================== -->
+<section id="concept">
+  <h2><span class="num">01</span>侵入の概念図</h2>
+  <p>典型的な放課後等デイサービスの1日に対して、mitooshi がどこに入るかを可視化。</p>
+
+  <div class="timeline-figure">
+    <div class="tf-title">放課後等デイ／典型的な1日（14時 〜 17時）</div>
+    <div class="tf-track">
+      <div class="tf-block gap">朝の見通し<br>(2〜5分)</div>
+      <div class="tf-block curriculum">学習タイム<br>（施設プログラム）</div>
+      <div class="tf-block gap">切り替え<br>(1〜2分)</div>
+      <div class="tf-block curriculum">SST／集団療育<br>（施設プログラム）</div>
+      <div class="tf-block gap">切り替え<br>(1〜2分)</div>
+      <div class="tf-block curriculum">個別療育・自由遊び<br>（施設プログラム）</div>
+      <div class="tf-block gap">振り返り<br>(3〜5分)</div>
+    </div>
+    <div style="margin-top:10px;display:grid;grid-template-columns:80px 1fr 80px 1fr 80px 1fr 80px;gap:6px;">
+      <div class="tf-time">14:00</div>
+      <div class="tf-time">14:05〜</div>
+      <div class="tf-time">15:00</div>
+      <div class="tf-time">15:05〜</div>
+      <div class="tf-time">16:00</div>
+      <div class="tf-time">16:05〜</div>
+      <div class="tf-time">16:55</div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>核となる発想</strong>
+    <p>
+      <strong>カリキュラム本体（灰色）</strong>には触れない。
+      <strong>「前」「切り替え」「後」（緑）</strong>の<strong>隙間時間</strong>だけに侵入する。
+      合計1日10〜15分の体験で、加算根拠データを生成する。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 7つの侵入アイデア ===================== -->
+<section id="ideas">
+  <h2><span class="num">02</span>7つの侵入アイデア</h2>
+  <p>侵入点ごとに7つのアイデアを整理。星印のついた3つが推奨。</p>
+
+  <!-- アイデア1 -->
+  <div class="idea-card recommended" id="idea1">
+    <div class="head">
+      <span class="num-tag">1</span>
+      <span class="name">朝の見通しボード（Morning Brief）</span>
+      <span class="badge">★ 推奨</span>
+    </div>
+    <div class="body">
+      <p>
+        登所直後の2〜5分、<strong>子どもが今日の流れを自分のボードで確認</strong>する。
+        カリキュラムの内容には触れない。
+        「今日は学習 → SST → 個別 → 帰宅」という構造だけを見通す。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h6>取れるデータ</h6>
+          <p>登所時刻／不安サイン（リトライ・離脱）／その日の体調セルフ評価／カードめくり所要時間</p>
+        </div>
+        <div class="col">
+          <h6>加算根拠</h6>
+          <p>個別サポート加算Ⅰ（個別ボード設計）／強度行動障害児支援加算（不安兆候の早期記録）</p>
+        </div>
+      </div>
+    </div>
+    <div class="meta-bar">
+      <span class="pill invasion">侵入度：低</span>
+      <span class="pill cost">所要：2〜5分／日</span>
+      <span class="pill kasan">個別Ⅰ／強度行動障害</span>
+      <span class="pill">既存カリキュラム不変</span>
+    </div>
+  </div>
+
+  <!-- アイデア2 -->
+  <div class="idea-card recommended" id="idea2">
+    <div class="head">
+      <span class="num-tag">2</span>
+      <span class="name">切り替え専用ボード（Transition Companion）</span>
+      <span class="badge">★ 推奨</span>
+    </div>
+    <div class="body">
+      <p>
+        プログラムの切り替えタイミング（学習→SST、SST→個別、個別→帰宅）<strong>だけ</strong>でmitooshi が登場。
+        「次は何」を1〜2分で確認。<strong>切り替えパニック</strong>が多い児童に効く。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h6>取れるデータ</h6>
+          <p>切り替え所要時間／パニック発生／離脱／自発めくり率／時系列での切り替えスムーズ度推移</p>
+        </div>
+        <div class="col">
+          <h6>加算根拠</h6>
+          <p>強度行動障害児支援加算（最強）／個別サポート加算Ⅰ／集中的支援加算（3か月で切り替え改善を可視化）</p>
+        </div>
+      </div>
+    </div>
+    <div class="meta-bar">
+      <span class="pill invasion">侵入度：最低</span>
+      <span class="pill cost">所要：1〜2分 × 3回／日</span>
+      <span class="pill kasan">強度行動障害／集中的支援</span>
+      <span class="pill">最も独自データ取得効率が高い</span>
+    </div>
+  </div>
+
+  <!-- アイデア3 -->
+  <div class="idea-card recommended" id="idea3">
+    <div class="head">
+      <span class="num-tag">3</span>
+      <span class="name">振り返りシール（Self Check-out）</span>
+      <span class="badge">★ 推奨</span>
+    </div>
+    <div class="body">
+      <p>
+        帰所前の3〜5分、<strong>子ども自身が「今日のメニューに対するセルフチェック」</strong>を行う。
+        メニュー名は施設のカリキュラムから自動取得（紙メニューを職員が登録）。
+        「楽しかった／むずかしかった／また」の3択シールを子どもが貼る。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h6>取れるデータ</h6>
+          <p>セルフ評価データ（主体的参加の証跡）／本人の言葉での感想（音声）／メニュー別の好み・困難度</p>
+        </div>
+        <div class="col">
+          <h6>加算根拠</h6>
+          <p>個別サポート加算Ⅰ（本人参加型）／モニタリング（3か月の好み変化＝発達証跡）／<strong>家庭連携加算（家庭への報告材料）</strong></p>
+        </div>
+      </div>
+    </div>
+    <div class="meta-bar">
+      <span class="pill invasion">侵入度：低</span>
+      <span class="pill cost">所要：3〜5分／日</span>
+      <span class="pill kasan">個別Ⅰ／モニタリング／家庭連携</span>
+      <span class="pill">保護者への報告に直結</span>
+    </div>
+  </div>
+
+  <!-- アイデア4 -->
+  <div class="idea-card" id="idea4">
+    <div class="head">
+      <span class="num-tag">4</span>
+      <span class="name">マイメニュー（Order Customization）</span>
+      <span class="badge">中</span>
+    </div>
+    <div class="body">
+      <p>
+        集団メニューの<strong>順序や難易度を子どもが自分で選ぶ</strong>。
+        「学習を先にする？SST先にする？」「カードAとB、どちらから？」など、
+        カリキュラムは施設、<strong>順序だけ子どもが決める</strong>。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h6>取れるデータ</h6>
+          <p>選択パターン／好み傾向／自己決定力の発達／回避傾向（いつも後回しにするメニュー）</p>
+        </div>
+        <div class="col">
+          <h6>加算根拠</h6>
+          <p>個別サポート加算Ⅰ（個別性）／<strong>専門的支援実施加算（自己決定支援）</strong></p>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-mute);margin-top:6px;">
+        ※ 施設の集団規律と衝突する可能性あり。職員の同意必須。
+      </p>
+    </div>
+    <div class="meta-bar">
+      <span class="pill invasion">侵入度：中</span>
+      <span class="pill cost">所要：5〜8分／日</span>
+      <span class="pill kasan">個別Ⅰ／専門的支援実施</span>
+    </div>
+  </div>
+
+  <!-- アイデア5 -->
+  <div class="idea-card" id="idea5">
+    <div class="head">
+      <span class="num-tag">5</span>
+      <span class="name">紙カードのデジタル化（Hybrid Bridge）</span>
+      <span class="badge">補助</span>
+    </div>
+    <div class="body">
+      <p>
+        既に施設で使っている紙の絵カード・ピクトグラム（コバリテ等）を、
+        <strong>そのまま撮影してmitooshi 化</strong>。施設の運用は完全に維持される。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h6>取れるデータ</h6>
+          <p>使用頻度／めくりログ／既存運用と全く同じ体験</p>
+        </div>
+        <div class="col">
+          <h6>加算根拠</h6>
+          <p>個別サポート加算Ⅰ（個別ボード設計の証跡）／モニタリング</p>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-mute);margin-top:6px;">
+        ※ 単独では物足りない。アイデア①〜③と組み合わせる導入緩衝材として機能。
+      </p>
+    </div>
+    <div class="meta-bar">
+      <span class="pill invasion">侵入度：ゼロ</span>
+      <span class="pill cost">所要：既存運用に準拠</span>
+      <span class="pill kasan">個別Ⅰ</span>
+      <span class="pill">導入抵抗ゼロの第一歩</span>
+    </div>
+  </div>
+
+  <!-- アイデア6 -->
+  <div class="idea-card" id="idea6">
+    <div class="head">
+      <span class="num-tag">6</span>
+      <span class="name">お便り作り（Auto-Letter）</span>
+      <span class="badge">中</span>
+    </div>
+    <div class="body">
+      <p>
+        帰所前に「<strong>今日のお便り</strong>」を子どもが mitooshi で作る。
+        その日のメニューカードと振り返りシールが<strong>保護者向けレポートに自動変換</strong>。
+        紙の連絡帳の代替・補完として機能。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h6>取れるデータ</h6>
+          <p>その日の活動全体のサマリ／子ども本人による表現／保護者への伝達コンテンツ</p>
+        </div>
+        <div class="col">
+          <h6>加算根拠</h6>
+          <p><strong>家庭連携加算（連続性データ）</strong>／個別サポート加算Ⅰ</p>
+        </div>
+      </div>
+    </div>
+    <div class="meta-bar">
+      <span class="pill invasion">侵入度：低</span>
+      <span class="pill cost">所要：振り返りに統合</span>
+      <span class="pill kasan">家庭連携</span>
+      <span class="pill">保護者ロイヤルティに直結</span>
+    </div>
+  </div>
+
+  <!-- アイデア7 -->
+  <div class="idea-card" id="idea7">
+    <div class="head">
+      <span class="num-tag">7</span>
+      <span class="name">初日対応セット（Onboarding Pack）</span>
+      <span class="badge">特殊</span>
+    </div>
+    <div class="body">
+      <p>
+        新入児の最初の数日間<strong>だけ</strong>特別運用。
+        環境慣れ・先生・場所・流れを mitooshi で見通し提示。
+        以降は通常運用に戻る。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h6>取れるデータ</h6>
+          <p>初期適応のベースライン／不安サイン／環境調整の証跡</p>
+        </div>
+        <div class="col">
+          <h6>加算根拠</h6>
+          <p>個別支援計画作成時の<strong>アセスメント素材</strong>として強い／<strong>関係機関連携加算</strong>（前所属からの引継ぎとセット）</p>
+        </div>
+      </div>
+    </div>
+    <div class="meta-bar">
+      <span class="pill invasion">侵入度：低（期間限定）</span>
+      <span class="pill cost">所要：初週のみ集中</span>
+      <span class="pill kasan">アセスメント／関係機関連携</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== サンドイッチ構造 ===================== -->
+<section id="sandwich">
+  <h2><span class="num">03</span>「サンドイッチ構造」体験フレームワーク</h2>
+  <p>推奨3アイデアを組み合わせると、<strong>カリキュラムを挟む</strong>シンプルな体験構造になる。</p>
+
+  <div class="sandwich">
+    <div class="layer bread">
+      <div class="l-time">14:00<br>2〜5分</div>
+      <div class="l-name">① 朝の見通しボード</div>
+      <div class="l-data">登所時の状態 / 体調 / 不安サイン / その日の予定確認</div>
+    </div>
+    <div class="arrow-vert">↓</div>
+    <div class="layer center">
+      <div class="l-time">14:05〜<br>16:55</div>
+      <div class="l-name">施設のカリキュラム本体</div>
+      <div class="l-data">学習・SST・個別療育・自由遊び（mitooshi は触れない）</div>
+    </div>
+    <div class="arrow-vert">↓</div>
+    <div style="margin: 4px 0;">
+      <div class="layer bread" style="background:rgba(0,184,148,0.05);border-color:rgba(0,184,148,0.4);grid-template-columns:80px 1fr 1fr;">
+        <div class="l-time">15:00<br>1〜2分</div>
+        <div class="l-name" style="font-size:13px;">② 切り替え専用ボード（途中3回）</div>
+        <div class="l-data" style="font-size:11px;">次のメニューの見通し提示 / 切り替えスムーズ度の記録</div>
+      </div>
+    </div>
+    <div class="arrow-vert">↓</div>
+    <div class="layer bread">
+      <div class="l-time">16:55<br>3〜5分</div>
+      <div class="l-name">③ 振り返りシール</div>
+      <div class="l-data">楽しかった/むずかしかった/また を子どもがセルフ評価 / お便り自動生成</div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>サンドイッチ構造のメリット</strong>
+    <p>
+      1. <strong>カリキュラム本体には触れない</strong>（施設の聖域を尊重）<br>
+      2. <strong>子どもの体験時間は1日10〜15分</strong>（負担最小）<br>
+      3. <strong>3つの侵入点で「個別性・主体性・効果検証」を全部カバー</strong>できる<br>
+      4. <strong>3つのデータ層が立体的に紐づく</strong>（朝の不安 × 切り替え × 振り返りの相関分析）
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 優先順位 ===================== -->
+<section id="priority">
+  <h2><span class="num">04</span>優先順位マトリクス</h2>
+  <p>各アイデアを「侵入度」「データ価値」「導入容易性」で評価。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>アイデア</th>
+        <th>侵入度<br>（低が良い）</th>
+        <th>データ価値<br>（高が良い）</th>
+        <th>導入容易性<br>（高が良い）</th>
+        <th>主要加算</th>
+        <th>採用</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>① 朝の見通し</td>
+        <td class="center">低</td>
+        <td class="center">中</td>
+        <td class="center">高</td>
+        <td>個別Ⅰ／強度行動障害</td>
+        <td class="priority-high">採用</td>
+      </tr>
+      <tr>
+        <td>② 切り替え専用</td>
+        <td class="center">最低</td>
+        <td class="center">最高</td>
+        <td class="center">高</td>
+        <td>強度行動障害／集中的支援</td>
+        <td class="priority-high">最優先</td>
+      </tr>
+      <tr>
+        <td>③ 振り返りシール</td>
+        <td class="center">低</td>
+        <td class="center">高</td>
+        <td class="center">高</td>
+        <td>個別Ⅰ／モニタリング／家庭連携</td>
+        <td class="priority-high">採用</td>
+      </tr>
+      <tr>
+        <td>④ マイメニュー</td>
+        <td class="center">中</td>
+        <td class="center">高</td>
+        <td class="center">中</td>
+        <td>個別Ⅰ／専門的支援実施</td>
+        <td class="priority-mid">後発</td>
+      </tr>
+      <tr>
+        <td>⑤ 紙カードのデジタル化</td>
+        <td class="center">ゼロ</td>
+        <td class="center">低</td>
+        <td class="center">最高</td>
+        <td>個別Ⅰ</td>
+        <td class="priority-mid">補助</td>
+      </tr>
+      <tr>
+        <td>⑥ お便り作り</td>
+        <td class="center">低</td>
+        <td class="center">高</td>
+        <td class="center">中</td>
+        <td>家庭連携</td>
+        <td class="priority-mid">統合</td>
+      </tr>
+      <tr>
+        <td>⑦ 初日対応セット</td>
+        <td class="center">低（期間限定）</td>
+        <td class="center">中</td>
+        <td class="center">中</td>
+        <td>アセスメント</td>
+        <td class="priority-low">特殊</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight">
+    <strong>結論</strong>
+    <p>
+      <strong>①+②+③ のサンドイッチを Step 3 のメイン体験</strong>として実装する。
+      ⑤（紙カードのデジタル化）を導入時の<strong>緩衝材</strong>として、
+      ⑥（お便り作り）は ③ の出力機能として統合。
+      ④ ⑦ は Phase 2 以降の追加機能。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 具体シーン例 ===================== -->
+<section id="scenes">
+  <h2><span class="num">05</span>具体シーン例</h2>
+
+  <div class="scene-example">
+    <div class="se-title">【シーン例 A】Aくん（強度行動障害児・8歳）の月曜午後</div>
+    <div class="se-flow">
+      <div class="se-step mit">14:00<br>朝の見通し<br>「今日は雨」<br>不安サイン3</div>
+      <div class="se-arrow">→</div>
+      <div class="se-step">14:05<br>学習タイム<br>（施設）</div>
+      <div class="se-arrow">→</div>
+      <div class="se-step mit">15:00<br>切り替え<br>所要45秒<br>（前週60秒）</div>
+    </div>
+    <div class="se-flow" style="margin-top:8px;">
+      <div class="se-step">15:05<br>SST<br>（施設）</div>
+      <div class="se-arrow">→</div>
+      <div class="se-step mit">16:00<br>切り替え<br>パニック1回</div>
+      <div class="se-arrow">→</div>
+      <div class="se-step mit">16:55<br>振り返り<br>「むずかしかった」<br>お便り送信</div>
+    </div>
+    <p style="font-size:12px;color:var(--text-sub);margin-top:10px;">
+      取れたデータ：朝の不安サイン（雨・気圧との相関）／切り替え時間の改善傾向／パニック発生の文脈／本人セルフ評価<br>
+      <strong>加算根拠：</strong>強度行動障害児支援加算（155単位）／個別サポート加算Ⅰ（100単位）／<strong>集中的支援加算（1,000単位）の効果検証データ</strong>
+    </p>
+  </div>
+
+  <div class="scene-example">
+    <div class="se-title">【シーン例 B】Bくん（軽度ASD・6歳）の通常運用</div>
+    <div class="se-flow">
+      <div class="se-step mit">14:00<br>朝の見通し<br>「学習やる」</div>
+      <div class="se-arrow">→</div>
+      <div class="se-step">学習・SST<br>個別<br>（施設）</div>
+      <div class="se-arrow">→</div>
+      <div class="se-step mit">16:55<br>振り返り<br>「楽しかった」<br>お便り</div>
+    </div>
+    <p style="font-size:12px;color:var(--text-sub);margin-top:10px;">
+      取れたデータ：日々の体調・気分の推移／メニュー別の好み傾向／3か月の成長曲線<br>
+      <strong>加算根拠：</strong>個別サポート加算Ⅰ（軽度の場合は対象外の可能性）／<strong>家庭連携加算（毎日のお便り＝連続性データ）</strong>
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 設計指針 ===================== -->
+<section id="design">
+  <h2><span class="num">06</span>設計指針</h2>
+
+  <h3>UI 設計の原則</h3>
+  <ul>
+    <li><strong>5分以内で完了する設計：</strong>子どもの集中力と職員のオペレーション両立</li>
+    <li><strong>カリキュラム名は施設が登録：</strong>「学習」「SST」など、施設文言をそのまま採用</li>
+    <li><strong>カリキュラム内容には触れない：</strong>「中身に何をするか」は施設の領域</li>
+    <li><strong>子ども操作は「シール貼り」感覚：</strong>3択タップ・ご褒美演出</li>
+    <li><strong>切り替えタイマーはあえて出す：</strong>これは toC 原則の例外（事業所の運用効率に必要）</li>
+  </ul>
+
+  <h3>データ設計の原則</h3>
+  <ul>
+    <li>3つの侵入点（朝・切替・夕）を<strong>同じ session_id で紐づける</strong></li>
+    <li>朝の不安 × 切替パニック × 夕の振り返り を<strong>立体相関分析</strong>できるようにする</li>
+    <li>「セルフ評価データ」は<strong>子ども本人入力フラグ</strong>を必ず立てる（主体的参加の証跡）</li>
+    <li>環境変数（天気・気温・曜日）を自動取得して相関分析の素材にする</li>
+  </ul>
+
+  <h3>運用ガイドの原則</h3>
+  <ul>
+    <li><strong>「カリキュラムを変える必要はありません」</strong>を提案の冒頭で必ず明示</li>
+    <li>導入初週は<strong>切り替えだけ・1日1回</strong>から始める</li>
+    <li>2週目から<strong>朝の見通しを追加</strong></li>
+    <li>3週目から<strong>振り返りシールを追加</strong></li>
+    <li>1か月後にサンドイッチ完成形に</li>
+  </ul>
+
+  <div class="warn-box">
+    <strong>注意：「集団主義」との衝突を避ける</strong>
+    <p>
+      日本の療育は「集団でやる」の文化が強い。Aくんだけ違う動きをするのは現場で嫌われる。
+      mitooshi の体験は<strong>「全員が同じタイミングでやる集団行動」</strong>として設計する。
+      個別ボードを開くタイミング・終わるタイミングを揃え、内容だけ個別化する。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== PRD反映項目 ===================== -->
+<section id="prd">
+  <h2><span class="num">07</span>PRD への反映項目</h2>
+
+  <h3>体験設計の更新</h3>
+  <ul>
+    <li>Step 3（個別ボード採用モード）の体験を<strong>「サンドイッチ構造」</strong>に再定義</li>
+    <li>「終日カリキュラム置き換え」ではなく<strong>「3侵入点の合計10〜15分」</strong></li>
+    <li>① 朝の見通し ／ ② 切り替え専用 ／ ③ 振り返りシール の3機能を Phase 2 開発スコープに</li>
+  </ul>
+
+  <h3>機能仕様の追加</h3>
+  <ul>
+    <li><strong>カリキュラム登録機能：</strong>施設の独自プログラム名を職員が登録、変更は最小</li>
+    <li><strong>セルフ評価3択 UI：</strong>振り返りシール「楽しかった／むずかしかった／また」</li>
+    <li><strong>切り替えタイマー：</strong>1〜2分の砂時計演出（toC 原則の例外として明記）</li>
+    <li><strong>お便り自動生成：</strong>3侵入点データから保護者向け1日サマリ生成</li>
+    <li><strong>立体相関ダッシュボード：</strong>朝の不安 × 切替 × 振り返りの相関を児発管に提示</li>
+    <li><strong>環境データ取得：</strong>天気・気温・曜日 API 連携</li>
+  </ul>
+
+  <h3>Discovery で確かめたいこと（追加）</h3>
+  <ul>
+    <li><strong>カリキュラム聖域感：</strong>施設は本当に「触らないでほしい」のか、それとも「むしろ整理してほしい」のか</li>
+    <li><strong>切り替え時のパニック頻度：</strong>強度行動障害児の切り替え失敗は事業所にとってどれだけ重要な課題か</li>
+    <li><strong>振り返りシールの抵抗感：</strong>子どもが自分で評価することに先生・保護者が抵抗するか</li>
+    <li><strong>集団行動との衝突：</strong>個別ボードを「全員同時に」運用できるか</li>
+    <li><strong>お便りの代替価値：</strong>連絡帳の代替として保護者が受け入れるか</li>
+  </ul>
+
+  <div class="insight">
+    <strong>戦略的意味</strong>
+    <p>
+      「サンドイッチ構造」は、<strong>カリキュラム聖域問題と加算データ生成を両立</strong>する設計。
+      AI 計画作成系（co-mii・AI-PAC）が触れない<strong>「子どもの主体的セルフ評価データ」</strong>を生成できる点で、
+      補完統合戦略（Option B）の<strong>実装具体化</strong>になる。
+    </p>
+  </div>
+</section>
+
+<footer>
+  作成：2026-04-29 ／ 関連：mitooshi_pro_experience_design.html, ai_writer_competitors.html, gradual_kasan_entry.html<br>
+  本書は間接侵入アイデア素案。Discovery 検証を経て、最適な侵入点組み合わせを確定する。
+</footer>
+
+</main>
+</div>
+</body>
+</html>

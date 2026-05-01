@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mitooshi Pro 事業構想 統合リサーチサイト</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --yellow: #FFE082;
+    --yellow-soft: #FFF8E1;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+    --danger: #DC2626;
+    --danger-soft: #FEE2E2;
+    --success: #15803D;
+    --success-soft: #DCFCE7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px; line-height: 1.7;
+    color: var(--text); background: var(--bg);
+  }
+
+  /* Top nav */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 0;
+  }
+  .topnav .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .topnav .brand {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--mint-dark);
+    text-decoration: none;
+  }
+  .topnav .nav-links {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .topnav .nav-links a {
+    font-size: 12px;
+    color: var(--text-sub);
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 14px;
+    transition: all 0.15s;
+  }
+  .topnav .nav-links a:hover {
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+  }
+
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 260px; flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto;
+    font-size: 13px; background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text); text-decoration: none;
+    padding: 4px 8px; display: block; border-radius: 4px; line-height: 1.4;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+  aside.toc .sub { padding-left: 14px; font-size: 12px; color: var(--text-sub); }
+
+  main { flex: 1; padding: 32px 56px; max-width: 940px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, var(--mint-soft) 0%, var(--blue-soft) 100%);
+    border-radius: 20px;
+    padding: 48px 40px;
+    margin-bottom: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,184,148,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero .eyebrow {
+    color: var(--mint-dark);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .hero p {
+    color: var(--text-sub);
+    font-size: 16px;
+    max-width: 720px;
+    margin-bottom: 16px;
+  }
+  .hero .meta {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--text-mute);
+  }
+
+  /* Executive Summary */
+  .exec-summary {
+    background: white;
+    border: 2px solid var(--mint);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin: -24px 0 56px;
+    box-shadow: 0 8px 24px rgba(0, 184, 148, 0.08);
+    position: relative;
+    z-index: 2;
+  }
+  .exec-summary h2 {
+    font-size: 18px;
+    color: var(--mint-dark);
+    border: none;
+    padding: 0;
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .exec-summary h2::before {
+    content: "📌";
+  }
+  .exec-summary .key-points {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .exec-summary .kp {
+    padding: 14px 16px;
+    background: var(--mint-soft);
+    border-radius: 10px;
+    border-left: 3px solid var(--mint);
+  }
+  .exec-summary .kp .label {
+    font-size: 10px;
+    color: var(--mint-dark);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .exec-summary .kp .value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  section { margin-bottom: 56px; scroll-margin-top: 80px; }
+  section h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--mint);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 28px 0 8px;
+    color: var(--text);
+  }
+  section h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 16px 0 6px;
+    color: var(--text-sub);
+  }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* Insight box variations */
+  .insight {
+    background: var(--mint-soft);
+    border-left: 4px solid var(--mint);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .insight strong:first-child {
+    display: block;
+    color: var(--mint-dark);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .warn-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .warn-box strong { color: var(--warn); display: block; margin-bottom: 4px; }
+
+  .danger-box {
+    background: var(--danger-soft);
+    border-left: 4px solid var(--danger);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .danger-box strong { color: var(--danger); display: block; margin-bottom: 4px; }
+
+  .success-box {
+    background: var(--success-soft);
+    border-left: 4px solid var(--success);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .success-box strong { color: var(--success); display: block; margin-bottom: 4px; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+  th, td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  th {
+    background: var(--bg-alt);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-sub);
+    border-bottom: 2px solid var(--line);
+  }
+  td.center { text-align: center; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* 詳細リンクカード */
+  .detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 6px 14px;
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    font-size: 12px;
+    color: var(--mint-dark);
+    text-decoration: none;
+    transition: all 0.15s;
+    font-weight: 700;
+  }
+  .detail-link:hover {
+    background: var(--mint);
+    color: white;
+    border-color: var(--mint);
+  }
+  .detail-link::after { content: "→"; }
+
+  /* ステップカード */
+  .step-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .step-grid .step {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .step-grid .step.recommended { box-shadow: 0 0 0 2px var(--mint); }
+  .step-grid .step .num-box {
+    background: var(--mint);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 8px;
+  }
+  .step-grid .step .num-box .label {
+    font-size: 10px;
+    margin-bottom: 4px;
+    opacity: 0.85;
+  }
+  .step-grid .step .num-box .num {
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .step-grid .step .body { padding: 14px 18px; }
+  .step-grid .step .body .name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .step-grid .step .body .desc { font-size: 12px; color: var(--text-sub); margin-bottom: 8px; }
+  .step-grid .step .body .meta { font-size: 11px; }
+  .step-grid .step .body .meta .pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 8px;
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+    margin-right: 4px;
+    font-weight: 700;
+  }
+
+  /* サンドイッチ図 */
+  .sandwich-figure {
+    background: var(--bg-alt);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .sandwich-figure .layer {
+    padding: 12px 16px;
+    margin: 6px 0;
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 14px;
+    align-items: center;
+  }
+  .sandwich-figure .layer.bread {
+    background: var(--mint-soft);
+    border: 2px solid var(--mint);
+  }
+  .sandwich-figure .layer.center {
+    background: #C0C0C0;
+    color: white;
+  }
+  .sandwich-figure .layer .l-time {
+    font-size: 11px;
+    text-align: center;
+    font-weight: 700;
+  }
+  .sandwich-figure .layer.bread .l-time { color: var(--mint-dark); }
+  .sandwich-figure .layer.center .l-time { color: white; }
+  .sandwich-figure .layer .l-content { font-size: 13px; }
+  .sandwich-figure .layer .l-content .name { font-weight: 700; margin-bottom: 2px; }
+  .sandwich-figure .layer .l-content .desc { font-size: 11px; }
+  .sandwich-figure .layer.bread .l-content .desc { color: var(--mint-dark); }
+
+  /* 加算カード */
+  .kasan-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .kasan-card-mini {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: var(--bg);
+  }
+  .kasan-card-mini.adopted {
+    border-color: var(--mint);
+    background: var(--mint-soft);
+  }
+  .kasan-card-mini.dropped {
+    border-color: var(--danger);
+    background: var(--danger-soft);
+    opacity: 0.7;
+  }
+  .kasan-card-mini .name {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .kasan-card-mini .units {
+    font-size: 12px;
+    color: var(--mint-dark);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .kasan-card-mini.dropped .units { color: var(--danger); }
+  .kasan-card-mini .reason { font-size: 11px; color: var(--text-sub); }
+  .kasan-card-mini .badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--mint);
+    color: white;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+  .kasan-card-mini.dropped .badge { background: var(--danger); }
+
+  /* 競合 2軸マップ */
+  .quadrant-map {
+    background: var(--bg-alt);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .quadrant-map .grid {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    grid-template-rows: 40px 1fr 1fr;
+    gap: 6px;
+    height: 320px;
+  }
+  .quadrant-map .corner { background: transparent; }
+  .quadrant-map .axis-x, .quadrant-map .axis-y {
+    background: var(--text);
+    color: white;
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .quadrant-map .axis-y {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  .quadrant-map .quadrant {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    font-size: 11px;
+    line-height: 1.5;
+    overflow: auto;
+  }
+  .quadrant-map .quadrant.q-mit {
+    background: var(--mint-soft);
+    border-color: var(--mint);
+  }
+  .quadrant-map .quadrant h4 {
+    font-size: 12px;
+    margin: 0 0 6px;
+    color: var(--text);
+  }
+  .quadrant-map .quadrant.q-mit h4 { color: var(--mint-dark); }
+  .quadrant-map .quadrant ul {
+    margin: 0;
+    padding-left: 14px;
+    font-size: 11px;
+  }
+
+  /* ドキュメントカード（最後のセクション） */
+  .doc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .doc-card-link {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.15s;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+  }
+  .doc-card-link:hover {
+    border-color: var(--mint);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 184, 148, 0.1);
+  }
+  .doc-card-link .badge-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .doc-card-link .badge-row .pill {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: var(--bg-alt);
+    color: var(--text-sub);
+    border: 1px solid var(--line);
+    letter-spacing: 0.05em;
+  }
+  .doc-card-link .badge-row .pill.cat-business { background: var(--mint-soft); color: var(--mint-dark); border-color: var(--mint); }
+  .doc-card-link .badge-row .pill.cat-strategy { background: var(--blue-soft); color: var(--blue); border-color: var(--blue); }
+  .doc-card-link .badge-row .pill.cat-product { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); }
+  .doc-card-link .badge-row .pill.cat-experience { background: #E8E0F8; color: #6B46C1; border-color: #6B46C1; }
+  .doc-card-link h4 { font-size: 14px; margin-bottom: 4px; font-weight: 700; }
+  .doc-card-link .desc { font-size: 11px; color: var(--text-sub); line-height: 1.5; flex: 1; }
+  .doc-card-link .open { font-size: 11px; color: var(--mint-dark); margin-top: 8px; font-weight: 700; }
+
+  /* 意思決定マップ */
+  .decisions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .decisions-grid .col {
+    background: var(--bg-alt);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .decisions-grid .col.done { border-left: 4px solid var(--success); }
+  .decisions-grid .col.pending { border-left: 4px solid var(--warn); }
+  .decisions-grid .col h3 { font-size: 14px; margin: 0 0 8px; }
+  .decisions-grid .col h3.done { color: var(--success); }
+  .decisions-grid .col h3.pending { color: var(--warn); }
+  .decisions-grid .col ul { padding-left: 18px; font-size: 12px; line-height: 1.6; }
+  .decisions-grid .col li { margin: 3px 0; }
+
+  /* 価格試算 */
+  .price-table {
+    background: var(--mint-soft);
+    border: 1px solid var(--mint);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .price-table h4 {
+    color: var(--mint-dark);
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .price-table table { background: transparent; }
+  .price-table table tbody tr:last-child {
+    background: white;
+    font-weight: 700;
+  }
+  .price-table .total-num {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--mint-dark);
+    margin-top: 12px;
+  }
+  .price-table .total-num small {
+    font-size: 14px;
+    color: var(--text-sub);
+    font-weight: 400;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 32px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 20px 16px; }
+    .hero { padding: 28px 20px; }
+    .hero h1 { font-size: 26px; }
+    .exec-summary .key-points { grid-template-columns: 1fr; }
+    .doc-grid, .kasan-grid, .decisions-grid { grid-template-columns: 1fr; }
+    .topnav .nav-links { font-size: 10px; }
+    .quadrant-map .grid { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; }
+    .quadrant-map .axis-y { writing-mode: horizontal-tb; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a href="#hero" class="brand">mitooshi Pro 統合リサーチ</a>
+    <div class="nav-links">
+      <a href="#summary">結論</a>
+      <a href="#industry">業界</a>
+      <a href="#strategy">戦略</a>
+      <a href="#kasan">加算</a>
+      <a href="#compete">競合</a>
+      <a href="#features">機能</a>
+      <a href="#exp">体験</a>
+      <a href="#data">データ</a>
+      <a href="#intermittent">触らない日</a>
+      <a href="#decisions">意思決定</a>
+      <a href="#docs">全資料</a>
+    </div>
+  </div>
+</nav>
+
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#hero">ヒーロー</a></li>
+    <li><a href="#summary">エグゼクティブサマリー</a></li>
+    <li><a href="#industry">1. 業界理解</a></li>
+    <li><a href="#strategy">2. 戦略：Option B 採用</a>
+      <ul>
+        <li class="sub"><a href="#fact-check">▲ ファクトチェックの教訓</a></li>
+        <li class="sub"><a href="#option-b">Option B の選択</a></li>
+      </ul>
+    </li>
+    <li><a href="#kasan">3. 加算戦略（軽度向け）</a>
+      <ul>
+        <li class="sub"><a href="#kasan-list">採用5加算と除外3加算</a></li>
+        <li class="sub"><a href="#kasan-pot">月額ポテンシャル試算</a></li>
+      </ul>
+    </li>
+    <li><a href="#compete">4. 競合とポジション</a>
+      <ul>
+        <li class="sub"><a href="#compete-cat">4カテゴリ整理</a></li>
+        <li class="sub"><a href="#compete-pos">独自ポジション</a></li>
+      </ul>
+    </li>
+    <li><a href="#path">5. 段階的進入路（5 Step）</a></li>
+    <li><a href="#features">6. 機能設計</a>
+      <ul>
+        <li class="sub"><a href="#sandwich">サンドイッチ構造</a></li>
+        <li class="sub"><a href="#anti-pattern">アンチパターン</a></li>
+      </ul>
+    </li>
+    <li><a href="#exp">7. 体験設計</a></li>
+    <li><a href="#data">8. データ → 出力</a></li>
+    <li><a href="#intermittent">9. 触らない日問題</a></li>
+    <li><a href="#decisions">10. 意思決定マップ</a></li>
+    <li><a href="#actions">11. 次のアクション</a></li>
+    <li><a href="#docs">12. 全ドキュメント</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<!-- ===================== HERO ===================== -->
+<section id="hero" style="margin-bottom: 0;">
+<div class="hero">
+  <div class="eyebrow">mitooshi Pro / Integrated Research Site</div>
+  <h1>mitooshi Pro<br>事業構想 統合リサーチ</h1>
+  <p>
+    療育事業所向け mitooshi Pro の事業戦略・差別化・機能設計・体験設計・出力ドキュメントまで、
+    対話を重ねて積み上げた12本のリサーチを1サイトに統合。<strong>Option B（軽度向け加算特化）戦略</strong>を採用。
+  </p>
+  <div class="meta">対話期間：2026-04 ／ 全 12 ドキュメント ／ 最終更新：2026-04-29</div>
+</div>
+</section>
+
+<!-- ===================== EXECUTIVE SUMMARY ===================== -->
+<section id="summary">
+<div class="exec-summary">
+  <h2>エグゼクティブサマリー</h2>
+  <div class="key-points">
+    <div class="kp">
+      <div class="label">ターゲット児童</div>
+      <div class="value">軽度ASD/ADHD<br>3歳〜小学校低学年</div>
+    </div>
+    <div class="kp">
+      <div class="label">主軸加算</div>
+      <div class="value">家庭連携／専門的支援実施<br>移行支援／関係機関連携</div>
+    </div>
+    <div class="kp">
+      <div class="label">月額ポテンシャル</div>
+      <div class="value">約 11 万円／事業所<br>（10名定員モデル）</div>
+    </div>
+    <div class="kp">
+      <div class="label">価格レンジ</div>
+      <div class="value">月額 1〜5 万円<br>（Step 1〜5 アラカルト）</div>
+    </div>
+    <div class="kp">
+      <div class="label">推奨進入路</div>
+      <div class="value">Step 1（家庭連携）<br>→ Step 3（個別ボード）<br>→ Step 5（フル運用）</div>
+    </div>
+    <div class="kp">
+      <div class="label">差別化の核心</div>
+      <div class="value">子どもが触る × toC×toB 連携<br>サンプリング型データ</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===================== 1. 業界理解 ===================== -->
+<section id="industry">
+  <h2><span class="num">01</span>業界理解</h2>
+  <p>
+    療育（児童発達支援・放課後等デイサービス）は<strong>1兆円市場・2万事業所</strong>の業界。
+    <strong>公費90% + 自己負担10%</strong>のプロセス課金モデルで、<strong>書類＝収益の根拠</strong>。
+    人件費比率70%、利益率3〜8%のタイトな経営環境で、<strong>加算の取りこぼし</strong>が経営を直撃する。
+  </p>
+
+  <h3>5つのサービス類型</h3>
+  <ul>
+    <li>児童発達支援（未就学児）</li>
+    <li>放課後等デイサービス（就学児）</li>
+    <li>保育所等訪問支援</li>
+    <li>障害児相談支援</li>
+    <li>居宅訪問型児童発達支援</li>
+  </ul>
+
+  <h3>収益構造</h3>
+  <p>
+    <strong>基本報酬</strong>（時間別・地域別）に<strong>4系統の加算</strong>（個別支援内容・児童特性・専門職関与・運営体制）が積み上がる。
+    1単位 = <strong>10〜10.93円</strong>（地域区分により差）。
+  </p>
+
+  <h3>ICT 現状</h3>
+  <p>
+    HUG（10,000施設）が業務統合 SaaS の支配的プレイヤー。<strong>「見通しボード市場」は完全に空白</strong>。
+    AI 計画作成系（co-mii・AI-PAC等）が2024-2025年に急成長中。
+  </p>
+
+  <a href="ryouiku_business_model.html" class="detail-link">詳細：療育ビジネスモデル解説</a>
+</section>
+
+<!-- ===================== 2. 戦略：Option B 採用 ===================== -->
+<section id="strategy">
+  <h2><span class="num">02</span>戦略：Option B 採用</h2>
+
+  <h3 id="fact-check">▲ ファクトチェックの教訓</h3>
+  <div class="danger-box">
+    <strong>※ 当初リサーチに3つの誤りがあった（2026-04-29 修正）</strong>
+    <ol style="margin: 8px 0 0 24px;">
+      <li>個別サポート加算Ⅰの単位数：100 → <strong>120単位/日</strong></li>
+      <li>強度行動障害児支援加算：155 → <strong>加算Ⅰ 200／加算Ⅱ 250 ＋ 開始90日以内 +500単位</strong></li>
+      <li>集中的支援加算：単独算定可能と誤認 → <strong>「広域的支援人材」の関与が必要</strong></li>
+    </ol>
+  </div>
+
+  <div class="danger-box">
+    <strong>致命的な戦略課題：ターゲットと加算対象のズレ</strong>
+    <p style="margin: 0;">
+      mitooshi の本来のターゲットは<strong>軽度ASD/ADHD</strong>。一方、当初狙っていた加算（個別サポートⅠ・強度行動障害・集中的支援）の対象は<strong>重度・強度行動障害認定児</strong>のみ。
+      → <strong>戦略の根本見直しが必要</strong>に。
+    </p>
+  </div>
+
+  <h3 id="option-b">Option B：軽度向け加算戦略への転換</h3>
+  <p>3つの選択肢を検討した結果、<strong>Option B（軽度向け加算に絞る）</strong>を採用。</p>
+
+  <table>
+    <thead>
+      <tr><th>選択肢</th><th>内容</th><th>判断</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Option A</td>
+        <td>ターゲットを重度・中度に広げる</td>
+        <td style="color:var(--text-mute);">不採用（toC ブランド毀損）</td>
+      </tr>
+      <tr>
+        <td><strong>Option B</strong></td>
+        <td><strong>軽度向けで対象児童制限のない加算に絞る</strong></td>
+        <td style="color:var(--mint-dark); font-weight:700;">★ 採用</td>
+      </tr>
+      <tr>
+        <td>Option C</td>
+        <td>toB は重度児のみ、toC は軽度のまま</td>
+        <td style="color:var(--text-mute);">不採用（運用複雑化）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <a href="gradual_kasan_entry.html" class="detail-link">詳細：段階的加算協力ラダー</a>
+</section>
+
+<!-- ===================== 3. 加算戦略 ===================== -->
+<section id="kasan">
+  <h2><span class="num">03</span>加算戦略（Option B 軽度向け）</h2>
+
+  <h3 id="kasan-list">採用 5 加算 と 除外 3 加算</h3>
+
+  <h4>★ 採用：対象児童制限のない加算</h4>
+  <div class="kasan-grid">
+    <div class="kasan-card-mini adopted">
+      <span class="badge">採用</span>
+      <div class="name">家庭連携加算</div>
+      <div class="units">300〜1,000単位/回（月4回上限）</div>
+      <div class="reason">toC × toB 連携の唯一無二の証跡。差別化の核心。</div>
+    </div>
+    <div class="kasan-card-mini adopted">
+      <span class="badge">採用</span>
+      <div class="name">専門的支援実施加算</div>
+      <div class="units">150単位/回（月4回上限）</div>
+      <div class="reason">PT/OT/ST立合時の使用ログがそのまま証跡に。</div>
+    </div>
+    <div class="kasan-card-mini adopted">
+      <span class="badge">採用</span>
+      <div class="name">保育・教育等移行支援加算</div>
+      <div class="units">500単位/回</div>
+      <div class="reason">引継ぎ書（カードセット＋使い方）として持ち運べる資産。</div>
+    </div>
+    <div class="kasan-card-mini adopted">
+      <span class="badge">採用</span>
+      <div class="name">関係機関連携加算</div>
+      <div class="units">150〜250単位/月</div>
+      <div class="reason">医療・相談支援との共有ログ。月1回でOK。</div>
+    </div>
+    <div class="kasan-card-mini adopted">
+      <span class="badge">採用</span>
+      <div class="name">アセスメント／モニタリング</div>
+      <div class="units">基本報酬の前提</div>
+      <div class="reason">3か月の行動データで個別性を客観化、減算リスク回避。</div>
+    </div>
+  </div>
+
+  <h4>× 除外：対象児童が軽度ASD/ADHDと合わない加算</h4>
+  <div class="kasan-grid">
+    <div class="kasan-card-mini dropped">
+      <span class="badge">除外</span>
+      <div class="name">個別サポート加算Ⅰ</div>
+      <div class="units">120単位/日（重度のみ）</div>
+      <div class="reason">対象は重症心身障害児・身体1-2級・重度知的・精神1級。軽度は対象外。</div>
+    </div>
+    <div class="kasan-card-mini dropped">
+      <span class="badge">除外</span>
+      <div class="name">強度行動障害児支援加算</div>
+      <div class="units">加算Ⅰ 200 / Ⅱ 250 単位/日</div>
+      <div class="reason">市区町村認定の強度行動障害児（児基準20点以上）のみ。</div>
+    </div>
+    <div class="kasan-card-mini dropped">
+      <span class="badge">除外</span>
+      <div class="name">集中的支援加算</div>
+      <div class="units">1,000単位/回（月4回上限）</div>
+      <div class="reason">強度行動障害児に「広域的支援人材」が訪問支援する場合のみ。</div>
+    </div>
+  </div>
+
+  <h3 id="kasan-pot">月額ポテンシャル試算</h3>
+  <div class="price-table">
+    <h4>1事業所あたり（児発・定員10名・稼働率80%）</h4>
+    <table>
+      <thead>
+        <tr><th>加算</th><th>算定回数（モデル）</th><th class="num">月額</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>家庭連携加算（中時間 600単位）</td><td>月4回 × 3名</td><td class="num">72,000円</td></tr>
+        <tr><td>専門的支援実施加算（150単位）</td><td>月4回 × 5名</td><td class="num">30,000円</td></tr>
+        <tr><td>関係機関連携加算Ⅰ（250単位）</td><td>月1回 × 3名</td><td class="num">7,500円</td></tr>
+        <tr><td>保育・教育等移行支援加算（500単位）</td><td>年4回平均</td><td class="num">1,667円</td></tr>
+        <tr><td>合計（取りこぼし防止前）</td><td>—</td><td class="num">111,167円</td></tr>
+      </tbody>
+    </table>
+    <div class="total-num">月 約 11 万円<small> ／ 年 約 130 万円</small></div>
+    <p style="font-size: 11px; color: var(--text-sub); margin-top: 8px;">
+      取りこぼし率 30% → 10% に圧縮で +6万円/月の収益改善。mitooshi Pro 月額 3〜5万円 でROI 1〜2か月で回収。
+    </p>
+  </div>
+
+  <a href="kasan_evidence_map.html" class="detail-link">詳細：加算証跡化マップ</a>
+</section>
+
+<!-- ===================== 4. 競合とポジション ===================== -->
+<section id="compete">
+  <h2><span class="num">04</span>競合とポジション</h2>
+
+  <h3 id="compete-cat">4カテゴリ整理</h3>
+
+  <table>
+    <thead>
+      <tr><th>カテゴリ</th><th>主要プレイヤー</th><th>機能の重心</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>業務統合 SaaS</td><td>HUG（業界最大手・10,000施設）／カイポケ／ほのぼのNEXT／コノベル</td><td>請求・出退・記録・シフト</td></tr>
+      <tr><td>個別計画特化</td><td>HAGONOTE</td><td>計画書・モニタリング</td></tr>
+      <tr style="background:var(--danger-soft);"><td>▲ AI 計画作成系（新発見）</td><td>AI-PAC（慶応大学発）／co-mii（特許出願済）／デイロボ／アルバトロス／エデアル</td><td>個別支援計画書の AI 半自動作成</td></tr>
+      <tr><td>視覚支援</td><td>LITALICOワンダー（自社運営）／コバリテ（紙）／Goally・Lil Planner（海外）</td><td>視覚カード・スケジュール</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn-box">
+    <strong>▲ 重要：AI 計画作成系は当初の競合分析で見落としていたカテゴリ</strong>
+    慶応大学発の AI-PAC、特許出願済の co-mii など、加算特化を明示した強力なプレイヤーが2024-2025年に集中して立ち上がっている。
+  </div>
+
+  <h3 id="compete-pos">独自ポジション：2軸マッピング</h3>
+
+  <div class="quadrant-map">
+    <div class="grid">
+      <div class="corner"></div>
+      <div class="axis-x">業務管理（請求・出退・記録）</div>
+      <div class="axis-x">支援内容（計画・アセス・記録の中身）</div>
+      <div class="axis-y">大人が<br>データ入力</div>
+      <div class="quadrant">
+        <h4>業務統合 SaaS</h4>
+        <ul>
+          <li>HUG</li><li>カイポケ</li><li>ほのぼのNEXT</li><li>コノベル</li><li>コドモン</li>
+        </ul>
+      </div>
+      <div class="quadrant">
+        <h4>AI 計画作成系</h4>
+        <ul>
+          <li>AI-PAC（慶応・ADDS）</li><li>co-mii（特許出願済）</li><li>デイロボ AI</li><li>アルバトロス</li><li>エデアル</li>
+        </ul>
+      </div>
+      <div class="axis-y">子ども・<br>本人が<br>データ生成</div>
+      <div class="quadrant">
+        <h4>—（該当なし）</h4>
+        <ul style="color:var(--text-mute);">
+          <li>子どもの行動を業務記録に変換するツールは存在しない</li>
+        </ul>
+      </div>
+      <div class="quadrant q-mit">
+        <h4>★ mitooshi Pro</h4>
+        <ul>
+          <li>子どもがカードをめくる</li>
+          <li>その操作ログ＝支援内容の証跡</li>
+          <li>家庭 × 施設の連続性</li>
+          <li><strong>競合 0 領域</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-box">
+    <strong>戦略：補完統合（Option B / Path B）</strong>
+    「請求は HUG、計画は AI 計画作成系、行動データは mitooshi」の<strong>3層エコシステム</strong>。<br>
+    AI 計画作成系には<strong>「データ提供層」として連携</strong>し、正面衝突を避ける。
+  </div>
+
+  <a href="competitive_kasan_map.html" class="detail-link">詳細：競合×加算マッピング</a>
+  <a href="ai_writer_competitors.html" class="detail-link">詳細：AI支援計画作成系の競合発見（補論）</a>
+</section>
+
+<!-- ===================== 5. 段階的進入路 ===================== -->
+<section id="path">
+  <h2><span class="num">05</span>段階的進入路（5 Step）</h2>
+  <p>フルスペック導入ではなく、<strong>侵入度の低い順に段階的に導入</strong>。各 Step は独立して契約・独立した価値で成立。</p>
+
+  <div class="step-grid">
+    <div class="step recommended">
+      <div class="num-box"><div class="label">STEP</div><div class="num">1</div></div>
+      <div class="body">
+        <div class="name">★ 家庭連携限定モード</div>
+        <div class="desc">家庭⇄施設の連携面談時のみ mitooshi。日常業務に侵食しない。</div>
+        <div class="meta"><span class="pill">月1〜2万円</span><span class="pill">家庭連携加算</span><span class="pill">導入リスク：低</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num-box"><div class="label">STEP</div><div class="num">2</div></div>
+      <div class="body">
+        <div class="name">専門職立合記録モード</div>
+        <div class="desc">PT/OT/ST/心理職の立合時のみ。月数回のピンポイント利用。</div>
+        <div class="meta"><span class="pill">月2〜3万円</span><span class="pill">専門的支援実施加算</span></div>
+      </div>
+    </div>
+    <div class="step recommended">
+      <div class="num-box"><div class="label">STEP</div><div class="num">3</div></div>
+      <div class="body">
+        <div class="name">★ 個別ボード採用モード（軽度向け）</div>
+        <div class="desc">3〜5名の個別ボードとして採用。サンドイッチ構造で運用。</div>
+        <div class="meta"><span class="pill">月3〜4万円</span><span class="pill">モニタリング充実</span><span class="pill">本来の見通し体験</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num-box"><div class="label">STEP</div><div class="num">4</div></div>
+      <div class="body">
+        <div class="name">移行支援・関係機関連携モード</div>
+        <div class="desc">引継ぎ書・連携記録機能を追加。年に数回の支援。</div>
+        <div class="meta"><span class="pill">月+1万円</span><span class="pill">移行・連携加算</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num-box"><div class="label">STEP</div><div class="num">5</div></div>
+      <div class="body">
+        <div class="name">フル運用モード</div>
+        <div class="desc">全児童対象。モニタリング・個別支援計画見直しの主軸ツール。</div>
+        <div class="meta"><span class="pill">月5〜10万円</span><span class="pill">全加算横断</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>推奨：3ホップ進入</strong>
+    Step 1 → Step 3 → Step 5 が中核ルート。Step 2・4 はオプション。<br>
+    開発コストを <strong>1/3 に縮小</strong>でき、3〜4か月で PoC 検証に入れる。
+  </div>
+</section>
+
+<!-- ===================== 6. 機能設計 ===================== -->
+<section id="features">
+  <h2><span class="num">06</span>機能設計</h2>
+
+  <h3>4層パイプライン（データ→ドキュメント変換）</h3>
+  <ol>
+    <li><strong>Layer 1：自動収集</strong> ─ めくり操作から構造化データ自動生成（職員入力ゼロ）</li>
+    <li><strong>Layer 2：半構造化入力</strong> ─ 職員1〜2タップで観察タグ・中断理由</li>
+    <li><strong>Layer 3：自由記述</strong> ─ 児発管・専門職が本児固有の所見を書く（テンプレ提示なし）</li>
+    <li><strong>Layer 4：ドキュメント生成</strong> ─ AI が下書きまで、最終確定は人間</li>
+  </ol>
+
+  <div class="warn-box">
+    <strong>核心の原則</strong>
+    AI が生成するのは <strong>Layer 4 のドキュメント下書きのみ</strong>。Layer 3（児発管所見）は人間が書く。<br>
+    これを混ぜないことで <strong>「コピペ疑い → 減算」リスクを構造的に回避</strong>。
+  </div>
+
+  <h3 id="sandwich">サンドイッチ構造（カリキュラム周辺侵入）</h3>
+  <p>カリキュラムは施設の聖域。本体には触れず、<strong>前後・隙間に短時間で侵入</strong>する。</p>
+
+  <div class="sandwich-figure">
+    <div class="layer bread">
+      <div class="l-time">14:00<br>2〜5分</div>
+      <div class="l-content">
+        <div class="name">① 朝の見通しボード</div>
+        <div class="desc">登所時の状態 / 体調 / 不安サイン / その日の予定確認</div>
+      </div>
+    </div>
+    <div class="layer center">
+      <div class="l-time">14:05〜<br>15:00</div>
+      <div class="l-content">
+        <div class="name">施設のカリキュラム本体（mitooshi 触れない）</div>
+        <div class="desc">学習・SST・個別療育・自由遊び</div>
+      </div>
+    </div>
+    <div class="layer bread">
+      <div class="l-time">15:00<br>1〜2分 × 3</div>
+      <div class="l-content">
+        <div class="name">② 切り替え専用ボード</div>
+        <div class="desc">次のメニューの見通し提示 / 切り替えスムーズ度の記録</div>
+      </div>
+    </div>
+    <div class="layer center">
+      <div class="l-time">15:05〜<br>16:55</div>
+      <div class="l-content">
+        <div class="name">施設のカリキュラム本体（mitooshi 触れない）</div>
+        <div class="desc">続き</div>
+      </div>
+    </div>
+    <div class="layer bread">
+      <div class="l-time">16:55<br>3〜5分</div>
+      <div class="l-content">
+        <div class="name">③ 振り返りシール</div>
+        <div class="desc">楽しかった/むずかしかった/また を子どもが評価 / お便り自動生成</div>
+      </div>
+    </div>
+  </div>
+
+  <p>合計1日10〜15分の体験で、<strong>個別性・主体性・効果検証</strong>を全カバーするデータが取れる。</p>
+
+  <h3 id="anti-pattern">アンチパターン（やらないこと 5つ）</h3>
+  <ol>
+    <li>AI が個別支援計画を自動執筆する（コピペ減算リスク）</li>
+    <li>「全部 mitooshi に入れろ」運用（現場拒絶）</li>
+    <li>「自動で加算が取れます」と謳う（実地指導は人による判断）</li>
+    <li>請求機能を作る（HUG の領域に踏み込まない）</li>
+    <li>子どもボードに大人向け機能を載せる（独自データの源泉を侵食）</li>
+  </ol>
+
+  <a href="../pdm/mitooshi_pro_feature_spec.html" class="detail-link">詳細：機能仕様（4層パイプライン × 8ドキュメント）</a>
+  <a href="../pdm/indirect_entry_design.html" class="detail-link">詳細：カリキュラム周辺からの間接侵入アイデア</a>
+</section>
+
+<!-- ===================== 7. 体験設計 ===================== -->
+<section id="exp">
+  <h2><span class="num">07</span>体験設計</h2>
+  <p>4アクター（子ども・保護者・職員・児発管）× サンドイッチ構造の3侵入点で、<strong>シーン別の体験フロー</strong>を設計。</p>
+
+  <h3>6つの画面イメージ</h3>
+  <ol>
+    <li><strong>子どもボード（タブレット縦持ち）</strong> ─ 現在カード大、次・その次は薄く。タイマーなし</li>
+    <li><strong>職員ペイン（PiP）</strong> ─ 5択タップ＋音声10秒メモ。文字入力なし</li>
+    <li><strong>児発管ダッシュボード</strong> ─ 児童一覧×行動データ×加算算定可能性表示</li>
+    <li><strong>面談画面</strong> ─ 「効いた／効かなかったカード」を視覚的に対比</li>
+    <li><strong>ドキュメント生成画面</strong> ─ AUTO（緑）／SEMI（青）／HAND（黄）の3層を色で区別</li>
+    <li><strong>家庭側 mitooshi</strong> ─ 子どもめくり画面の下に保護者用評価ボタンを薄く重ねる</li>
+  </ol>
+
+  <h3>「人間にしかできないこと」5つ</h3>
+  <p>AI に渡さない領域：</p>
+  <ul>
+    <li>児発管の個別性ある所見（人の言葉で書く）</li>
+    <li>保護者との面談での対話（信頼関係構築）</li>
+    <li>専門職の専門的判断（評価・治療方針）</li>
+    <li>子どもへの声かけ・励まし（mitooshi は声を出さない）</li>
+    <li>家族との合意形成（保護者署名）</li>
+  </ul>
+
+  <a href="../pdm/mitooshi_pro_experience_design.html" class="detail-link">詳細：体験設計＋画面イメージ</a>
+</section>
+
+<!-- ===================== 8. データ → 出力 ===================== -->
+<section id="data">
+  <h2><span class="num">08</span>データ → 出力ドキュメント</h2>
+  <p>サンドイッチ構造の3侵入点から取れたデータが、加算別の出力帳票に自動分配される。</p>
+
+  <h3>主要 4 帳票（Option B 適用版）</h3>
+
+  <table>
+    <thead>
+      <tr><th>帳票</th><th>頻度</th><th>対象加算</th><th>差別化価値</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>家庭連携加算 面談記録</td>
+        <td>月1〜4回</td>
+        <td>家庭連携加算（300〜1,000単位/回）</td>
+        <td>★★★ toC ログ連携で競合不可能</td>
+      </tr>
+      <tr>
+        <td>専門的支援実施記録</td>
+        <td>月4回上限</td>
+        <td>専門的支援実施加算（150単位/回）</td>
+        <td>★★ 専門職立合の客観証跡</td>
+      </tr>
+      <tr>
+        <td>引継ぎ書（移行支援）</td>
+        <td>進級・進学時</td>
+        <td>保育・教育等移行支援加算（500単位/回）</td>
+        <td>★★ 子どもの取扱説明書として持ち運べる資産</td>
+      </tr>
+      <tr>
+        <td>3か月モニタリング下書き</td>
+        <td>3か月毎</td>
+        <td>モニタリング（基本報酬の前提）</td>
+        <td>★★★ 3か月の行動データで個別性を客観化</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight">
+    <strong>★ AI 計画作成系では作れない領域</strong>
+    AI 計画作成系（co-mii・AI-PAC）は<strong>事前計画</strong>は作れても、<strong>毎日の行動データに裏打ちされた実施記録・効果検証</strong>は作れない。<br>
+    mitooshi の<strong>恒久的な差別化</strong>はここにある。
+  </div>
+
+  <a href="../pdm/kasan_data_output_spec.html" class="detail-link">詳細：加算別データ取得 × 出力ドキュメント仕様</a>
+</section>
+
+<!-- ===================== 9. 触らない日問題 ===================== -->
+<section id="intermittent">
+  <h2><span class="num">09</span>触らない日問題：サンプリング型データ収集</h2>
+
+  <div class="success-box">
+    <strong>★ 重要発見：Option B では「毎日触る必要なし」</strong>
+    Option B のすべての加算は <strong>「日次算定」ではなく「イベント駆動算定」</strong>。
+    家庭で月数回・施設で月数回の<strong>サンプリング型</strong>でも算定可能。
+  </div>
+
+  <h3>加算別の最低接触頻度</h3>
+  <table>
+    <thead>
+      <tr><th>加算</th><th>必要接触頻度</th><th>触らない日OK？</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>家庭連携加算</td><td>家庭で月4回程度＋面談1回/月</td><td style="color:var(--mint-dark);font-weight:700;">◎ 大半の日OK</td></tr>
+      <tr><td>保育・教育等移行支援</td><td>引継ぎ時の1回のみ</td><td style="color:var(--mint-dark);font-weight:700;">◎ 年数回でOK</td></tr>
+      <tr><td>関係機関連携加算</td><td>月1回程度</td><td style="color:var(--mint-dark);font-weight:700;">◎ 月1回でOK</td></tr>
+      <tr><td>専門的支援実施加算</td><td>立合時月4回</td><td style="color:#B45309;">○ 立合時のみ</td></tr>
+      <tr><td>モニタリング</td><td>3か月で複数回</td><td style="color:#B45309;">○ 3か月で数回でOK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5つのフォールバック設計</h3>
+  <ol>
+    <li><strong>集中接触モード</strong> ─ 面談前1週間だけ集中的に触る、普段は使わなくてOK</li>
+    <li><strong>紙＋写真フォールバック</strong> ─ 紙メモ・連絡帳の写真をアップ、OCR で日付・児童名を自動推定</li>
+    <li><strong>既存データ連携</strong> ─ HUG・カイポケから取り込み、外部データを「mitooshi 接触相当」扱い</li>
+    <li><strong>最小1回有効設計</strong> ─ 1回の接触＝1つの加算根拠として独立、即時フィードバック</li>
+    <li><strong>算定可能性アラート</strong> ─ 児発管ダッシュボードで「あと2回触ると…」とリアルタイム提示</li>
+  </ol>
+
+  <div class="insight">
+    <strong>戦略的意味</strong>
+    「触らない日問題」は弱みに見えて<strong>実は強み</strong>。<br>
+    競合 SaaS（HUG等）は日次入力前提で業務負担を増やすのに対し、mitooshi は <strong>「軽量・イベント駆動・取りこぼし防止」</strong> という独自ポジションが取れる。
+  </div>
+
+  <a href="../pdm/intermittent_use_design.html" class="detail-link">詳細：触らない日問題（サンプリング型データ収集）</a>
+</section>
+
+<!-- ===================== 10. 意思決定マップ ===================== -->
+<section id="decisions">
+  <h2><span class="num">10</span>意思決定マップ</h2>
+
+  <div class="decisions-grid">
+    <div class="col done">
+      <h3 class="done">✓ 確定したこと</h3>
+      <ul>
+        <li>toB（mitooshi Pro）と toC（mitooshi）はプロダクト分離・並行開発</li>
+        <li>日本 PMF 優先、グローバル展開は後</li>
+        <li>請求機能は作らない（HUG等の補完）</li>
+        <li>「子どもが触る」を死守する設計</li>
+        <li>段階導入：Step 1 → 3 → 5 の3ホップ採用</li>
+        <li>Phase 1 は Step 1（家庭連携）で開始</li>
+        <li>AI 自動生成は「下書きまで」、所見は人間が書く</li>
+        <li>手書き運用許容（写真アップで紐付け）</li>
+        <li>サインは紙／タブレット／電子の3モード</li>
+        <li>カードライブラリはテンプレOK、所見はテンプレ提示しない</li>
+        <li><strong>★ Option B（軽度向け加算戦略）採用</strong></li>
+        <li><strong>★ サンドイッチ構造（朝＋切替＋振り返り）採用</strong></li>
+        <li><strong>★ サンプリング型データ収集モデル採用</strong></li>
+        <li><strong>★ AI 計画作成系とは補完統合戦略</strong></li>
+      </ul>
+    </div>
+    <div class="col pending">
+      <h3 class="pending">⏳ 未決・要 Discovery 検証</h3>
+      <ul>
+        <li>タイマー機能の扱い（toC原則と toB ニーズ）</li>
+        <li>記録の所有権設計（事業所/家族/mitooshi）</li>
+        <li>「自動ボード切り替え」の現実性</li>
+        <li>HUG 等を使う施設が「支援の中身」に課題感あるか</li>
+        <li>「個別性が薄い」実地指導指摘事例の実数</li>
+        <li>家庭連携加算の月4回フル算定率の実数</li>
+        <li>「子どもが触る」ことへの現場抵抗感</li>
+        <li>HUG 等と並列導入の月額予算枠</li>
+        <li>Phase 1 の正式 PRD（Step 1 機能要件）</li>
+        <li>Discovery インタビューガイド（3ロール別）</li>
+        <li>AI 計画作成系（co-mii / AI-PAC）の実機検証</li>
+        <li>ADDS（AI-PAC運営）とのパートナーシップ可能性</li>
+        <li>地域区分による単価差の事業所別シミュレーション</li>
+        <li>都道府県別の実地指導運用差</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 11. 次のアクション ===================== -->
+<section id="actions">
+  <h2><span class="num">11</span>次のアクション</h2>
+
+  <ol>
+    <li><strong>Step 1 PRD の正式作成</strong> ─ Phase 1 開発スコープを PRD_v3 に書き起こす（家庭側評価マーク／面談画面／Doc E／3サインモード）</li>
+    <li><strong>Discovery インタビュー設計</strong> ─ 3ロール別質問ガイド（児発管／職員／保護者）+ AI計画作成系試用経験の質問追加</li>
+    <li><strong>Step 1 営業1枚物</strong> ─ 家庭連携加算の月4回フル算定を訴求する A4 1枚資料</li>
+    <li><strong>加算単位数の最終確認</strong> ─ こども家庭庁通知（令和6年4月1日 事務連絡）で再検証</li>
+    <li><strong>co-mii / AI-PAC のデモ申込み</strong> ─ 実機テスト・特許文書確認・パートナーシップ可能性</li>
+    <li><strong>API 連携の技術仕様検討</strong> ─ mitooshi のデータをどう外部 AI 計画作成系に渡すか</li>
+    <li><strong>マーケティング言語の刷新</strong> ─ 「AI で計画書」と差別化する「子どもが残すデータ」キャッチコピー</li>
+    <li><strong>地域別シミュレーター作成</strong> ─ 1〜7級地別の月額ポテンシャル試算ツール</li>
+  </ol>
+</section>
+
+<!-- ===================== 12. 全ドキュメント ===================== -->
+<section id="docs">
+  <h2><span class="num">12</span>全ドキュメント（12本）</h2>
+  <p>各ドキュメントは独立して読めます。本サイトは要約と統合視点。詳細は各ドキュメントへ。</p>
+
+  <div class="doc-grid">
+    <a href="ryouiku_business_model.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-business">業界</span><span class="pill">10章</span></div>
+      <h4>療育ビジネスモデル解説書</h4>
+      <div class="desc">業界全体像・報酬構造・加算 / 補助金・コスト構造・主要プレイヤー。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="kasan_evidence_map.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-strategy">加算</span><span class="pill">7章</span></div>
+      <h4>加算証跡化マップ</h4>
+      <div class="desc">Tier 1〜3 の加算別に、要件 × mitooshi 証跡 × 取りこぼし防止レバレッジ。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="../pdm/kasan_and_data_value.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-strategy">加算</span><span class="pill">5章</span></div>
+      <h4>加算とデータ価値の関係</h4>
+      <div class="desc">「データが取れると施設は嬉しい？」への回答。直接 vs 間接の連動構造。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="competitive_kasan_map.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-strategy">競合</span><span class="pill">8章</span></div>
+      <h4>競合 × 加算マッピング</h4>
+      <div class="desc">HUG・カイポケ等 × 加算別マトリクス。3つの勝ち筋（Path A/B/C）。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="ai_writer_competitors.html" class="doc-card-link" style="border-color: var(--danger);">
+      <div class="badge-row"><span class="pill cat-strategy" style="background:var(--danger-soft);color:var(--danger);border-color:var(--danger);">▲ 補論</span><span class="pill">8章</span></div>
+      <h4>AI 支援計画作成系の競合発見</h4>
+      <div class="desc">AI-PAC・co-mii 等 6 社の発見。補完統合戦略を推奨。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="gradual_kasan_entry.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-strategy">戦略</span><span class="pill">7章</span></div>
+      <h4>段階的加算協力ラダー</h4>
+      <div class="desc">5 Step（家庭連携 → 専門職立合 → 個別ボード → 集中支援 → フル）の進入戦略。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="../pdm/mitooshi_pro_feature_spec.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-product">機能</span><span class="pill">10章</span></div>
+      <h4>機能仕様：めくりログ → 加算エビデンス</h4>
+      <div class="desc">4層パイプライン・5モジュール・8ドキュメント生成・アンチパターン5。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="../pdm/mitooshi_pro_value_map.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-product">参考</span></div>
+      <h4>mitooshi Pro 価値マップ</h4>
+      <div class="desc">基本体験 → データ → 業務プロセス → ビジネス価値の4層フロー。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="../pdm/indirect_entry_design.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-product">機能</span><span class="pill">7章</span></div>
+      <h4>カリキュラム周辺からの間接侵入アイデア</h4>
+      <div class="desc">7つの侵入アイデア。サンドイッチ構造（朝＋切替＋振り返り）を推奨。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="../pdm/mitooshi_pro_experience_design.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-experience">体験</span><span class="pill">6章</span></div>
+      <h4>体験設計＋画面イメージ</h4>
+      <div class="desc">Step 1・3 のシーン×アクター×6画面モック。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="../pdm/kasan_data_output_spec.html" class="doc-card-link">
+      <div class="badge-row"><span class="pill cat-product">データ</span><span class="pill">7章</span></div>
+      <h4>加算別データ取得 × 出力ドキュメント仕様</h4>
+      <div class="desc">生データ → 出力帳票（実物モック）まで具体化。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+    <a href="../pdm/intermittent_use_design.html" class="doc-card-link" style="border-color: var(--mint);">
+      <div class="badge-row"><span class="pill cat-product" style="background:var(--mint);color:white;border-color:var(--mint);">★ 最新</span><span class="pill">7章</span></div>
+      <h4>触らない日問題：サンプリング型データ収集</h4>
+      <div class="desc">「毎日触る必要なし」の構造発見。5つのフォールバック設計。</div>
+      <div class="open">📄 開く →</div>
+    </a>
+  </div>
+</section>
+
+<footer>
+  作成：2026-04-29 ／ かめち × Claude Cowork mode<br>
+  すべてのドキュメントは <code>/mitooshi/business/</code> および <code>/mitooshi/pdm/</code> 配下に配置<br>
+  Option B（軽度向け加算戦略）採用版 ／ 単位数は令和6年改定後の値（要再確認）
+</footer>
+
+</main>
+</div>
+</body>
+</html>

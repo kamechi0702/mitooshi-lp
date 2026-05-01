@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>段階的加算協力ラダー ／ mitooshi Pro 進入戦略</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 240px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    font-size: 13px;
+    background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text);
+    text-decoration: none;
+    padding: 4px 8px;
+    display: block;
+    border-radius: 4px;
+    line-height: 1.4;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+
+  main { flex: 1; padding: 48px 56px; max-width: 940px; }
+  header.doc {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  header.doc .eyebrow {
+    color: var(--mint);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header.doc h1 {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  header.doc .lead { color: var(--text-sub); font-size: 15px; }
+
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  section h3 { font-size: 17px; font-weight: 700; margin: 24px 0 8px; }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* 質問への回答ボックス */
+  .qa {
+    background: var(--bg-alt);
+    border-left: 4px solid var(--blue);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .qa .q {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .qa .question {
+    font-size: 14px;
+    font-style: italic;
+    color: var(--text-sub);
+    margin-bottom: 10px;
+  }
+  .qa .a {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--mint-dark);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  /* ラダー */
+  .ladder {
+    margin: 24px 0;
+    position: relative;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 0;
+    margin-bottom: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .step .num-box {
+    background: var(--mint);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 8px;
+  }
+  .step .num-box .step-label {
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    opacity: 0.85;
+  }
+  .step .num-box .step-num {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .step .body { padding: 16px 20px; }
+  .step .body .name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .step .body .tagline { font-size: 12px; color: var(--mint-dark); margin-bottom: 12px; font-weight: 700; }
+  .step .body .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  .step .body .grid .col h5 {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-mute);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .step .body .grid .col ul { padding-left: 16px; margin: 0; }
+  .step .body .grid .col li { font-size: 12px; line-height: 1.5; margin: 2px 0; }
+  .step .body .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 11px;
+  }
+  .step .body .meta .tag {
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    color: var(--text-sub);
+  }
+  .step .body .meta .tag.kasan {
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+    border-color: var(--mint);
+  }
+  .step .body .meta .tag.cost {
+    background: var(--blue-soft);
+    color: var(--blue);
+    border-color: var(--blue);
+  }
+  .step .body .meta .tag.risk-low { background: #DCFCE7; color: #15803D; border-color: #15803D; }
+  .step .body .meta .tag.risk-mid { background: #FEF3C7; color: #B45309; border-color: #D97706; }
+  .step .body .meta .tag.risk-high { background: #FEE2E2; color: #B91C1C; border-color: #DC2626; }
+  .step.recommended { box-shadow: 0 0 0 2px var(--mint); }
+  .step.recommended .body { background: var(--mint-soft); }
+
+  /* マトリクス */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+  th, td {
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-alt);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-sub);
+  }
+  td.center { text-align: center; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* インサイト */
+  .insight {
+    background: var(--mint-soft);
+    border-left: 4px solid var(--mint);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .insight strong {
+    display: block;
+    color: var(--mint-dark);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .warn-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .warn-box strong { color: var(--warn); display: block; margin-bottom: 4px; }
+
+  /* 推奨経路 */
+  .path-recommended {
+    background: linear-gradient(135deg, var(--mint-soft) 0%, var(--blue-soft) 100%);
+    border: 2px solid var(--mint);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+  }
+  .path-recommended h3 { color: var(--mint-dark); margin-top: 0; }
+  .path-recommended .arrow {
+    text-align: center;
+    color: var(--mint);
+    font-size: 18px;
+    margin: 8px 0;
+  }
+  .path-recommended .step-mini {
+    background: white;
+    border-radius: 6px;
+    padding: 12px 16px;
+    border-left: 3px solid var(--mint);
+  }
+  .path-recommended .step-mini .label {
+    font-size: 10px;
+    color: var(--mint-dark);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  /* サイン用 */
+  .sign-modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .sign-mode {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px;
+    background: var(--bg);
+  }
+  .sign-mode h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .sign-mode .desc { font-size: 12px; color: var(--text-sub); }
+  .sign-mode.recommended { border-color: var(--mint); background: var(--mint-soft); }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 24px 20px; }
+    .step { grid-template-columns: 1fr; }
+    .step .body .grid { grid-template-columns: 1fr; }
+    .sign-modes { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#qa">3つの問いへの整理</a></li>
+    <li><a href="#why-gradual">1. なぜ段階導入か</a></li>
+    <li><a href="#ladder">2. 5段階ラダー</a></li>
+    <li><a href="#step1">　Step 1：家庭連携限定</a></li>
+    <li><a href="#step2">　Step 2：専門職立合記録</a></li>
+    <li><a href="#step3">　Step 3：個別ボード採用</a></li>
+    <li><a href="#step4">　Step 4：集中的支援</a></li>
+    <li><a href="#step5">　Step 5：フル運用</a></li>
+    <li><a href="#matrix">3. 比較マトリクス</a></li>
+    <li><a href="#sign">4. 電子署名の段階化</a></li>
+    <li><a href="#curriculum">5. カリキュラム×コメント構造</a></li>
+    <li><a href="#recommend">6. 推奨進入路</a></li>
+    <li><a href="#prd">7. PRDへの含意</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">mitooshi Pro ／ Go-to-Market 戦略</div>
+  <h1>段階的加算協力ラダー</h1>
+  <p class="lead">
+    フルスペックを最初から提供せず、<strong>5段階で徐々に加算根拠ドキュメントを担う</strong>進入戦略。
+    最初は影響範囲の狭い加算だけ、信頼が築けてから本丸（モニタリング・個別支援計画）へ。
+    Discovery と PoC を並列で回せるサイズ感に分解する。
+  </p>
+</header>
+
+<!-- ===================== 3つの問いへの整理 ===================== -->
+<section id="qa">
+  <h2><span class="num">▶</span>かめちの3つの問いへの整理</h2>
+
+  <div class="qa">
+    <div class="q">問い 1</div>
+    <div class="question">「カリキュラムをめくりでテンプレ化、そこに人間がコメントを記載していく流れか？」</div>
+    <div class="a">回答</div>
+    <p>
+      YES、ただし<strong>テンプレは2層に分ける</strong>。
+      <strong>カードライブラリ・シーンプリセット</strong>はテンプレOK（カリキュラム要素として再利用）。
+      <strong>記録ドキュメント本体</strong>はテンプレ提示しない（コピペ減算回避）。
+      めくり実績→観察タグ→所見、と3層で積層する設計。
+    </p>
+  </div>
+
+  <div class="qa">
+    <div class="q">問い 2</div>
+    <div class="question">「保護者のサインも電子化するイメージか？」</div>
+    <div class="a">回答</div>
+    <p>
+      電子と紙を<strong>選べる</strong>設計。療育業界の紙文化を尊重し、
+      「電子署名 OR 紙署名 + 写真アップ」のどちらでも有効に扱う。詳細は §4。
+    </p>
+  </div>
+
+  <div class="qa">
+    <div class="q">問い 3</div>
+    <div class="question">「もう少し段階的に加算に協力して入るパターンはないか？」</div>
+    <div class="a">回答</div>
+    <p>
+      ある。<strong>5段階のラダー</strong>として整理した。
+      Step 1（家庭連携限定）→ Step 2（専門職立合）→ Step 3（個別ボード）→ Step 4（集中的支援）→ Step 5（フル運用）。
+      各段階で独立した価値を提供し、施設の信頼度に応じて拡張する。本書のメインテーマ。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== なぜ段階導入か ===================== -->
+<section id="why-gradual">
+  <h2><span class="num">01</span>なぜ段階導入か</h2>
+  <p>前回の機能仕様（M1〜M5 ＋ 8 ドキュメント）はフルスペック。これを<strong>初日から</strong>提供すると以下のリスクがある。</p>
+  <ul>
+    <li><strong>導入意思決定のハードルが上がる</strong>：児発管が「全部置き換えるのか…」と身構える</li>
+    <li><strong>Discovery 検証の粒度が粗くなる</strong>：何が刺さって何が刺さらないか分離できない</li>
+    <li><strong>失敗時のダメージが大きい</strong>：1施設で滑ると業界内に悪評が立つ</li>
+    <li><strong>開発コストが先行して回収できない</strong>：Phase 1 で全機能を作る必要が出る</li>
+  </ul>
+  <p>
+    <strong>「狭く深く始めて、じわじわ拡げる」</strong>のが療育業界の信頼構築には合う。
+    各 Step は独立してビジネス価値を持ち、施設は <strong>そこで止まっても損をしない</strong>設計にする。
+  </p>
+</section>
+
+<!-- ===================== 5段階ラダー ===================== -->
+<section id="ladder">
+  <h2><span class="num">02</span>5段階の進入路ラダー</h2>
+  <p>各 Step は独立した契約・独立した価値で成立する。Step 1 だけで止めても OK、Step 5 まで進んでも OK の構造。</p>
+
+  <!-- Step 1 -->
+  <div class="step recommended" id="step1">
+    <div class="num-box">
+      <div class="step-label">STEP</div>
+      <div class="step-num">1</div>
+    </div>
+    <div class="body">
+      <div class="name">家庭連携限定モード</div>
+      <div class="tagline">★ toC × toB 連携で唯一無二、最も低リスクな入り口</div>
+      <p style="font-size:13px;color:var(--text-sub);">
+        家庭⇄施設の連携面談時のみ mitooshi を使う。家庭ですでに mitooshi（toC）を使っている保護者を持つ施設に提案。
+        児発管・職員の日常業務には触れない。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h5>提供機能</h5>
+          <ul>
+            <li>家庭側 toC mitooshi の使用ログ閲覧</li>
+            <li>面談時の画面共有・スクショ保存</li>
+            <li>家庭連携加算 面談記録 (Doc E)</li>
+            <li>「効いた／効かなかった」カードの可視化</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h5>対象加算</h5>
+          <ul>
+            <li>家庭連携加算（300〜1,000単位／回・月4回上限）</li>
+          </ul>
+          <h5>児発管・職員の負担</h5>
+          <ul>
+            <li>面談時のみ（月1〜4回）／30分以下</li>
+            <li>日常運用への侵食ゼロ</li>
+          </ul>
+        </div>
+      </div>
+      <div class="meta">
+        <span class="tag kasan">家庭連携加算</span>
+        <span class="tag cost">月額 1〜2万円</span>
+        <span class="tag risk-low">導入リスク：低</span>
+        <span class="tag">機能 M3 の一部のみ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step" id="step2">
+    <div class="num-box">
+      <div class="step-label">STEP</div>
+      <div class="step-num">2</div>
+    </div>
+    <div class="body">
+      <div class="name">専門職立合記録モード</div>
+      <div class="tagline">月数回のピンポイント利用、PT/OT/ST と児発管の関係構築</div>
+      <p style="font-size:13px;color:var(--text-sub);">
+        PT/OT/ST/心理職の立合時のみ mitooshi を使う。月4回×複数児童の専門的支援実施加算に集中。
+        児発管の通常業務は HUG のまま。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h5>提供機能</h5>
+          <ul>
+            <li>専門職ログイン認証（タブレット渡し方式）</li>
+            <li>立合時のカードセット使用ログ</li>
+            <li>専門的支援実施記録 (Doc B)</li>
+            <li>所見入力＋電子サイン</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h5>対象加算</h5>
+          <ul>
+            <li>専門的支援実施加算（150単位／回・月4回上限）</li>
+          </ul>
+          <h5>児発管・職員の負担</h5>
+          <ul>
+            <li>専門職立合時のみ／月4〜16回</li>
+            <li>記録時間が紙の半分目標</li>
+          </ul>
+        </div>
+      </div>
+      <div class="meta">
+        <span class="tag kasan">専門的支援実施加算</span>
+        <span class="tag cost">月額 2〜3万円</span>
+        <span class="tag risk-low">導入リスク：低</span>
+        <span class="tag">機能 M2 の一部 + M3</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step recommended" id="step3">
+    <div class="num-box">
+      <div class="step-label">STEP</div>
+      <div class="step-num">3</div>
+    </div>
+    <div class="body">
+      <div class="name">個別ボード採用モード</div>
+      <div class="tagline">★ Phase 1 PoC の本命、本来の見通しボードとしての価値発揮</div>
+      <p style="font-size:13px;color:var(--text-sub);">
+        ケアニーズの高い特定児童（3〜5名）の個別ボードとして mitooshi を採用。
+        日常の見通し提示ツールとして子どもが使い、職員が観察タグを付ける。
+        個別サポート加算Ⅰの日次証跡を自動生成。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h5>提供機能</h5>
+          <ul>
+            <li>子どもボード (M1) — 特定児童のみ</li>
+            <li>職員ペイン (M2) — 中断理由・観察タグ</li>
+            <li>個別サポート加算Ⅰ証跡 (Doc C)</li>
+            <li>日次サマリ (Doc A) — 該当児童のみ</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h5>対象加算</h5>
+          <ul>
+            <li>個別サポート加算Ⅰ（100単位／日）</li>
+            <li>強度行動障害児支援加算（155単位／日）</li>
+          </ul>
+          <h5>児発管・職員の負担</h5>
+          <ul>
+            <li>該当児童（3〜5名）のみ／日2分以内</li>
+            <li>その他児童は従来通り</li>
+          </ul>
+        </div>
+      </div>
+      <div class="meta">
+        <span class="tag kasan">個別サポートⅠ</span>
+        <span class="tag kasan">強度行動障害</span>
+        <span class="tag cost">月額 3〜4万円</span>
+        <span class="tag risk-mid">導入リスク：中</span>
+        <span class="tag">機能 M1 + M2 + M3 一部</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step" id="step4">
+    <div class="num-box">
+      <div class="step-label">STEP</div>
+      <div class="step-num">4</div>
+    </div>
+    <div class="body">
+      <div class="name">集中的支援モード</div>
+      <div class="tagline">強度行動障害児1〜2名向け、3か月レポートで効果検証</div>
+      <p style="font-size:13px;color:var(--text-sub);">
+        Step 3 のスコープを保ちつつ、特定児童の3か月集中支援プログラムを mitooshi の効果検証データで支える。
+        集中的支援加算（1,000単位／日・新設）の算定根拠を作る。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h5>提供機能</h5>
+          <ul>
+            <li>Step 3 のすべて</li>
+            <li>3か月効果検証レポート (Doc D)</li>
+            <li>行動データの時系列グラフ</li>
+            <li>事前比較期間との対比可視化</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h5>対象加算</h5>
+          <ul>
+            <li>集中的支援加算（1,000単位／日・月4回上限）</li>
+          </ul>
+          <h5>児発管・職員の負担</h5>
+          <ul>
+            <li>該当児童のみ／3か月の運用設計が必要</li>
+            <li>レポート所見記述は児発管 60〜90分</li>
+          </ul>
+        </div>
+      </div>
+      <div class="meta">
+        <span class="tag kasan">集中的支援加算</span>
+        <span class="tag cost">月額 4〜6万円</span>
+        <span class="tag risk-mid">導入リスク：中</span>
+        <span class="tag">機能 +ダッシュボード強化</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step" id="step5">
+    <div class="num-box">
+      <div class="step-label">STEP</div>
+      <div class="step-num">5</div>
+    </div>
+    <div class="body">
+      <div class="name">フル運用モード（モニタリング・個別支援計画）</div>
+      <div class="tagline">本丸：児発管の最重要業務を mitooshi でサポート</div>
+      <p style="font-size:13px;color:var(--text-sub);">
+        全児童を対象に mitooshi を運用。3か月モニタリング下書きと6か月個別支援計画見直し下書きを生成。
+        信頼が築けた施設のみ進める最終フェーズ。
+      </p>
+      <div class="grid">
+        <div class="col">
+          <h5>提供機能</h5>
+          <ul>
+            <li>子どもボード (M1) — 全児童</li>
+            <li>3か月モニタリング下書き (Doc F)</li>
+            <li>6か月個別支援計画見直し下書き (Doc G)</li>
+            <li>引継ぎ書 (Doc H) — 該当時</li>
+            <li>HUG 連携 CSV (M5)</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h5>対象加算</h5>
+          <ul>
+            <li>すべての加算の証跡として機能</li>
+            <li>モニタリング・計画書の質的要件担保</li>
+          </ul>
+          <h5>児発管・職員の負担</h5>
+          <ul>
+            <li>全児童／導入移行期は2か月程度の慣熟が必要</li>
+            <li>軌道に乗れば計画書作成時間が現状の半分</li>
+          </ul>
+        </div>
+      </div>
+      <div class="meta">
+        <span class="tag kasan">複数加算横断</span>
+        <span class="tag cost">月額 5〜10万円</span>
+        <span class="tag risk-high">導入リスク：高</span>
+        <span class="tag">フル機能</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 比較マトリクス ===================== -->
+<section id="matrix">
+  <h2><span class="num">03</span>5段階の比較マトリクス</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th class="center">Step 1</th>
+        <th class="center">Step 2</th>
+        <th class="center">Step 3</th>
+        <th class="center">Step 4</th>
+        <th class="center">Step 5</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>対象児童数</td>
+        <td class="center">面談時のみ</td>
+        <td class="center">専門職対応児</td>
+        <td class="center">3〜5名</td>
+        <td class="center">1〜2名（集中）</td>
+        <td class="center">全児童</td>
+      </tr>
+      <tr>
+        <td>主要対象加算</td>
+        <td>家庭連携</td>
+        <td>専門的支援実施</td>
+        <td>個別サポートⅠ／強度行動障害</td>
+        <td>集中的支援</td>
+        <td>すべて</td>
+      </tr>
+      <tr>
+        <td>児発管の関与</td>
+        <td class="center">面談時のみ</td>
+        <td class="center">サインのみ</td>
+        <td class="center">日次15分</td>
+        <td class="center">レポート確認</td>
+        <td class="center">フル</td>
+      </tr>
+      <tr>
+        <td>月額目安</td>
+        <td class="num">1〜2万円</td>
+        <td class="num">2〜3万円</td>
+        <td class="num">3〜4万円</td>
+        <td class="num">4〜6万円</td>
+        <td class="num">5〜10万円</td>
+      </tr>
+      <tr>
+        <td>収益改善ポテンシャル/月</td>
+        <td class="num">+3〜7万円</td>
+        <td class="num">+3〜6万円</td>
+        <td class="num">+5〜10万円</td>
+        <td class="num">+4〜10万円</td>
+        <td class="num">+10〜20万円</td>
+      </tr>
+      <tr>
+        <td>導入リスク</td>
+        <td class="center">低</td>
+        <td class="center">低</td>
+        <td class="center">中</td>
+        <td class="center">中</td>
+        <td class="center">高</td>
+      </tr>
+      <tr>
+        <td>Discovery 検証粒度</td>
+        <td class="center">小</td>
+        <td class="center">小</td>
+        <td class="center">中</td>
+        <td class="center">大</td>
+        <td class="center">最大</td>
+      </tr>
+      <tr>
+        <td>必要な機能モジュール</td>
+        <td class="center">M3 一部</td>
+        <td class="center">M2+M3</td>
+        <td class="center">M1+M2+M3</td>
+        <td class="center">+ダッシュボード</td>
+        <td class="center">M1〜M5 全部</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:var(--text-mute);">
+    ※ 収益改善ポテンシャルは取りこぼし率改善を仮定した試算。実数値は Discovery 検証で確定する。
+  </p>
+</section>
+
+<!-- ===================== 電子署名 ===================== -->
+<section id="sign">
+  <h2><span class="num">04</span>電子署名の段階化</h2>
+  <p>保護者サインは <strong>3 つのモードを選択可能</strong>にする。施設の文化に応じて使い分け。</p>
+  <div class="sign-modes">
+    <div class="sign-mode recommended">
+      <h4>① 紙署名 + 写真アップ</h4>
+      <div class="desc">
+        計画書を印刷 → 保護者が署名 → スマホで写真撮影 → mitooshi に紐付け保存。
+        現状の運用を尊重。<strong>推奨デフォルト</strong>。
+      </div>
+    </div>
+    <div class="sign-mode">
+      <h4>② タブレット手書きサイン</h4>
+      <div class="desc">
+        面談時にタブレット画面に直接署名。SVG として保存し、印刷時に再現。
+        紙→電子の中間形態。
+      </div>
+    </div>
+    <div class="sign-mode">
+      <h4>③ 電子署名（DocuSign 的）</h4>
+      <div class="desc">
+        メールリンクから保護者が遠隔署名。タイムスタンプ付き。
+        Phase 5 以降の選択肢として用意。
+      </div>
+    </div>
+  </div>
+  <div class="insight">
+    <strong>原則</strong>
+    <p>
+      <strong>「紙か電子か」を施設が選べる</strong>。電子強要しない。
+      ただしどのモードでも mitooshi 内に証跡として保存される。
+      実地指導での提示にはどれも有効。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== カリキュラム×コメント構造 ===================== -->
+<section id="curriculum">
+  <h2><span class="num">05</span>カリキュラム × コメント の3層構造</h2>
+  <p>「テンプレ＋人間コメント」の理解は正しいが、テンプレを<strong>2つの場所に分けて</strong>持つ。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:200px;">層</th>
+        <th>テンプレ提示</th>
+        <th>具体物</th>
+        <th>誰が触る</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>カードライブラリ</strong></td>
+        <td class="center">あり（推奨）</td>
+        <td>「手洗い」「連絡帳」「席につく」など共通カード</td>
+        <td>運営（mitooshi）／施設管理者</td>
+      </tr>
+      <tr>
+        <td><strong>シーンプリセット</strong></td>
+        <td class="center">あり（推奨）</td>
+        <td>「登園シーン」「帰宅シーン」など定型カード組</td>
+        <td>施設管理者／児発管</td>
+      </tr>
+      <tr>
+        <td><strong>個別ボード</strong></td>
+        <td class="center">プリセットから個別調整</td>
+        <td>本児専用のカード組合せ</td>
+        <td>児発管／職員</td>
+      </tr>
+      <tr>
+        <td><strong>めくり実績</strong></td>
+        <td class="center">−（自動生成）</td>
+        <td>誰が・いつ・何回めくったかの記録</td>
+        <td>子ども（自発）／職員（補助）</td>
+      </tr>
+      <tr>
+        <td><strong>観察タグ</strong></td>
+        <td class="center">5択以内</td>
+        <td>中断理由・観察カテゴリ</td>
+        <td>職員（1タップ）</td>
+      </tr>
+      <tr>
+        <td><strong>所見テキスト</strong></td>
+        <td class="center"><strong>なし（重要）</strong></td>
+        <td>本児固有の言語化</td>
+        <td>児発管（自由記述）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight">
+    <strong>テンプレ非提示の哲学</strong>
+    <p>
+      上から3層（カード／シーン／個別ボード）はテンプレでOK。<strong>めくり実績</strong>は自動生成。
+      <strong>観察タグ</strong>は5択。だが <strong>所見テキスト</strong>はテンプレ提示しない。
+      代わりに本児固有の過去データを横にチラ見せして書きやすくする。
+      これがコピペ減算回避と個別性担保の両立。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 推奨進入路 ===================== -->
+<section id="recommend">
+  <h2><span class="num">06</span>推奨進入路</h2>
+
+  <div class="path-recommended">
+    <h3>★ Step 1 → Step 3 → Step 5 の3ホップ進入</h3>
+    <p style="margin-bottom:14px;">
+      Step 2（専門職立合）と Step 4（集中的支援）は<strong>オプション機能</strong>として後付け提供する。
+      メインルートは「家庭連携 → 個別ボード → フル運用」の3ステップ。
+    </p>
+
+    <div class="step-mini">
+      <div class="label">PHASE 1：3〜6か月</div>
+      <strong>Step 1：家庭連携限定モード</strong>
+      <p style="margin:6px 0 0; font-size:13px; color:var(--text-sub);">
+        toC mitooshi のヘビーユーザー保護者を持つ施設に「家庭連携面談時の支援ツール」として提案。
+        月1〜2万円。ROI は家庭連携加算の月4回フル算定で月3〜7万円改善。
+        <strong>導入意思決定が軽い</strong>のが最大の強み。Discovery 検証もここで回す。
+      </p>
+    </div>
+    <div class="arrow">▼</div>
+    <div class="step-mini">
+      <div class="label">PHASE 2：6〜12か月後</div>
+      <strong>Step 3：個別ボード採用モード</strong>
+      <p style="margin:6px 0 0; font-size:13px; color:var(--text-sub);">
+        Step 1 で信頼ができた施設に提案拡張。「ケアニーズが高い3〜5名の個別ボード化」。
+        月3〜4万円。本来の見通しボードとしての価値発揮。
+        <strong>子どもボード機能が初めて施設で稼働</strong>するのもここ。差別化価値の証明場面。
+      </p>
+    </div>
+    <div class="arrow">▼</div>
+    <div class="step-mini">
+      <div class="label">PHASE 3：12か月以降</div>
+      <strong>Step 5：フル運用モード</strong>
+      <p style="margin:6px 0 0; font-size:13px; color:var(--text-sub);">
+        Step 3 で半年以上稼働して信頼が固まった施設のみ。「モニタリングと個別支援計画見直しも mitooshi で」。
+        月5〜10万円。ここまで来ると<strong>抜けにくい状態</strong>になる。
+        Step 2・4 はサイドオプションとして提供（必要な施設のみ）。
+      </p>
+    </div>
+  </div>
+
+  <h3>なぜこの順序か</h3>
+  <ol>
+    <li><strong>導入抵抗の階段が滑らか</strong>：日常業務への侵食が Step 1 ＝ゼロ → Step 3 ＝ 一部児童 → Step 5 ＝ 全児童 と段階的</li>
+    <li><strong>失敗時のリカバリー可能</strong>：Step 1 で合わなければ撤退コストが小さい。Step 3 で躓いてもStep 5 までは行かなくていい</li>
+    <li><strong>差別化価値の証明順序が論理的</strong>：toC×toB（独自）→ 子どもが触る（独自）→ 全体運用（フル）</li>
+    <li><strong>営業の言いやすさ</strong>：「家庭連携面談だけまず使ってみませんか」は導入意思決定が軽い</li>
+    <li><strong>開発リソース配分が現実的</strong>：Phase 1 は M3 の家庭連携機能のみ作ればよい</li>
+  </ol>
+
+  <div class="warn-box">
+    <strong>注意：Step を飛ばさない</strong>
+    Step 3 から始めたい施設も出るかもしれないが、信頼関係なしで子どもボード導入はリスクが大きい。
+    まず Step 1 で運用文化を理解してもらう。Step 1 が「お互いを知る期間」として機能する。
+  </div>
+</section>
+
+<!-- ===================== PRDへの含意 ===================== -->
+<section id="prd">
+  <h2><span class="num">07</span>PRD_v3 への含意</h2>
+  <p>段階導入を採るなら、PRD_v3 の構成も組み直す必要がある。</p>
+
+  <h3>機能モジュールを Step 単位で分割</h3>
+  <ul>
+    <li><strong>Phase 1 開発スコープ：</strong> Step 1 のみ — M3（家庭連携機能）＋ Doc E（家庭連携加算記録）</li>
+    <li><strong>Phase 2 開発スコープ：</strong> Step 3 — M1（子どもボード）＋ M2（職員ペイン）＋ Doc A・C</li>
+    <li><strong>Phase 3 開発スコープ：</strong> Step 5 — Doc F・G・M5（CSV連携）</li>
+    <li><strong>Phase 2.5 / 4 開発スコープ：</strong> Step 2・4 のオプション機能</li>
+  </ul>
+
+  <h3>料金体系の組み直し</h3>
+  <ul>
+    <li>「Step ベースのアラカルト料金」が現実的</li>
+    <li>Step 1 のみ：月 1〜2万円</li>
+    <li>Step 1 + 3：月 3〜4万円</li>
+    <li>Step 1 + 3 + 5：月 5〜8万円</li>
+    <li>+ オプション（Step 2・4）：それぞれ +1〜2万円</li>
+  </ul>
+
+  <h3>Discovery インタビューも段階化</h3>
+  <ul>
+    <li><strong>Step 1 Discovery：</strong> toC ヘビーユーザー保護者を持つ施設、家庭連携の悩み</li>
+    <li><strong>Step 3 Discovery：</strong> ケアニーズ高い児童の個別対応の悩み、個別性記録の壁</li>
+    <li><strong>Step 5 Discovery：</strong> 計画書作成の時間負担、コピペ疑い指摘の経験</li>
+  </ul>
+
+  <div class="insight">
+    <strong>戦略的ベネフィット</strong>
+    <p>
+      段階導入で <strong>Phase 1 の開発コストが大幅に縮小</strong>する。
+      M3 の家庭連携機能 + Doc E のみで Step 1 を提供開始できる。3〜5施設のPoCを<strong>3〜4か月</strong>で回せる。
+      フルスペックを最初から作るより、<strong>開発期間 ⅓・初期投資 ⅓</strong> で市場検証に入れる。
+    </p>
+  </div>
+</section>
+
+<footer>
+  作成：2026-04-29 ／ 関連：mitooshi_pro_feature_spec.html, competitive_kasan_map.html, kasan_evidence_map.html<br>
+  本書は段階導入戦略の素案。Discovery 検証を経て、各 Step の境界・料金・機能を確定する。
+</footer>
+
+</main>
+</div>
+</body>
+</html>

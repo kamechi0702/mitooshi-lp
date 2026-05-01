@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mitooshi Pro 体験設計＋画面イメージ</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --yellow: #FFE082;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 240px; flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    font-size: 13px; background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text); text-decoration: none;
+    padding: 4px 8px; display: block; border-radius: 4px; line-height: 1.4;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+  aside.toc .sub { padding-left: 14px; font-size: 12px; color: var(--text-sub); }
+
+  main { flex: 1; padding: 48px 56px; max-width: 940px; }
+  header.doc {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px; margin-bottom: 40px;
+  }
+  header.doc .eyebrow {
+    color: var(--mint); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  header.doc h1 {
+    font-size: 28px; font-weight: 700; line-height: 1.3; margin-bottom: 8px;
+  }
+  header.doc .lead { color: var(--text-sub); font-size: 15px; }
+
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 22px; font-weight: 700; margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint); font-size: 14px; font-weight: 700;
+  }
+  section h3 { font-size: 17px; font-weight: 700; margin: 24px 0 8px; }
+  section p { margin-bottom: 12px; }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* アクター紹介 */
+  .actors {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .actor-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    background: var(--bg);
+  }
+  .actor-card .icon {
+    width: 48px; height: 48px; margin: 0 auto 8px;
+    background: var(--mint-soft);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--mint-dark);
+  }
+  .actor-card.child .icon { background: var(--mint-soft); color: var(--mint-dark); }
+  .actor-card.parent .icon { background: var(--pink-soft); color: #B85555; }
+  .actor-card.staff .icon { background: var(--blue-soft); color: var(--blue); }
+  .actor-card.mgr .icon { background: var(--warn-soft); color: var(--warn); }
+  .actor-card .name { font-size: 13px; font-weight: 700; }
+  .actor-card .role { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
+
+  /* シーン体験フロー表 */
+  .scene-flow {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin: 16px 0;
+    overflow: hidden;
+  }
+  .scene-row {
+    display: grid;
+    grid-template-columns: 100px repeat(5, 1fr);
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+  }
+  .scene-row:last-child { border-bottom: none; }
+  .scene-row.header {
+    background: var(--bg-alt);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .scene-row > div {
+    padding: 12px 10px;
+    border-right: 1px solid var(--line);
+    line-height: 1.5;
+  }
+  .scene-row > div:last-child { border-right: none; }
+  .scene-row .scene-label {
+    background: var(--mint-soft);
+    color: var(--mint-dark);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .scene-row .scene-label .num {
+    font-size: 10px; opacity: 0.7; margin-bottom: 2px;
+  }
+  .scene-row .psyche {
+    background: #FFF8E1;
+    color: #B45309;
+    font-style: italic;
+  }
+  .scene-row .psyche .label {
+    font-size: 9px; font-style: normal; font-weight: 700;
+    color: #B45309; opacity: 0.7; margin-top: 4px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  /* スクリーンモック */
+  .screen-mock {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin: 20px 0;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .screen-mock .mock-head {
+    padding: 12px 16px;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .screen-mock .mock-head .title {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .screen-mock .mock-head .device {
+    font-size: 11px;
+    background: var(--mint);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .screen-mock .mock-body {
+    padding: 16px;
+    background: linear-gradient(180deg, var(--bg-alt) 0%, var(--bg) 100%);
+  }
+
+  /* タブレット風モック（子どもボード） */
+  .device-tablet {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    border: 8px solid #2C3E50;
+    padding: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .device-tablet .tab-header {
+    background: var(--mint);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .device-tablet .tab-header .name { font-size: 13px; font-weight: 700; }
+  .device-tablet .tab-header .scene { font-size: 10px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 8px; }
+  .device-tablet .card-stack { padding: 10px 0; }
+  .device-tablet .card {
+    background: var(--mint-soft);
+    border: 2px solid var(--mint);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 8px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--mint-dark);
+    font-weight: 700;
+  }
+  .device-tablet .card.next {
+    background: var(--bg-alt);
+    border-color: var(--line);
+    color: var(--text-mute);
+    font-weight: 400;
+    font-size: 12px;
+  }
+  .device-tablet .card.current {
+    box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3);
+    transform: translateY(-2px);
+  }
+  .device-tablet .card-icon {
+    font-size: 32px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .device-tablet .swipe-hint {
+    text-align: center;
+    color: var(--text-mute);
+    font-size: 10px;
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  /* PiP 職員ペイン */
+  .device-pip {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    background: white;
+    border: 2px dashed var(--blue);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .device-pip .pip-head {
+    font-size: 11px;
+    color: var(--blue);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .device-pip .pip-tags {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .device-pip .pip-tag {
+    background: var(--blue-soft);
+    color: var(--blue);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    border: 1px solid var(--blue);
+  }
+  .device-pip .pip-tag.active {
+    background: var(--blue);
+    color: white;
+  }
+  .device-pip .pip-voice {
+    margin-top: 8px;
+    background: var(--bg-alt);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: var(--text-sub);
+    text-align: center;
+  }
+
+  /* 児発管ダッシュボード */
+  .device-pc {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .device-pc .pc-head {
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--line);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+  .device-pc .pc-body {
+    padding: 14px;
+  }
+  .device-pc .child-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 12px;
+  }
+  .device-pc .child-list { font-size: 12px; }
+  .device-pc .child-list .ci {
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin: 4px 0;
+    cursor: pointer;
+    border: 1px solid var(--line);
+  }
+  .device-pc .child-list .ci.active {
+    background: var(--mint-soft);
+    border-color: var(--mint);
+    color: var(--mint-dark);
+    font-weight: 700;
+  }
+  .device-pc .child-list .ci .alert {
+    font-size: 9px;
+    color: white;
+    background: var(--warn);
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 4px;
+  }
+  .device-pc .child-detail h4 {
+    font-size: 14px; margin-bottom: 8px;
+  }
+  .device-pc .data-card {
+    background: var(--bg-alt);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin: 6px 0;
+    font-size: 11px;
+  }
+  .device-pc .data-card .label {
+    font-size: 9px; color: var(--text-mute);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .device-pc .data-card .value {
+    font-size: 16px; font-weight: 700; color: var(--mint-dark);
+  }
+  .device-pc .graph {
+    background: linear-gradient(180deg, var(--mint-soft) 0%, transparent 100%);
+    height: 50px;
+    border-bottom: 2px solid var(--mint);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    margin-top: 6px;
+  }
+  .device-pc .graph::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 100%;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' preserveAspectRatio='none'><polyline points='0,40 15,35 30,28 45,22 60,18 75,12 90,8 100,5' fill='none' stroke='%2300876d' stroke-width='2'/></svg>") no-repeat;
+    background-size: 100% 100%;
+  }
+
+  /* 家庭側 mitooshi */
+  .device-phone {
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+    background: white;
+    border: 8px solid #2C3E50;
+    border-radius: 24px;
+    padding: 12px;
+  }
+  .device-phone .phone-head {
+    background: linear-gradient(135deg, var(--mint) 0%, var(--blue) 100%);
+    color: white;
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .device-phone .scene-pill {
+    background: var(--bg-alt);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    text-align: center;
+    margin-bottom: 8px;
+    color: var(--text-sub);
+  }
+
+  /* 面談画面 */
+  .device-meeting {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .device-meeting .meeting-head {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+  .device-meeting .meeting-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .device-meeting .panel {
+    background: var(--bg-alt);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+  }
+  .device-meeting .panel .label {
+    font-size: 9px;
+    color: var(--text-mute);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .device-meeting .panel .item {
+    background: white;
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin: 4px 0;
+    border-left: 3px solid var(--mint);
+  }
+  .device-meeting .panel .item.no { border-left-color: #DC2626; }
+
+  /* ドキュメント生成画面 */
+  .doc-gen {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .doc-gen .doc-head {
+    background: var(--mint);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .doc-gen .doc-section {
+    margin: 8px 0;
+    padding: 8px 10px;
+    border-left: 3px solid var(--mint);
+    background: var(--bg-alt);
+    border-radius: 0 4px 4px 0;
+    font-size: 11px;
+  }
+  .doc-gen .doc-section.auto { border-left-color: var(--mint); }
+  .doc-gen .doc-section.semi { border-left-color: var(--blue); }
+  .doc-gen .doc-section.hand { border-left-color: var(--warn); }
+  .doc-gen .doc-section .tag {
+    display: inline-block;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    background: white;
+  }
+  .doc-gen .doc-section.auto .tag { color: var(--mint-dark); border: 1px solid var(--mint); }
+  .doc-gen .doc-section.semi .tag { color: var(--blue); border: 1px solid var(--blue); }
+  .doc-gen .doc-section.hand .tag { color: var(--warn); border: 1px solid var(--warn); }
+  .doc-gen .doc-section .content { color: var(--text); line-height: 1.5; }
+  .doc-gen .doc-section .placeholder {
+    color: var(--text-mute);
+    font-style: italic;
+  }
+
+  /* インサイト */
+  .insight {
+    background: var(--mint-soft);
+    border-left: 4px solid var(--mint);
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 4px;
+  }
+  .insight strong {
+    display: block;
+    color: var(--mint-dark);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* シーンヘッダー */
+  .scene-header {
+    margin: 32px 0 12px;
+    padding: 12px 16px;
+    background: linear-gradient(90deg, var(--mint-soft) 0%, transparent 100%);
+    border-left: 4px solid var(--mint);
+    border-radius: 0 4px 4px 0;
+  }
+  .scene-header .sn {
+    font-size: 10px;
+    color: var(--mint-dark);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .scene-header h4 {
+    font-size: 18px;
+    margin: 4px 0 0;
+    color: var(--text);
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 24px 20px; }
+    .actors { grid-template-columns: 1fr 1fr; }
+    .scene-row { grid-template-columns: 1fr; }
+    .device-pc .child-grid { grid-template-columns: 1fr; }
+    .device-meeting .meeting-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#intro">はじめに</a></li>
+    <li><a href="#actors">アクター</a></li>
+    <li><a href="#step1-flow">Step 1：家庭連携の体験フロー</a>
+      <ul>
+        <li class="sub"><a href="#s1-1">家庭で使う</a></li>
+        <li class="sub"><a href="#s1-2">気づき</a></li>
+        <li class="sub"><a href="#s1-3">面談前</a></li>
+        <li class="sub"><a href="#s1-4">面談中</a></li>
+        <li class="sub"><a href="#s1-5">合意・実践</a></li>
+      </ul>
+    </li>
+    <li><a href="#step3-flow">Step 3：個別ボードの体験フロー</a>
+      <ul>
+        <li class="sub"><a href="#s3-1">準備</a></li>
+        <li class="sub"><a href="#s3-2">登園</a></li>
+        <li class="sub"><a href="#s3-3">個別療育</a></li>
+        <li class="sub"><a href="#s3-4">観察</a></li>
+        <li class="sub"><a href="#s3-5">振り返り</a></li>
+      </ul>
+    </li>
+    <li><a href="#screens">画面イメージ集</a>
+      <ul>
+        <li class="sub"><a href="#sc-child">① 子どもボード</a></li>
+        <li class="sub"><a href="#sc-staff">② 職員ペイン</a></li>
+        <li class="sub"><a href="#sc-mgr">③ 児発管ダッシュボード</a></li>
+        <li class="sub"><a href="#sc-meet">④ 面談画面</a></li>
+        <li class="sub"><a href="#sc-doc">⑤ ドキュメント生成</a></li>
+        <li class="sub"><a href="#sc-home">⑥ 家庭側 mitooshi</a></li>
+      </ul>
+    </li>
+    <li><a href="#handoff">アクター間ハンドオフ</a></li>
+    <li><a href="#prd-impl">実装メモ</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">mitooshi Pro ／ Experience Design v0.1</div>
+  <h1>体験設計＋画面イメージ</h1>
+  <p class="lead">
+    Step 1（家庭連携限定）と Step 3（個別ボード採用）の体験フローを、
+    シーン×アクター×画面イメージで具体化する。
+    ここまでのリサーチを「実際の運用シーン」に落とし込み、Discovery と PoC で検証可能な粒度にする。
+  </p>
+</header>
+
+<!-- ===================== はじめに ===================== -->
+<section id="intro">
+  <h2><span class="num">▶</span>はじめに</h2>
+  <p>
+    本書は <a href="../business/gradual_kasan_entry.html">段階的加算協力ラダー</a> の Step 1 と Step 3 を、
+    <a href="./mitooshi_pro_feature_spec.html">機能仕様</a>と整合させながら、
+    <strong>具体的な運用シーン</strong>と <strong>画面イメージ</strong>に翻訳したもの。
+  </p>
+  <p>
+    Step 2（専門職立合）と Step 4（集中的支援）は Step 3 のバリエーションとして派生するため、本書では割愛する。
+    Step 5（フル運用）は信頼が築けた施設での運用なので、Step 3 が動けば自然に拡張される構造。
+  </p>
+  <div class="insight">
+    <strong>体験設計の前提</strong>
+    <p>
+      ① 子どもの操作主体（自発／補助）を <strong>UI で意図的に区別</strong>する。<br>
+      ② 職員のタップは <strong>1日累計2分以内</strong>を死守する。<br>
+      ③ 児発管の所見入力 UI は <strong>テンプレ提示しない</strong>。<br>
+      ④ 保護者には <strong>連絡帳のような温度感</strong>を残す（「アプリの通知」にしない）。
+    </p>
+  </div>
+</section>
+
+<!-- ===================== アクター ===================== -->
+<section id="actors">
+  <h2><span class="num">01</span>アクターと役割</h2>
+  <div class="actors">
+    <div class="actor-card child">
+      <div class="icon">👶</div>
+      <div class="name">子ども</div>
+      <div class="role">3〜小学校低学年／軽度ASD・ADHD</div>
+    </div>
+    <div class="actor-card parent">
+      <div class="icon">👨‍👩‍👧</div>
+      <div class="name">保護者</div>
+      <div class="role">主に母親／声かけ疲れ</div>
+    </div>
+    <div class="actor-card staff">
+      <div class="icon">👩‍🏫</div>
+      <div class="name">職員</div>
+      <div class="role">児童指導員／保育士</div>
+    </div>
+    <div class="actor-card mgr">
+      <div class="icon">👨‍💼</div>
+      <div class="name">児発管</div>
+      <div class="role">児童発達支援管理責任者</div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--text-mute);">
+    ※ 専門職（PT/OT/ST/心理）は Step 2 のオプション機能として登場。本書では割愛。
+  </p>
+</section>
+
+<!-- ===================== Step 1 体験フロー ===================== -->
+<section id="step1-flow">
+  <h2><span class="num">02</span>Step 1：家庭連携の体験フロー</h2>
+  <p>
+    家庭で mitooshi（toC）をすでに使っている保護者と施設をつなぐ。
+    施設側は<strong>家庭連携加算の面談時のみ</strong> mitooshi Pro を使う。日常業務には侵食しない。
+  </p>
+
+  <h3>シーン×アクター 一覧表</h3>
+  <div class="scene-flow">
+    <div class="scene-row header">
+      <div>シーン</div>
+      <div>顧客心理（保護者）</div>
+      <div>子ども</div>
+      <div>保護者</div>
+      <div>児発管</div>
+      <div>mitooshi</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 1</div>家庭で使う</div>
+      <div class="psyche">「朝は時間がない…<br>ボードあると助かる」<div class="label">日常の頼れる相棒</div></div>
+      <div>朝の支度カードをめくる<br>「つぎは くつ」</div>
+      <div>子どもと一緒にカードを並べる<br>声かけ最小化</div>
+      <div>—</div>
+      <div><strong>めくりログを家庭側に蓄積</strong>／クラウドに同期</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 2</div>気づき</div>
+      <div class="psyche">「最近 〇〇 が苦手みたい、相談したい」<div class="label">専門家への相談欲求</div></div>
+      <div>—</div>
+      <div>「効いた」「効かなかった」を<strong>1タップで反応マーク</strong></div>
+      <div>—</div>
+      <div>反応マークを蓄積／<strong>面談議題候補</strong>を生成</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 3</div>面談予約</div>
+      <div class="psyche">「先生に相談する時間とりたい」<div class="label">行動への移行</div></div>
+      <div>—</div>
+      <div>mitooshi 内から面談リクエスト</div>
+      <div>面談スケジュール承諾／<strong>事前データを確認</strong></div>
+      <div>家庭の使用ログを児発管側にも展開</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 4</div>面談中</div>
+      <div class="psyche">「具体的に話せる、自分が見ていたものを共有できる」<div class="label">相互理解の高まり</div></div>
+      <div>—</div>
+      <div>家庭での反応データを<strong>画面共有</strong>／具体的な相談</div>
+      <div>「効かなかったカード」を一緒に見る／代替案を提示</div>
+      <div><strong>面談画面でデータを並列表示</strong>／スクショ自動保存</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 5</div>合意・実践</div>
+      <div class="psyche">「次に試すことが具体的に決まった」<div class="label">前向きな行動可能感</div></div>
+      <div>新しいカード組合せを試す</div>
+      <div>合意事項を確認／署名</div>
+      <div>所見記述／<strong>家庭連携加算記録ドラフトを確認・確定</strong></div>
+      <div>家庭連携加算記録 (Doc E) を自動生成 → 児発管がレビュー</div>
+    </div>
+  </div>
+
+  <!-- シーン詳細 -->
+  <div id="s1-1" class="scene-header">
+    <div class="sn">SCENE 1</div>
+    <h4>家庭で使う</h4>
+  </div>
+  <p>
+    保護者が朝の支度・出かける前・寝る前など日常のシーンで mitooshi（toC）を使う。
+    子どもがカードをめくり、保護者は<strong>声かけを最小化</strong>できることに価値を感じる。
+    施設側はまだ介入しない。<strong>蓄積されるデータが信頼の素材</strong>になる。
+  </p>
+
+  <div id="s1-2" class="scene-header">
+    <div class="sn">SCENE 2</div>
+    <h4>気づき</h4>
+  </div>
+  <p>
+    保護者が「このカードが効いた」「逆に効かなかった」を <strong>1タップで反応マーク</strong>する。
+    深い記述は不要。マークだけ。
+    mitooshi がこれを蓄積し、<strong>「面談議題候補」</strong>を自動でリスト化しておく。
+  </p>
+
+  <div id="s1-3" class="scene-header">
+    <div class="sn">SCENE 3 〜 4</div>
+    <h4>面談前 → 面談中</h4>
+  </div>
+  <p>
+    児発管が <strong>面談前に5分</strong>で家庭の使用データを確認できる。
+    面談中は画面共有しながら<strong>「効かなかったカード」をテーマに具体的議論</strong>。
+    保護者の<strong>「先生がちゃんと見てくれている」感</strong>が信頼を生む。
+  </p>
+  <p style="font-size:13px;color:var(--text-sub);">
+    ※ 競合 SaaS では「保護者連絡」は文字メッセージのみで、こうしたデータ連携面談は構造的にできない。
+  </p>
+
+  <div id="s1-5" class="scene-header">
+    <div class="sn">SCENE 5</div>
+    <h4>合意・実践</h4>
+  </div>
+  <p>
+    新しいカード組み合わせ・対応方針を合意し、保護者署名。
+    <strong>家庭連携加算 面談記録（Doc E）が自動でドラフト生成</strong>され、児発管が15分以内で確認・確定できる。
+    実施後、保護者は新しい方針を家庭で試し、結果がまた次回面談の議題に。
+  </p>
+</section>
+
+<!-- ===================== Step 3 体験フロー ===================== -->
+<section id="step3-flow">
+  <h2><span class="num">03</span>Step 3：個別ボードの体験フロー</h2>
+  <p>
+    ケアニーズが高い児童（3〜5名）に mitooshi の個別ボードを採用。
+    日常の見通し提示ツールとして子どもが使い、職員が観察タグを付ける。
+    <strong>個別サポート加算Ⅰと強度行動障害児支援加算</strong>の日次証跡が自動生成される。
+  </p>
+
+  <h3>シーン×アクター 一覧表</h3>
+  <div class="scene-flow">
+    <div class="scene-row header">
+      <div>シーン</div>
+      <div>顧客心理（児童）</div>
+      <div>子ども</div>
+      <div>職員</div>
+      <div>児発管</div>
+      <div>mitooshi</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 1</div>準備</div>
+      <div class="psyche">—</div>
+      <div>—</div>
+      <div>朝、対象児の<strong>個別ボードを確認</strong>／前日のフォロータグをチェック</div>
+      <div>—</div>
+      <div>前日の中断児童に<strong>フォロータグ自動付与</strong></div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 2</div>登園</div>
+      <div class="psyche">「いつもと同じ流れ、安心」<div class="label">予測可能性の獲得</div></div>
+      <div>個別ボードを開く／<strong>カードを自分でめくる</strong></div>
+      <div>そばで見守り／必要時のみ補助</div>
+      <div>—</div>
+      <div><strong>操作主体（自発／補助）を自動判定</strong>／所要時間記録</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 3</div>個別療育</div>
+      <div class="psyche">「次にすること わかる」<div class="label">主体的参加</div></div>
+      <div>個別シーンのカード列を進める</div>
+      <div>カード設計を即時調整／反応を観察</div>
+      <div>—</div>
+      <div>カード列＝個別支援の証跡として記録</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 4</div>観察</div>
+      <div class="psyche">—</div>
+      <div>離席・パニックなど反応</div>
+      <div><strong>1タップで中断理由を記録</strong>／音声10秒メモ（任意）</div>
+      <div>—</div>
+      <div>観察タグを記録／<strong>強度行動障害児支援加算</strong>の根拠ログに紐付け</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 5</div>振り返り</div>
+      <div class="psyche">—</div>
+      <div>—</div>
+      <div>—</div>
+      <div>15分でダッシュボード確認／<strong>気になる子3名を特定</strong></div>
+      <div>日次サマリ／<strong>個別サポート加算Ⅰ証跡</strong>を自動出力</div>
+    </div>
+    <div class="scene-row">
+      <div class="scene-label"><div class="num">SCENE 6</div>記録</div>
+      <div class="psyche">—</div>
+      <div>—</div>
+      <div>—</div>
+      <div>必要児童のみ追加メモ（音声 or 紙写真アップ）</div>
+      <div>HUG 連携 CSV を翌朝出力／請求担当に通知</div>
+    </div>
+  </div>
+
+  <!-- シーン詳細 -->
+  <div id="s3-1" class="scene-header">
+    <div class="sn">SCENE 1</div>
+    <h4>準備（朝）</h4>
+  </div>
+  <p>
+    職員が対象児（3〜5名）の個別ボードを確認。前日の中断児童には<strong>フォロータグが自動付与</strong>されている。
+    「今日は B くんに気をつけよう」が朝の準備で見える。
+  </p>
+
+  <div id="s3-2" class="scene-header">
+    <div class="sn">SCENE 2 〜 3</div>
+    <h4>登園 → 個別療育</h4>
+  </div>
+  <p>
+    対象児が個別ボードを開き、<strong>自分でカードをめくる</strong>。
+    操作の押下圧・速さ・タッチパターンから自発／補助を自動判定。
+    職員は隣で見守り、必要時のみ補助。<strong>「子どもが触る」が独自データの源泉</strong>。
+  </p>
+
+  <div id="s3-4" class="scene-header">
+    <div class="sn">SCENE 4</div>
+    <h4>観察</h4>
+  </div>
+  <p>
+    パニック・離席・興味薄れ・眠気・他、5択から職員が <strong>1タップで中断理由を記録</strong>。
+    迷うときは<strong>音声10秒メモ</strong>に逃がす（後でテキスト化）。
+    強度行動障害児支援加算の根拠データに自動紐付け。
+  </p>
+
+  <div id="s3-5" class="scene-header">
+    <div class="sn">SCENE 5 〜 6</div>
+    <h4>振り返り → 記録</h4>
+  </div>
+  <p>
+    児発管がダッシュボードで <strong>15分</strong>で全対象児の日次サマリを俯瞰。
+    気になる子3名を特定し、必要に応じて追加メモ。
+    紙メモは写真アップで mitooshi に紐付け（OCRで日付児童名自動推定）。
+  </p>
+</section>
+
+<!-- ===================== 画面イメージ ===================== -->
+<section id="screens">
+  <h2><span class="num">04</span>画面イメージ集</h2>
+  <p>主要6画面の構成イメージ。実装時のデザイン指針として使う。</p>
+
+  <!-- 1. 子どもボード -->
+  <div class="screen-mock" id="sc-child">
+    <div class="mock-head">
+      <span class="title">① 子どもボード（施設・タブレット縦持ち）</span>
+      <span class="device">TABLET</span>
+    </div>
+    <div class="mock-body">
+      <div class="device-tablet">
+        <div class="tab-header">
+          <span class="name">Aくんのボード</span>
+          <span class="scene">朝のしたく</span>
+        </div>
+        <div class="card-stack">
+          <div class="card current">
+            <span class="card-icon">🧴</span>
+            てを あらう
+          </div>
+          <div class="card next">つぎ：れんらくちょう を だす</div>
+          <div class="card next">そのつぎ：いす に すわる</div>
+        </div>
+        <div class="swipe-hint">↑ うえに スワイプして めくる</div>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-top:14px;text-align:center;">
+        現在カードを大きく中央に。次・その次は小さく薄く。タイマーは表示しない（toC原則）。
+      </p>
+    </div>
+  </div>
+
+  <!-- 2. 職員ペイン -->
+  <div class="screen-mock" id="sc-staff">
+    <div class="mock-head">
+      <span class="title">② 職員ペイン（PiP・別タブレット or サブウィンドウ）</span>
+      <span class="device">PIP</span>
+    </div>
+    <div class="mock-body">
+      <div class="device-pip">
+        <div class="pip-head">いま：A くん「あさのしたく」</div>
+        <div class="pip-tags">
+          <div class="pip-tag">パニック</div>
+          <div class="pip-tag active">離席</div>
+          <div class="pip-tag">興味薄れ</div>
+          <div class="pip-tag">眠気</div>
+          <div class="pip-tag">他</div>
+          <div class="pip-tag">専門職立合</div>
+        </div>
+        <div class="pip-voice">🎙 音声10秒メモ（任意）</div>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-top:14px;text-align:center;">
+        選択肢は5個以内。タップで完結。迷う時は音声に逃がす。文字入力は基本なし。
+      </p>
+    </div>
+  </div>
+
+  <!-- 3. 児発管ダッシュボード -->
+  <div class="screen-mock" id="sc-mgr">
+    <div class="mock-head">
+      <span class="title">③ 児発管ダッシュボード（PC・タブレット）</span>
+      <span class="device">PC / TABLET</span>
+    </div>
+    <div class="mock-body">
+      <div class="device-pc">
+        <div class="pc-head">
+          <span>🏥 ABC 児童発達支援センター ／ 2026-04-29 (火)</span>
+          <span>👤 児発管：田中</span>
+        </div>
+        <div class="pc-body">
+          <div class="child-grid">
+            <div class="child-list">
+              <div style="font-size:11px;color:var(--text-mute);margin-bottom:4px;letter-spacing:0.05em;">対象児童（5名）</div>
+              <div class="ci active">A くん <span class="alert">注</span></div>
+              <div class="ci">B くん</div>
+              <div class="ci">C くん <span class="alert">パニック2回</span></div>
+              <div class="ci">D くん</div>
+              <div class="ci">E くん</div>
+            </div>
+            <div class="child-detail">
+              <h4>A くん｜本日の様子</h4>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                <div class="data-card">
+                  <div class="label">自発めくり率</div>
+                  <div class="value">72%</div>
+                  <div style="font-size:10px;color:var(--mint-dark);">↑ +8pt 先週比</div>
+                </div>
+                <div class="data-card">
+                  <div class="label">完了率</div>
+                  <div class="value">90%</div>
+                  <div style="font-size:10px;color:var(--text-sub);">→ 横ばい</div>
+                </div>
+                <div class="data-card">
+                  <div class="label">中断回数</div>
+                  <div class="value">1</div>
+                  <div style="font-size:10px;color:var(--text-sub);">離席（10:30）</div>
+                </div>
+              </div>
+              <div class="data-card" style="margin-top:10px;">
+                <div class="label">3か月の自発めくり率推移</div>
+                <div class="graph"></div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:var(--text-sub);">
+                💡 加算証跡：個別サポートⅠ（本日100単位算定可）／専門的支援実施（10:00 PT立合）
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-top:14px;text-align:center;">
+        15分でざっと俯瞰、気になる子だけクリックで深掘り。所見入力時はテンプレを出さず、過去データを横にチラ見せ。
+      </p>
+    </div>
+  </div>
+
+  <!-- 4. 面談画面 -->
+  <div class="screen-mock" id="sc-meet">
+    <div class="mock-head">
+      <span class="title">④ 面談画面（家庭連携）</span>
+      <span class="device">PC + TABLET</span>
+    </div>
+    <div class="mock-body">
+      <div class="device-meeting">
+        <div class="meeting-head">
+          <span>🤝 A くん家庭連携面談 ／ 2026-04-29 14:00〜14:30</span>
+          <span>📷 自動スクショ保存中</span>
+        </div>
+        <div class="meeting-grid">
+          <div class="panel">
+            <div class="label">家庭で 効いた カード</div>
+            <div class="item">🧴 手を洗う（自発率 90%）</div>
+            <div class="item">🍽 朝ごはん（自発率 85%）</div>
+            <div class="item">👟 靴を履く（自発率 78%）</div>
+          </div>
+          <div class="panel">
+            <div class="label">家庭で 効かなかった カード</div>
+            <div class="item no">🦷 歯磨き（拒否 8回／14日）</div>
+            <div class="item no">📚 絵本（離席 5回／7日）</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;background:var(--mint-soft);padding:10px 12px;border-radius:6px;font-size:11px;">
+          💬 議題候補（自動生成）<br>
+          ・歯磨きカードの代替案（鏡カード・タイマーカードなど）<br>
+          ・絵本シーンの長さ調整（10分→5分カード）
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-top:14px;text-align:center;">
+        画面共有しながら具体的に議論。スクショは自動で保存され、家庭連携加算記録の証跡になる。
+      </p>
+    </div>
+  </div>
+
+  <!-- 5. ドキュメント生成 -->
+  <div class="screen-mock" id="sc-doc">
+    <div class="mock-head">
+      <span class="title">⑤ ドキュメント生成画面（家庭連携加算記録）</span>
+      <span class="device">PC</span>
+    </div>
+    <div class="mock-body">
+      <div class="doc-gen">
+        <div class="doc-head">📄 家庭連携加算 面談記録 ドラフト ／ A くん ／ 2026-04-29</div>
+        <div class="doc-section auto">
+          <span class="tag">AUTO</span>
+          <div class="content">
+            <strong>面談実施日時：</strong>2026-04-29 14:00 〜 14:35（35分）<br>
+            <strong>参加者：</strong>母（佐藤花子）／児発管（田中）／A くん（同席せず）
+          </div>
+        </div>
+        <div class="doc-section auto">
+          <span class="tag">AUTO</span>
+          <div class="content">
+            <strong>使用データ：</strong>家庭での mitooshi 使用ログ 14日分<br>
+            効いたカード3種（手洗い・朝食・靴）／効かなかったカード2種（歯磨き・絵本）
+          </div>
+        </div>
+        <div class="doc-section semi">
+          <span class="tag">SEMI</span>
+          <div class="content">
+            <strong>議題：</strong>☑ カード調整 ☑ 家庭での声かけ ☐ 体調 ☐ 進路
+          </div>
+        </div>
+        <div class="doc-section hand">
+          <span class="tag">HAND</span>
+          <div class="content placeholder">
+            <strong>相談内容の要旨：</strong><br>
+            （ここに児発管が記述）<br><br>
+            ※テンプレ提示なし。空白から書く。<br>
+            横の「過去のA くん固有データ」を見ながら本児の言葉で書く。
+          </div>
+        </div>
+        <div class="doc-section hand">
+          <span class="tag">HAND</span>
+          <div class="content placeholder">
+            <strong>合意事項・次回までのアクション：</strong><br>
+            （ここに記述）
+          </div>
+        </div>
+        <div class="doc-section semi">
+          <span class="tag">SEMI</span>
+          <div class="content">
+            <strong>保護者サイン：</strong>☐ 紙署名（写真アップ） ☑ タブレット手書きサイン ☐ 電子署名
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-top:14px;text-align:center;">
+        AUTO（緑）／ SEMI（青）／ HAND（黄）の3層で表示。手書き欄はテンプレを出さない。
+      </p>
+    </div>
+  </div>
+
+  <!-- 6. 家庭側 mitooshi -->
+  <div class="screen-mock" id="sc-home">
+    <div class="mock-head">
+      <span class="title">⑥ 家庭側 mitooshi（保護者向け、Step 1 の入口）</span>
+      <span class="device">PHONE</span>
+    </div>
+    <div class="mock-body">
+      <div class="device-phone">
+        <div class="phone-head">A くんと一緒に</div>
+        <div class="scene-pill">朝のしたく · 5/7枚</div>
+        <div class="device-tablet" style="border:none;padding:0;max-width:none;">
+          <div class="card-stack">
+            <div class="card current">
+              <span class="card-icon">🦷</span>
+              はを みがく
+            </div>
+            <div class="card next">つぎ：くつしたを はく</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;background:var(--bg-alt);padding:10px;border-radius:8px;font-size:10px;">
+          このカード、A くんに合ってる？<br>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button style="flex:1;background:var(--mint-soft);border:1px solid var(--mint);color:var(--mint-dark);padding:6px;border-radius:6px;font-size:10px;font-weight:700;">😊 効いた</button>
+            <button style="flex:1;background:var(--pink-soft);border:1px solid var(--pink);color:#B85555;padding:6px;border-radius:6px;font-size:10px;font-weight:700;">😟 効かない</button>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-top:14px;text-align:center;">
+        子どもめくり画面の下に、保護者用の小さな評価ボタン。1タップで「効いた／効かなかった」が記録される。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ハンドオフ ===================== -->
+<section id="handoff">
+  <h2><span class="num">05</span>アクター間のハンドオフ</h2>
+  <p>体験フローの中で、データや責任が誰から誰に渡るかを明確化する。</p>
+
+  <h3>Step 1（家庭連携）のハンドオフ</h3>
+  <ol>
+    <li>子どもの操作 → <strong>mitooshi（自動でログ化）</strong></li>
+    <li>保護者の評価マーク → <strong>mitooshi（議題候補に変換）</strong></li>
+    <li>mitooshi → <strong>児発管（面談前のデータ提示）</strong></li>
+    <li>児発管 ⇄ 保護者（面談で双方向対話）→ <strong>mitooshi が記録ドラフト生成</strong></li>
+    <li>児発管 → <strong>請求担当（HUG 用 CSV 経由）</strong></li>
+  </ol>
+
+  <h3>Step 3（個別ボード）のハンドオフ</h3>
+  <ol>
+    <li>子ども → <strong>mitooshi（操作ログ自動取得）</strong></li>
+    <li>子ども → <strong>職員（観察・補助）</strong></li>
+    <li>職員 → <strong>mitooshi（観察タグ1タップ）</strong></li>
+    <li>mitooshi → <strong>児発管（日次ダッシュボード）</strong></li>
+    <li>児発管 → <strong>請求担当・HUG（月次 CSV）</strong></li>
+  </ol>
+
+  <div class="insight">
+    <strong>人間にしかできないこと</strong>
+    <p>
+      ① 児発管の<strong>個別性のある所見</strong>（人の言葉で書く）<br>
+      ② 保護者との<strong>面談での対話</strong>（信頼関係の構築）<br>
+      ③ 専門職の<strong>専門的判断</strong>（評価・治療方針）<br>
+      ④ 子どもへの<strong>声かけ・励まし</strong>（mitooshi は声を出さない）<br>
+      ⑤ 家族との<strong>合意形成</strong>（保護者署名）
+    </p>
+  </div>
+</section>
+
+<!-- ===================== 実装メモ ===================== -->
+<section id="prd-impl">
+  <h2><span class="num">06</span>実装メモ（PRD への反映）</h2>
+
+  <h3>UI デザイン原則</h3>
+  <ul>
+    <li><strong>子どもボード：</strong>絵文字・タイマー・通知なし。カード中心。スワイプのみ。</li>
+    <li><strong>職員ペイン：</strong>選択肢5個以内、文字入力なし、音声逃しあり。</li>
+    <li><strong>児発管ダッシュボード：</strong>15分で全児童俯瞰可能なレイアウト。所見入力時テンプレ非提示。</li>
+    <li><strong>面談画面：</strong>「効いた／効かなかった」を視覚的に対比。スクショ自動保存。</li>
+    <li><strong>ドキュメント生成：</strong>AUTO／SEMI／HAND を色で区別。手書き欄に AI 提案を入れない。</li>
+    <li><strong>家庭側：</strong>子どもめくり画面に保護者用評価ボタンを薄く重ねる（邪魔しない）。</li>
+  </ul>
+
+  <h3>Step 1 開発スコープ（Phase 1：3〜4か月）</h3>
+  <ul>
+    <li>家庭側 mitooshi の評価マーク機能（既存 toC への追加）</li>
+    <li>家庭⇄施設のデータ連携（児発管が家庭ログを閲覧）</li>
+    <li>面談画面（画面共有・スクショ保存）</li>
+    <li>家庭連携加算記録ドキュメント生成（Doc E）</li>
+    <li>3つのサインモード対応</li>
+  </ul>
+
+  <h3>Step 3 開発スコープ（Phase 2：6〜10か月）</h3>
+  <ul>
+    <li>子どもボード（個別ボード対応）</li>
+    <li>操作主体推定（自発／補助）ロジック</li>
+    <li>職員ペイン（PiP）</li>
+    <li>児発管ダッシュボード（日次サマリ・対象児童管理）</li>
+    <li>個別サポートⅠ／強度行動障害児支援加算の証跡ドキュメント（Doc A・C）</li>
+    <li>HUG 連携 CSV エクスポート（M5 の最低限）</li>
+  </ul>
+
+  <h3>Discovery で確かめたいこと</h3>
+  <ul>
+    <li><strong>家庭側：</strong>「効いた／効かなかった」評価を実際に使う頻度・抵抗感</li>
+    <li><strong>保護者：</strong>面談で「家庭の使用データを共有される」ことの心理的負担／喜び</li>
+    <li><strong>児発管：</strong>「面談前の5分データ確認」が業務として成立するか</li>
+    <li><strong>職員：</strong>1日2分のタップ操作の現実性／観察タグの粒度</li>
+    <li><strong>子ども：</strong>個別ボードでの自発めくり率の実態</li>
+  </ul>
+</section>
+
+<footer>
+  作成：2026-04-29 ／ 関連：mitooshi_pro_feature_spec.html, gradual_kasan_entry.html, competitive_kasan_map.html<br>
+  本書は体験設計素案。Discovery 検証を経て、画面・UI・運用フローを確定する。
+</footer>
+
+</main>
+</div>
+</body>
+</html>

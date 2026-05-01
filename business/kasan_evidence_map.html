@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>加算証跡化マップ｜mitooshi Pro</title>
+<style>
+  :root {
+    --mint: #00B894;
+    --mint-soft: #E6F8F3;
+    --mint-dark: #00876d;
+    --blue: #0073cc;
+    --blue-soft: #E8F2FB;
+    --pink: #FFB6B6;
+    --pink-soft: #FFF0F0;
+    --text: #333333;
+    --text-sub: #666666;
+    --text-mute: #999999;
+    --line: #E5E5E5;
+    --line-soft: #F2F2F2;
+    --bg: #FFFFFF;
+    --bg-alt: #FAFAFA;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .layout { display: flex; max-width: 1280px; margin: 0 auto; }
+  aside.toc {
+    width: 240px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--line);
+    padding: 32px 20px 32px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    font-size: 13px;
+    background: var(--bg-alt);
+  }
+  aside.toc h2 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  aside.toc ul { list-style: none; }
+  aside.toc li { margin: 6px 0; }
+  aside.toc a {
+    color: var(--text);
+    text-decoration: none;
+    line-height: 1.4;
+    display: block;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  aside.toc a:hover { background: var(--mint-soft); color: var(--mint-dark); }
+  aside.toc .sub { padding-left: 12px; font-size: 12px; color: var(--text-sub); }
+
+  main { flex: 1; padding: 48px 56px; max-width: 940px; }
+  header.doc {
+    border-bottom: 2px solid var(--mint);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  header.doc .eyebrow {
+    color: var(--mint);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header.doc h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  header.doc .lead {
+    color: var(--text-sub);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  header.doc .meta {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--text-mute);
+  }
+
+  section { margin-bottom: 56px; }
+  section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  section h2 .num {
+    color: var(--mint);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  section h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 24px 0 8px;
+  }
+  section h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-sub);
+    margin: 16px 0 6px;
+    letter-spacing: 0.02em;
+  }
+  section p { margin-bottom: 12px; color: var(--text); }
+  section ul, section ol { margin: 0 0 12px 22px; }
+  section li { margin: 4px 0; line-height: 1.7; }
+
+  /* 大局マップ */
+  .map-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .map-tier {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+    background: var(--bg);
+  }
+  .map-tier.t1 { border-left: 3px solid var(--mint); }
+  .map-tier.t2 { border-left: 3px solid var(--blue); }
+  .map-tier.t3 { border-left: 3px solid var(--pink); }
+  .map-tier h4 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .map-tier .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+  .map-tier.t1 .badge { background: var(--mint-soft); color: var(--mint-dark); }
+  .map-tier.t2 .badge { background: var(--blue-soft); color: var(--blue); }
+  .map-tier.t3 .badge { background: var(--pink-soft); color: #B85555; }
+  .map-tier ul {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 12px;
+    color: var(--text-sub);
+  }
+  .map-tier li { margin: 2px 0; line-height: 1.5; }
+
+  /* 加算カード */
+  .kasan-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin: 16px 0;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .kasan-card.tier-1 { border-left: 4px solid var(--mint); }
+  .kasan-card.tier-2 { border-left: 4px solid var(--blue); }
+  .kasan-card.tier-3 { border-left: 4px solid var(--pink); }
+  .kasan-card .head {
+    padding: 14px 18px;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .kasan-card .head .name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .kasan-card .head .units {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--mint-dark);
+    background: var(--mint-soft);
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+  .kasan-card .body {
+    padding: 14px 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .kasan-card .body .col h5 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-mute);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .kasan-card .body .col p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .kasan-card .body .col ul {
+    font-size: 13px;
+    margin-left: 18px;
+    color: var(--text);
+  }
+  .kasan-card .body .col li { line-height: 1.6; }
+  .kasan-card .leverage {
+    margin: 0 18px 14px;
+    padding: 10px 14px;
+    background: var(--mint-soft);
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  .kasan-card.tier-2 .leverage { background: var(--blue-soft); }
+  .kasan-card.tier-3 .leverage { background: var(--pink-soft); }
+  .kasan-card .leverage strong {
+    display: block;
+    font-size: 11px;
+    color: var(--mint-dark);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .kasan-card.tier-2 .leverage strong { color: var(--blue); }
+  .kasan-card.tier-3 .leverage strong { color: #B85555; }
+
+  /* テーブル */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+  th, td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-alt);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-sub);
+    border-bottom: 2px solid var(--line);
+  }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* インパクト試算ボックス */
+  .impact-box {
+    background: var(--mint-soft);
+    border: 1px solid var(--mint);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .impact-box h4 {
+    color: var(--mint-dark);
+    margin: 0 0 12px;
+    font-size: 14px;
+  }
+  .impact-num {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--mint-dark);
+    margin: 8px 0;
+    line-height: 1.2;
+  }
+  .impact-num small {
+    font-size: 14px;
+    color: var(--text-sub);
+    font-weight: 400;
+  }
+
+  /* 注意ボックス */
+  .warn-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .warn-box strong {
+    color: var(--warn);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .info-box {
+    background: var(--blue-soft);
+    border-left: 4px solid var(--blue);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .info-box strong {
+    color: var(--blue);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* 営業セリフ */
+  .pitch {
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .pitch .quote {
+    font-style: italic;
+    color: var(--text);
+    margin: 4px 0;
+    padding-left: 12px;
+    border-left: 2px solid var(--mint);
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 64px;
+    color: var(--text-mute);
+    font-size: 12px;
+  }
+
+  @media (max-width: 880px) {
+    aside.toc { display: none; }
+    main { padding: 24px 20px; }
+    .map-grid { grid-template-columns: 1fr; }
+    .kasan-card .body { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#purpose">本書の目的</a></li>
+    <li><a href="#how-to-read">読み方</a></li>
+    <li><a href="#big-map">1. 大局マップ</a></li>
+    <li><a href="#tier1">2. Tier 1：直接レバレッジ</a>
+      <ul>
+        <li class="sub"><a href="#k-spec-jisshi">専門的支援実施加算</a></li>
+        <li class="sub"><a href="#k-shuchu">集中的支援加算</a></li>
+        <li class="sub"><a href="#k-isi">個別サポート加算Ⅰ</a></li>
+        <li class="sub"><a href="#k-kyodo">強度行動障害児支援加算</a></li>
+        <li class="sub"><a href="#k-katei">家庭連携加算</a></li>
+        <li class="sub"><a href="#k-iko">保育・教育等移行支援加算</a></li>
+      </ul>
+    </li>
+    <li><a href="#tier2">3. Tier 2：補助的証跡</a>
+      <ul>
+        <li class="sub"><a href="#k-asses">アセスメント・モニタリング</a></li>
+        <li class="sub"><a href="#k-renkei">関係機関連携加算</a></li>
+        <li class="sub"><a href="#k-spec-taisei">専門的支援体制加算</a></li>
+        <li class="sub"><a href="#k-enchou">延長支援加算</a></li>
+        <li class="sub"><a href="#k-kesseki">欠席時対応加算</a></li>
+      </ul>
+    </li>
+    <li><a href="#tier3">4. Tier 3：関係薄</a></li>
+    <li><a href="#impact">5. 経済インパクト試算</a></li>
+    <li><a href="#sales">6. 営業での使い方</a></li>
+    <li><a href="#caveats">7. 注意事項・前提</a></li>
+  </ul>
+</aside>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">mitooshi Pro × 療育報酬</div>
+  <h1>加算証跡化マップ</h1>
+  <p class="lead">
+    「mitooshi の利用ログが、どの加算の算定根拠としてどれだけ強く効くか」を加算ごとに整理した営業資料の核。
+    <strong>時短ツール</strong>ではなく <strong>加算取りこぼし防止ツール</strong>として売るためのロジックを提供する。
+  </p>
+  <div class="meta">v1.0 ／ 令和6年報酬改定ベース ／ 単位数は要再確認（後述）</div>
+</header>
+
+<section id="purpose">
+  <h2><span class="num">▶</span>本書の目的</h2>
+  <p>
+    療育事業所への提案で、mitooshi Pro を「効率化ツール」と説明すると <strong>3〜5万円/月の予算枠</strong>でしか戦えない。
+    一方、<strong>加算取りこぼしを防ぐツール</strong>として位置づけると、月数万〜十数万円の収益改善が見えるため、
+    <strong>20〜50万円/月の意思決定枠</strong>に引き上げられる。本書はそのロジックを加算別に分解する。
+  </p>
+  <div class="info-box">
+    <strong>前提</strong>
+    日本の障害福祉は<strong>プロセス課金</strong>。書類・記録は事務作業ではなく<strong>収益の根拠</strong>そのもの。
+    したがって mitooshi の利用ログ＝「ちゃんと支援した証跡」をどれだけ強く生成できるかが、提案価値の本質。
+  </div>
+</section>
+
+<section id="how-to-read">
+  <h2><span class="num">▶</span>読み方</h2>
+  <p>各加算を3層に分類している。Tier ごとに mitooshi の貢献度が違うので、営業時の話し方を変える。</p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:80px;">Tier</th>
+        <th>定義</th>
+        <th>営業での話し方</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span style="color:var(--mint-dark);font-weight:700;">Tier 1</span></td>
+        <td>mitooshi のログが算定要件の<strong>主要根拠</strong>になる加算</td>
+        <td>「これだけで月◯万円取りこぼしを防げます」と単独で訴求できる</td>
+      </tr>
+      <tr>
+        <td><span style="color:var(--blue);font-weight:700;">Tier 2</span></td>
+        <td>主たる証跡は別だが、mitooshi が<strong>個別性の根拠</strong>として補助できる加算</td>
+        <td>「実地指導で減算リスクを下げる」という文脈で語る</td>
+      </tr>
+      <tr>
+        <td><span style="color:#B85555;font-weight:700;">Tier 3</span></td>
+        <td>mitooshi の貢献が薄い加算（送迎・食事等）</td>
+        <td>触れない。専門システムが向く領域として整理</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 大局マップ -->
+<section id="big-map">
+  <h2><span class="num">01</span>大局マップ</h2>
+  <p>主要加算を Tier 別に俯瞰する。</p>
+  <div class="map-grid">
+    <div class="map-tier t1">
+      <span class="badge">TIER 1 直接</span>
+      <h4>支援の「実施記録」が要件のもの</h4>
+      <ul>
+        <li>専門的支援実施加算</li>
+        <li>集中的支援加算</li>
+        <li>個別サポート加算Ⅰ</li>
+        <li>強度行動障害児支援加算</li>
+        <li>家庭連携加算</li>
+        <li>保育・教育等移行支援加算</li>
+      </ul>
+    </div>
+    <div class="map-tier t2">
+      <span class="badge">TIER 2 補助</span>
+      <h4>「個別性」「連携」の証跡が問われるもの</h4>
+      <ul>
+        <li>アセスメント加算（モニタリング）</li>
+        <li>関係機関連携加算</li>
+        <li>専門的支援体制加算</li>
+        <li>延長支援加算</li>
+        <li>欠席時対応加算</li>
+      </ul>
+    </div>
+    <div class="map-tier t3">
+      <span class="badge">TIER 3 関係薄</span>
+      <h4>専門システムが向く領域</h4>
+      <ul>
+        <li>送迎加算</li>
+        <li>食事提供加算</li>
+        <li>入浴支援加算</li>
+        <li>看護職員配置加算</li>
+        <li>処遇改善加算（経営事項）</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TIER 1 ===================== -->
+<section id="tier1">
+  <h2><span class="num">02</span>Tier 1：直接レバレッジ加算</h2>
+  <p>mitooshi のログが算定要件の主要根拠になる加算群。営業資料の主役。</p>
+
+  <!-- 専門的支援実施加算 -->
+  <div class="kasan-card tier-1" id="k-spec-jisshi">
+    <div class="head">
+      <span class="name">専門的支援実施加算</span>
+      <span class="units">150単位／回（月4回上限）</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>算定要件</h5>
+        <ul>
+          <li>理学療法士・作業療法士・言語聴覚士・心理担当職員等が実施</li>
+          <li>個別支援計画に位置付けた支援を実施</li>
+          <li>実施記録を作成（誰が・いつ・何を・効果）</li>
+        </ul>
+        <h5>監査でチェックされる点</h5>
+        <ul>
+          <li>専門職本人の関与の証跡（サインだけでは弱い）</li>
+          <li>「計画に沿った内容か」の照合可能性</li>
+          <li>テンプレ化された記録は減算対象になりやすい</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>専門職立ち合い時のログイン・操作ログ</li>
+          <li>その日に使ったカード列＝実施した支援内容</li>
+          <li>子どものめくり/反応パターン＝効果の客観記録</li>
+          <li>計画カード（目標）と実施ログの自動紐付け</li>
+        </ul>
+        <h5>取りこぼし防止のレバレッジ</h5>
+        <p><strong>★★★</strong> 月4回×全員の上限取得が現場の負担で取れていないケースが多い。記録の自動化で取得率を引き上げ可能。</p>
+      </div>
+    </div>
+    <div class="leverage">
+      <strong>営業フック</strong>
+      「専門職の関与記録、毎回テキストで起こすの大変じゃないですか？ mitooshi なら立ち合った専門職のログと支援カード列がそのまま記録になります」
+    </div>
+  </div>
+
+  <!-- 集中的支援加算 -->
+  <div class="kasan-card tier-1" id="k-shuchu">
+    <div class="head">
+      <span class="name">集中的支援加算（令和6年新設）</span>
+      <span class="units">1,000単位／日（月4回上限）</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>算定要件</h5>
+        <ul>
+          <li>強度行動障害・著しい行動上の課題を有する児童</li>
+          <li>専門人材による集中的支援計画を作成</li>
+          <li>計画に基づく集中的支援を実施し記録</li>
+          <li>原則3か月以内の集中支援期間</li>
+        </ul>
+        <h5>監査でチェックされる点</h5>
+        <ul>
+          <li>計画と実施の「日々の整合性」</li>
+          <li>3か月後の効果検証の記録</li>
+          <li>専門人材の関与エビデンス</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>集中支援期間中のカード設計の差分（通常 vs 集中）</li>
+          <li>毎日のめくり実績／離席・パニック等の行動ログ</li>
+          <li>3か月の行動変化グラフ＝効果検証エビデンス</li>
+          <li>計画→実施→検証のループが時系列で残る</li>
+        </ul>
+        <h5>取りこぼし防止のレバレッジ</h5>
+        <p><strong>★★★</strong> 1,000単位は加算の中でも破格。算定できる事業所がまだ少なく、要件記録のハードルが高いのが理由。mitooshi の自動証跡化が決定打になりうる。</p>
+      </div>
+    </div>
+    <div class="leverage">
+      <strong>営業フック</strong>
+      「1,000単位の集中的支援加算、要件の記録が大変で算定見送ってませんか？ mitooshi の利用ログがそのまま3か月の経過記録になります」
+    </div>
+  </div>
+
+  <!-- 個別サポート加算Ⅰ -->
+  <div class="kasan-card tier-1" id="k-isi">
+    <div class="head">
+      <span class="name">個別サポート加算Ⅰ</span>
+      <span class="units">100単位／日</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>算定要件</h5>
+        <ul>
+          <li>ケアニーズの高い児童（行動関連項目等）</li>
+          <li>当該児童に応じた個別支援を実施</li>
+          <li>個別支援計画への明記・実施記録</li>
+        </ul>
+        <h5>監査でチェックされる点</h5>
+        <ul>
+          <li>「個別」の中身の具体性</li>
+          <li>毎日の実施記録の有無（集団記録だけだと減算）</li>
+          <li>計画との対応関係</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>当該児童専用のカード設計＝個別性の証跡</li>
+          <li>個別の見通しボード使用ログ＝個別支援の実施事実</li>
+          <li>反応データ＝個別調整のフィードバック証跡</li>
+        </ul>
+        <h5>取りこぼし防止のレバレッジ</h5>
+        <p><strong>★★</strong> 取得率は中程度。記録の質を上げて減算リスクを下げる効果が大きい。</p>
+      </div>
+    </div>
+    <div class="leverage">
+      <strong>営業フック</strong>
+      「個別サポート加算Ⅰ、実地指導で『集団記録だけ』と指摘されたことありませんか？ mitooshi なら個別ボードのログが個別性の根拠になります」
+    </div>
+  </div>
+
+  <!-- 強度行動障害児支援加算 -->
+  <div class="kasan-card tier-1" id="k-kyodo">
+    <div class="head">
+      <span class="name">強度行動障害児支援加算</span>
+      <span class="units">155単位／日（重度の場合）</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>算定要件</h5>
+        <ul>
+          <li>強度行動障害支援者養成研修修了者の関与</li>
+          <li>当該児童への個別支援計画</li>
+          <li>専門的視点からの支援実施記録</li>
+        </ul>
+        <h5>監査でチェックされる点</h5>
+        <ul>
+          <li>研修修了者の実関与（名義だけはNG）</li>
+          <li>行動上の課題への具体的アプローチ記録</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>当該児童のパニック前後のカードめくり履歴</li>
+          <li>切り替え失敗のパターン分析</li>
+          <li>研修修了者がカード設計した編集ログ</li>
+          <li>環境調整の具体的記録</li>
+        </ul>
+        <h5>取りこぼし防止のレバレッジ</h5>
+        <p><strong>★★</strong> 子どもの行動データそのものがエビデンスとなる相性の良い加算。</p>
+      </div>
+    </div>
+    <div class="leverage">
+      <strong>営業フック</strong>
+      「強度行動障害児への支援、その日その日の対応をテキストで起こすのが大変。mitooshi の行動ログがそのまま専門的支援の記録になります」
+    </div>
+  </div>
+
+  <!-- 家庭連携加算 -->
+  <div class="kasan-card tier-1" id="k-katei">
+    <div class="head">
+      <span class="name">家庭連携加算</span>
+      <span class="units">300〜1,000単位／回（月4回上限）</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>算定要件</h5>
+        <ul>
+          <li>家庭への訪問または家庭からの来所による相談支援</li>
+          <li>支援内容・時間の記録</li>
+          <li>家庭との合意形成の証跡</li>
+        </ul>
+        <h5>監査でチェックされる点</h5>
+        <ul>
+          <li>面談時間の正確な記録</li>
+          <li>面談内容の具体性</li>
+          <li>連絡帳の写しでは認められないことが多い</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡【独自の強み】</h5>
+        <ul>
+          <li><strong>toC mitooshi との連携</strong>：家庭での同じカード使用ログ</li>
+          <li>「家庭でこのカードが効いた／効かなかった」のフィードバック</li>
+          <li>面談時の画面共有ログ＝具体的な相談内容の根拠</li>
+          <li>家庭→施設への申し送りメモ</li>
+        </ul>
+        <h5>取りこぼし防止のレバレッジ</h5>
+        <p><strong>★★★</strong> mitooshi の <strong>toC × toB 連携</strong>でしか作れない証跡。競合 SaaS では真似できない領域。</p>
+      </div>
+    </div>
+    <div class="leverage">
+      <strong>営業フック</strong>
+      「家庭連携加算、面談を実施しても記録の証跡で算定を諦めることがあるんです。mitooshi なら家庭でのカード使用ログがそのまま連携の根拠になります」
+    </div>
+  </div>
+
+  <!-- 保育・教育等移行支援加算 -->
+  <div class="kasan-card tier-1" id="k-iko">
+    <div class="head">
+      <span class="name">保育・教育等移行支援加算</span>
+      <span class="units">500単位／回</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>算定要件</h5>
+        <ul>
+          <li>保育所・幼稚園・認定こども園・学校等への移行支援</li>
+          <li>移行先との情報共有・引継ぎ</li>
+          <li>支援内容の記録</li>
+        </ul>
+        <h5>監査でチェックされる点</h5>
+        <ul>
+          <li>移行先と共有した内容の具体性</li>
+          <li>引継ぎの実施事実（口頭だけはNG）</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>引継ぎ用カードセットの作成・共有ログ</li>
+          <li>移行先での試用結果（連携可能なら）</li>
+          <li>引継ぎ会議時のスクリーンショット記録</li>
+        </ul>
+        <h5>取りこぼし防止のレバレッジ</h5>
+        <p><strong>★★</strong> mitooshi が <strong>「子どもの取扱説明書」として機能</strong>することで、引継ぎ自体の質も上がる副次効果。</p>
+      </div>
+    </div>
+    <div class="leverage">
+      <strong>営業フック</strong>
+      「進級・進学のタイミングで mitooshi のカードセットをそのまま引き継げる。先生が『この子はこう接するといい』を理解する時間が劇的に短縮されます」
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TIER 2 ===================== -->
+<section id="tier2">
+  <h2><span class="num">03</span>Tier 2：補助的証跡加算</h2>
+  <p>主たる証跡は別書類だが、mitooshi が個別性・連携の根拠として補強する加算群。</p>
+
+  <!-- アセスメント -->
+  <div class="kasan-card tier-2" id="k-asses">
+    <div class="head">
+      <span class="name">アセスメント加算（個別支援計画 / モニタリング）</span>
+      <span class="units">基本報酬の前提条件</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>位置づけ</h5>
+        <p>加算ではなく、すべての算定の前提となる土台。6か月毎の見直し・3か月毎のモニタリングが必須。
+          コピペ疑いがあると<strong>過去5年遡及で返還</strong>のリスク。</p>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>3か月分のカード使用履歴＝アセスメントの素材</li>
+          <li>反応データの推移＝目標設定の根拠</li>
+          <li>計画見直し時の「成長エビデンス」テンプレ生成</li>
+        </ul>
+      </div>
+    </div>
+    <div class="leverage">
+      <strong>営業フック</strong>
+      「個別支援計画の見直しが期限ギリギリで、文言が他の子と似てしまっていませんか？ mitooshi が3か月の行動データを自動で並べてくれるので、本児固有の記述が書きやすくなります」
+    </div>
+  </div>
+
+  <!-- 関係機関連携 -->
+  <div class="kasan-card tier-2" id="k-renkei">
+    <div class="head">
+      <span class="name">関係機関連携加算（Ⅰ・Ⅱ・Ⅲ）</span>
+      <span class="units">150〜250単位／月</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>算定要件</h5>
+        <ul>
+          <li>主治医・相談支援専門員等との連携</li>
+          <li>連携内容・日時の記録</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>カードセットの共有履歴（医療機関・相談支援との）</li>
+          <li>連携先からのフィードバックログ</li>
+        </ul>
+        <p style="font-size:12px;color:var(--text-mute);">※主たる証跡はメール・FAX・面談記録。mitooshi は補強。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 専門的支援体制 -->
+  <div class="kasan-card tier-2" id="k-spec-taisei">
+    <div class="head">
+      <span class="name">専門的支援体制加算（職員配置）</span>
+      <span class="units">職員配置に応じた基礎加算</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>位置づけ</h5>
+        <p>専門職を配置していること自体への加算。配置の事実が要件で、mitooshi のログは直接の根拠にならない。
+          ただし「配置されている専門職が機能しているか」の実態確認には貢献する。</p>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>専門職の操作ログ＝関与の実態</li>
+          <li>専門職が設計したカード件数</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 延長支援 -->
+  <div class="kasan-card tier-2" id="k-enchou">
+    <div class="head">
+      <span class="name">延長支援加算</span>
+      <span class="units">61単位／30分</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>算定要件</h5>
+        <ul>
+          <li>営業時間を超えた延長</li>
+          <li>やむを得ない理由の記録</li>
+          <li>延長時間の記録</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>延長時間中のカード使用ログ＝支援継続の事実</li>
+          <li>子どものログイン時刻＝在所時間の根拠</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 欠席時対応 -->
+  <div class="kasan-card tier-2" id="k-kesseki">
+    <div class="head">
+      <span class="name">欠席時対応加算</span>
+      <span class="units">94単位／回（月4回上限）</span>
+    </div>
+    <div class="body">
+      <div class="col">
+        <h5>算定要件</h5>
+        <ul>
+          <li>欠席連絡を受けた際の家庭支援</li>
+          <li>連絡内容と相談内容の記録</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>mitooshi で生成される証跡</h5>
+        <ul>
+          <li>家庭との mitooshi 上のメッセージ履歴（実装次第）</li>
+          <li>欠席日に家庭で使ったカードログ＝家庭支援継続の根拠</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TIER 3 ===================== -->
+<section id="tier3">
+  <h2><span class="num">04</span>Tier 3：関係薄領域</h2>
+  <p>mitooshi の貢献が薄い加算群。提案では触れず、専門システム（請求 SaaS / 送迎管理）の領域として整理する。</p>
+  <table>
+    <thead>
+      <tr>
+        <th>加算名</th>
+        <th>単位数（目安）</th>
+        <th>主たる証跡</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>送迎加算</td><td class="num">54単位／片道</td><td>運転日報・GPS 記録</td></tr>
+      <tr><td>食事提供加算</td><td class="num">30単位／日</td><td>献立表・調理記録</td></tr>
+      <tr><td>入浴支援加算</td><td class="num">50単位／回</td><td>入浴介助記録</td></tr>
+      <tr><td>看護職員配置加算</td><td class="num">配置実態に応じる</td><td>勤務シフト</td></tr>
+      <tr><td>処遇改善加算（Ⅰ〜Ⅴ）</td><td class="num">基本報酬の数%</td><td>賃金改善計画書・実績報告書</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== 経済インパクト ===================== -->
+<section id="impact">
+  <h2><span class="num">05</span>経済インパクト試算</h2>
+  <p>mitooshi 導入で取りこぼしが減ると、いくらの収益改善になるか。1事業所あたりの試算。</p>
+
+  <h3>前提モデル</h3>
+  <ul>
+    <li>児童発達支援事業所、定員10名</li>
+    <li>稼働率80%（平均8名／日）、月20日稼働 ＝ 延べ160人日／月</li>
+    <li>1単位＝10円（地域加算なしのケース）</li>
+    <li>取りこぼし率 30% を mitooshi で 10%まで圧縮するシナリオ</li>
+  </ul>
+
+  <h3>各加算の月額ポテンシャル</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>加算</th>
+        <th>単位数</th>
+        <th>算定可能回数（モデル）</th>
+        <th class="num">月額ポテンシャル</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>専門的支援実施加算</td>
+        <td>150単位／回</td>
+        <td>月4回 × 全員（10名）</td>
+        <td class="num">60,000円</td>
+      </tr>
+      <tr>
+        <td>個別サポート加算Ⅰ</td>
+        <td>100単位／日</td>
+        <td>該当児5名 × 20日</td>
+        <td class="num">100,000円</td>
+      </tr>
+      <tr>
+        <td>強度行動障害児支援加算</td>
+        <td>155単位／日</td>
+        <td>該当児2名 × 20日</td>
+        <td class="num">62,000円</td>
+      </tr>
+      <tr>
+        <td>家庭連携加算</td>
+        <td>600単位／回（中時間）</td>
+        <td>月4回 × 3名</td>
+        <td class="num">72,000円</td>
+      </tr>
+      <tr>
+        <td>集中的支援加算</td>
+        <td>1,000単位／日</td>
+        <td>該当児1名 × 月4回</td>
+        <td class="num">40,000円</td>
+      </tr>
+      <tr>
+        <td>関係機関連携加算Ⅰ</td>
+        <td>250単位／月</td>
+        <td>月1回 × 3名</td>
+        <td class="num">7,500円</td>
+      </tr>
+      <tr>
+        <td>保育・教育等移行支援加算</td>
+        <td>500単位／回</td>
+        <td>年4回（年間平均）</td>
+        <td class="num">1,667円</td>
+      </tr>
+      <tr style="background:var(--mint-soft);font-weight:700;">
+        <td colspan="3">合計ポテンシャル</td>
+        <td class="num">343,167円／月</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="impact-box">
+    <h4>取りこぼし防止インパクト試算</h4>
+    <table style="background:transparent;">
+      <tr>
+        <td>① 加算ポテンシャル合計</td>
+        <td class="num">343,167円／月</td>
+      </tr>
+      <tr>
+        <td>② 現状の取りこぼし率（仮定 30%）</td>
+        <td class="num">▲ 102,950円／月</td>
+      </tr>
+      <tr>
+        <td>③ mitooshi 導入後の取りこぼし率（仮定 10%）</td>
+        <td class="num">▲ 34,317円／月</td>
+      </tr>
+      <tr style="font-weight:700;border-top:2px solid var(--mint);">
+        <td>収益改善額（②−③）</td>
+        <td class="num"><strong>+ 68,633円／月</strong></td>
+      </tr>
+    </table>
+    <div class="impact-num">+ 約82万円<small> ／ 年</small></div>
+    <p style="font-size:12px;color:var(--text-sub);margin:0;">
+      ※ 取りこぼし率は事業所により大きく異なる。Discovery で実態を確認することが重要。
+    </p>
+  </div>
+
+  <h3>価格設計への含意</h3>
+  <p>
+    mitooshi Pro の月額が <strong>3万円〜5万円</strong>であれば、上記モデルで <strong>ROI は1〜2か月で回収</strong>。
+    交渉枠としては<strong>5万〜10万円／月</strong>が現実的な提案レンジになる。
+  </p>
+  <ul>
+    <li>提案の最低ライン：<strong>3万円／月</strong>（取りこぼし率を 5pt 改善できれば回収）</li>
+    <li>標準ライン：<strong>5万円／月</strong>（10pt 改善前提、年60万円 vs 改善額82万円）</li>
+    <li>上振れライン：<strong>10万円／月</strong>（児発管・専門職多数のサイトで複数加算をフル活用）</li>
+  </ul>
+</section>
+
+<!-- ===================== 営業での使い方 ===================== -->
+<section id="sales">
+  <h2><span class="num">06</span>営業での使い方</h2>
+
+  <h3>Discovery 段階で聞くべき5つの質問</h3>
+  <ol>
+    <li>「直近1年で、加算の取りこぼしを<strong>具体的に振り返った</strong>ことはありますか？」</li>
+    <li>「実地指導で<strong>記録の個別性</strong>を指摘されたことはありますか？」</li>
+    <li>「<strong>集中的支援加算</strong>、算定検討したけど見送ったことは？（理由は？）</li>
+    <li>「<strong>家庭連携加算</strong>、月4回フル算定できていますか？（記録の壁は何？）」</li>
+    <li>「<strong>個別支援計画の見直し</strong>、児発管が何時間かけていますか？」</li>
+  </ol>
+
+  <h3>提案書での順序</h3>
+  <ol>
+    <li><strong>事実認識の擦り合わせ</strong>：加算ポテンシャル試算（その施設の規模で）</li>
+    <li><strong>取りこぼし要因の言語化</strong>：記録の負担／個別性の薄さ／時間切れ</li>
+    <li><strong>mitooshi の証跡化マップ</strong>：本書を提案書化したもの</li>
+    <li><strong>導入シミュレーション</strong>：補助金（ICT 導入モデル事業）込みの実質負担額</li>
+    <li><strong>ROI 試算</strong>：取りこぼし率改善幅 × 月額の対比</li>
+  </ol>
+
+  <h3>避けるべき言い方</h3>
+  <div class="warn-box">
+    <strong>NG：「mitooshi で加算が自動で取れます」</strong>
+    実地指導は人による判断が入るため、自動化を強調すると現場の警戒感を生む。「証跡が強くなる」「取りこぼしが減る」が正しい言い方。
+  </div>
+  <div class="warn-box">
+    <strong>NG：「業務が劇的に楽になります」</strong>
+    現場の児発管・職員はベテランであるほど「楽になる」を警戒する（自分の専門性が軽んじられる感覚）。「ベテランの判断が記録に残るようになる」が正しい言い方。
+  </div>
+
+  <h3>セールス・トーク例</h3>
+  <div class="pitch">
+    <div class="quote">
+      「障害福祉の加算って、書類があれば取れる仕組みじゃなくて、書類の中身の個別性まで問われますよね。
+      ベテランの児発管さんが頭の中で見ている子ども一人ひとりの違いを、そのまま記録として残せる仕組みが mitooshi です。
+      時短ではなく、専門性の見える化を目指しています。
+      結果として加算の取りこぼしが減り、実地指導でも安心していただける。
+      その意味では <strong>『見えない仕事を見える資産に変えるツール』</strong>と思っていただけると」
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 注意事項 ===================== -->
+<section id="caveats">
+  <h2><span class="num">07</span>注意事項・前提</h2>
+  <div class="warn-box">
+    <strong>① 単位数は要再確認</strong>
+    本書の単位数は令和6年改定の概要ベース。<strong>正確な単位数・算定要件は厚労省告示・解釈通知の最新版で必ず確認</strong>すること。
+    特に集中的支援加算は新設のため運用解釈が流動的。地域差（地域区分）でも10〜18%変動する。
+  </div>
+  <div class="warn-box">
+    <strong>② mitooshi のログだけで加算が取れるわけではない</strong>
+    各加算には専門職配置・研修修了等の<strong>人的要件</strong>がある。
+    mitooshi は「実施記録の個別性・具体性」のレバーであり、人的要件を満たさない事業所が算定できるようになるわけではない。
+  </div>
+  <div class="warn-box">
+    <strong>③ コピペ可能な UI にしない</strong>
+    AI 自動生成・テンプレ流用ができる UI にすると、結果として<strong>個別性が失われ実地指導で減算</strong>される。
+    自動化と個別性のバランスが mitooshi Pro の最重要設計課題。<a href="ryouiku_business_model.html">ryouiku_business_model.html</a> も参照。
+  </div>
+  <div class="warn-box">
+    <strong>④ 営業時の数字は仮定値</strong>
+    取りこぼし率 30%→10% は仮定。Discovery で実態を確認し、その施設の数字でシミュレートし直すことが提案の質を決める。
+  </div>
+  <div class="info-box">
+    <strong>次に検証したいこと</strong>
+    ・実地指導での減算事例の実数（業界団体ヒアリング）<br>
+    ・集中的支援加算の算定率（新設のため未公表が多い）<br>
+    ・家庭連携加算の月4回フル算定率（mitooshi の toC 連携の差別化価値）<br>
+    ・専門的支援実施加算の取得月平均回数（業界平均との差を把握したい）
+  </div>
+</section>
+
+<footer>
+  作成：2026-04-28 ／ 参照：business/ryouiku_business_model.html, pdm/kasan_and_data_value.html, pdm/mitooshi_pro_value_map.html<br>
+  本書の内容は令和6年（2024年）報酬改定の制度概要に基づく。実運用にあたっては最新の通知・告示を必ず確認すること。
+</footer>
+
+</main>
+</div>
+</body>
+</html>
