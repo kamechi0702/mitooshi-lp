@@ -310,17 +310,19 @@ body {
   transform: scale(0.98);
   border-color: var(--primary);
 }
-/* row sticker — small colored chip showing position/index for fav rows */
-.row-sticker {
-  width: 36px; height: 36px;
-  border-radius: 12px;
+/* row thumbnail — first card of the list rendered as the row icon */
+.row-thumb {
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+/* empty-state row icon — used when the list has no cards yet */
+.row-thumb-empty {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: var(--bg-soft);
+  border: 1px dashed var(--border-strong);
   display: inline-flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  font-weight: 900;
-  font-size: 15px;
-  color: #fff;
-  letter-spacing: 0.5px;
-  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08);
 }
 .list-row .star-btn,
 .list-row .edit-btn {

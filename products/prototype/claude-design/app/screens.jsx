@@ -92,8 +92,7 @@ function CardThumb({ card, size = 56, className = '' }) {
 function ScreenTop({ scenes, onOpen, onEdit, onToggleFav, onTab, onAdd }) {
   const fav = scenes.filter(s=>s.isFavorite).sort((a,b)=>(b.favoriteSetAt||b.createdAt)-(a.favoriteSetAt||a.createdAt));
   const norm = scenes.filter(s=>!s.isFavorite).sort((a,b)=>(b.lastUsedAt||b.createdAt)-(a.lastUsedAt||a.createdAt));
-
-  const stickerColors = ['#A2C8F0','#7CC9B6','#B8B0E8','#9DD4E8','#7FB8DB','#6FC9C9'];
+  // ListRow shows the first card's thumbnail as the row icon (illust/photo/clock/text — handled by CardThumb)
 
   return (
     <div className="screen top-screen">
@@ -114,8 +113,8 @@ function ScreenTop({ scenes, onOpen, onEdit, onToggleFav, onTab, onAdd }) {
           </div>
         ) : (
           <div className="list-rows">
-            {fav.map((s,i) => (
-              <ListRow key={s.id} scene={s} variant="fav" stickerColor={stickerColors[i%stickerColors.length]}
+            {fav.map((s) => (
+              <ListRow key={s.id} scene={s} variant="fav"
                        onOpen={onOpen} onEdit={onEdit} onToggleFav={onToggleFav}/>
             ))}
           </div>
@@ -129,8 +128,8 @@ function ScreenTop({ scenes, onOpen, onEdit, onToggleFav, onTab, onAdd }) {
           </div>
         ) : (
           <div className="list-rows">
-            {norm.map((s,i) => (
-              <ListRow key={s.id} scene={s} variant="normal" stickerColor={stickerColors[(i+3)%stickerColors.length]}
+            {norm.map((s) => (
+              <ListRow key={s.id} scene={s} variant="normal"
                        onOpen={onOpen} onEdit={onEdit} onToggleFav={onToggleFav}/>
             ))}
           </div>
@@ -142,7 +141,7 @@ function ScreenTop({ scenes, onOpen, onEdit, onToggleFav, onTab, onAdd }) {
   );
 }
 
-function ListRow({ scene, onOpen, onEdit, onToggleFav, variant, stickerColor }) {
+function ListRow({ scene, onOpen, onEdit, onToggleFav, variant }) {
   const [pressing, setPressing] = useState(false);
   const timerRef = useRef(null);
   const triggeredRef = useRef(false);
@@ -169,8 +168,9 @@ function ListRow({ scene, onOpen, onEdit, onToggleFav, variant, stickerColor }) 
     onOpen(scene);
   };
 
-  // Initial character for the sticker (first non-space char of name)
-  const initial = (scene.name || '?').trim().charAt(0);
+  // Row icon = first card thumbnail (illust/photo/clock/text rendered by CardThumb).
+  // Empty list (no cards) gets a soft dashed placeholder.
+  const firstCard = scene.cards && scene.cards[0];
   const variantClass = variant === 'fav' ? 'is-fav' : variant === 'normal' ? 'is-normal' : '';
 
   return (
@@ -179,8 +179,12 @@ function ListRow({ scene, onOpen, onEdit, onToggleFav, variant, stickerColor }) 
          onMouseDown={startPress} onMouseUp={endPress} onMouseLeave={endPress}
          onTouchStart={startPress} onTouchEnd={endPress}>
       <StarBtn on={scene.isFavorite} onClick={()=>onToggleFav(scene.id)}/>
-      {stickerColor && (
-        <span className="row-sticker" style={{background: stickerColor}}>{initial}</span>
+      {firstCard ? (
+        <CardThumb card={firstCard} size={40} className="row-thumb"/>
+      ) : (
+        <span className="row-thumb-empty" aria-hidden="true">
+          <Icon name="palette" size={18} stroke="var(--text-muted)"/>
+        </span>
       )}
       <div className="row-name">{scene.name}</div>
       <button className="edit-btn" onClick={(e)=>{e.stopPropagation(); onEdit(scene);}} aria-label="編集">
