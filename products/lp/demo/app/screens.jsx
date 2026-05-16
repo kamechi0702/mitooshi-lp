@@ -261,7 +261,7 @@ function ScreenCardType({ onBack, onPick, sceneName, onTab }) {
 // ═══════════════════════════════════════════════
 function ScreenIllust({ onBack, onPick, sceneName, onTab, illustLib }) {
   const [cat, setCat] = useState('一日');
-  const cats = ['一日', '食事', 'おでかけ', 'おかいもの', '学校'];
+  const cats = ['一日', '食事', 'おでかけ', 'おかいもの', '学校', 'ごほうび'];
   const filtered = illustLib.filter(i => i.cat === cat);
   return (
     <div className="screen">
