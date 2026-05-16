@@ -260,8 +260,8 @@ function ScreenCardType({ onBack, onPick, sceneName, onTab }) {
 // S4a — イラスト選択
 // ═══════════════════════════════════════════════
 function ScreenIllust({ onBack, onPick, sceneName, onTab, illustLib }) {
-  const [cat, setCat] = useState('一日');
-  const cats = ['一日', '食事', 'おでかけ', 'おかいもの', '学校', 'ごほうび'];
+  const [cat, setCat] = useState('あさ');
+  const cats = ['あさ', 'よる', 'たべる', 'おでかけ', 'びょういん', 'がっこう', 'からだ', 'ごほうび', 'ぎょうじ'];
   const filtered = illustLib.filter(i => i.cat === cat);
   return (
     <div className="screen">
