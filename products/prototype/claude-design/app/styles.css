@@ -212,7 +212,7 @@ body {
 
 /* ===== Tab bar ===== */
 .tab-bar {
-  height: 76px;
+  height: 80px;                   /* FAB 48 + gap 3 + label 14 + padding 6+8 = 79 ≤ 80 */
   padding: 6px 0 8px;
   border-top: 1px solid var(--border);
   background: var(--bg);
@@ -232,7 +232,7 @@ body {
   gap: 3px;
   background: transparent;
   border: 0;
-  color: var(--text-sub);
+  color: var(--text-sub);         /* base: 通常タブのラベル/アイコンは gray */
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
@@ -243,13 +243,20 @@ body {
 .tab.active { color: var(--primary); font-weight: 700; }
 .tab.center { position: relative; }
 .tab.center .fab {
-  width: 52px; height: 52px;
+  /* §5-2: footer 内収納を維持しつつ、円形を flex 親で歪ませないよう
+     明示的に正方形を固定 (flex-basis 48px + aspect-ratio 1:1)。 */
+  flex: 0 0 48px;
+  width: 48px; height: 48px;
+  min-width: 48px; min-height: 48px;
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
   border-radius: 50%;
   background: var(--primary);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: -22px;
+  margin: 0;
+  padding: 0;
   box-shadow: 0 4px 12px rgba(0,184,148,0.35);
   transition: transform 120ms, box-shadow 120ms;
 }
@@ -280,7 +287,8 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 14px 14px 12px;
+  padding: 0.5rem 1rem;             /* §0-1: 共通行 padding */
+  min-height: 64px;                 /* サムネ 48 + padding 16 */
   border: 1px solid rgba(0,0,0,0.04);
   border-radius: 16px;
   margin-bottom: 10px;
@@ -291,6 +299,7 @@ body {
   position: relative;
   box-shadow: 0 2px 6px rgba(140,110,60,0.06), 0 1px 2px rgba(0,0,0,0.03);
 }
+.list-row > .star-btn { margin-right: 1rem; }   /* §0-3 + 1-3: ★右側余白 1rem */
 /* favorite section: soft cool tint + accent left bar removed in favor of soft glow */
 .top-screen .list-row.is-fav {
   background: linear-gradient(180deg, #f0f7ff 0%, #f8fbfe 100%);
@@ -310,14 +319,15 @@ body {
   transform: scale(0.98);
   border-color: var(--primary);
 }
-/* row thumbnail — first card of the list rendered as the row icon */
+/* row thumbnail — first card of the list rendered as the row icon.
+   §0-2: 「行高に追従」は親 height 未確定で破綻するため、CardThumb の size prop で固定 px 指定する方針に戻す。 */
 .row-thumb {
   flex-shrink: 0;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 /* empty-state row icon — used when the list has no cards yet */
 .row-thumb-empty {
-  width: 40px; height: 40px;
+  width: 48px; height: 48px;
   border-radius: 10px;
   background: var(--bg-soft);
   border: 1px dashed var(--border-strong);
@@ -423,6 +433,35 @@ body {
   display: inline-flex; align-items: center; justify-content: center;
   color: var(--primary);
   flex-shrink: 0;
+}
+
+/* ===== TOP の「すべてのリスト」ボタン ===== */
+.all-lists-bar {
+  padding: 20px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.all-lists-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: var(--bg);
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.all-lists-btn:active { background: var(--primary-soft); }
+.all-lists-hint {
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 /* ===== S2 form ===== */
@@ -685,17 +724,30 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px;
-  min-height: 68px;
-  background: var(--bg-soft);
+  padding: 0.5rem 1rem;           /* §0-1 共通行 padding */
+  min-height: 68px;               /* base 維持 */
+  background: #fff;               /* §2-1 タスク背景を白固定 */
+  border: 1px solid var(--border);
   border-radius: 12px;
   margin-bottom: 8px;
-  transition: opacity 280ms, transform 280ms;
+  transition: opacity 280ms, transform 280ms, box-shadow 180ms;
 }
 .edit-row.removing {
   opacity: 0;
   transform: translateX(-40px);
   margin-bottom: -68px;
+}
+/* §2-4 ドラッグ中の行 */
+.edit-row.dragging {
+  z-index: 30;
+  box-shadow: 0 12px 28px rgba(0,184,148,0.22), 0 4px 8px rgba(0,0,0,0.08);
+  background: #fff;
+  cursor: grabbing;
+  border-color: var(--primary);
+}
+.edit-row.drop-target {
+  border-color: var(--primary);
+  background: var(--primary-soft);
 }
 .edit-row .thumb {
   width: 52px; height: 52px;
@@ -713,6 +765,10 @@ body {
   font-size: 15px;
   font-weight: 700;
   color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .edit-row-btn {
   width: 36px; height: 36px;
@@ -725,7 +781,9 @@ body {
   flex-shrink: 0;
 }
 .edit-row-btn.delete { color: var(--danger); }
-.edit-row-btn:active { background: rgba(0,0,0,0.05); transform: scale(0.92); }
+.edit-row-btn.drag-handle { cursor: grab; touch-action: none; }
+.edit-row-btn.drag-handle:active { cursor: grabbing; }
+.edit-row-btn:not(.drag-handle):active { background: rgba(0,0,0,0.05); transform: scale(0.92); }
 
 .s5-empty {
   padding: 60px 30px;
@@ -740,22 +798,30 @@ body {
   border-top: 1px solid var(--border);
   background: var(--bg);
   display: flex;
-  gap: 10px;
+  justify-content: space-between;   /* §2-7 両サイド寄せ */
+  align-items: stretch;
+  gap: 8px;
   flex-shrink: 0;
 }
+/* §2-5/6/7 タスクを追加するボタン: 白背景+緑outline+45%幅+保存と同radius */
 .add-card-btn {
-  width: 52px; height: 52px;
-  border-radius: 50%;
-  background: var(--primary-soft);
-  border: 1px solid var(--primary);
+  flex: 0 0 45%;
+  height: 52px;
+  border-radius: var(--r-small);    /* cta-button と同じ */
+  background: var(--bg);
+  border: 1.5px solid var(--primary);
   color: var(--primary);
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px;
   font-family: inherit;
-  flex-shrink: 0;
-  transition: all 120ms;
+  transition: background 120ms, color 120ms, transform 120ms;
 }
-.add-card-btn:active { transform: scale(0.94); background: var(--primary); color: #fff; }
+.add-card-btn:active { transform: scale(0.97); background: var(--primary-soft); }
+/* §2-7 リストを保存するボタンも 45% に */
+.s5-footer .cta-button { flex: 0 0 45%; width: auto; }
 
 /* ===== S6 exec ===== */
 .exec-progress-old-removed {
@@ -766,7 +832,8 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px;
+  padding: 0.5rem 1rem;             /* §0-1 共通行 padding */
+  min-height: 80px;                 /* §3-3 サムネ大きく → 行も大きく（子ども画面） */
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -780,7 +847,7 @@ body {
               background 200ms, box-shadow 200ms, max-height 380ms;
   overflow: hidden;
   position: relative;
-  max-height: 200px;
+  max-height: 220px;
 }
 .exec-row:active { transform: scale(0.985); background: #f6fbfa; }
 .exec-row.is-next {
@@ -800,20 +867,22 @@ body {
   100% { opacity: 0; transform: translateX(110%) scale(0.96); max-height: 0; padding-top: 0; padding-bottom: 0; margin-top: 0; margin-bottom: 0; border-color: transparent; }
 }
 
-/* Check button — empty circle that fills with primary on tap */
+/* Check button — empty circle that fills with primary on tap.
+   §3-1: right-edge alignment via margin-left:auto (DOM order puts thumb/label first). */
 .exec-check {
-  width: 32px; height: 32px;
+  width: 32px; height: 32px;        /* base 維持 */
   border-radius: 50%;
   border: 2.5px solid var(--border-strong);
   flex-shrink: 0;
   background: #fff;
   display: flex; align-items: center; justify-content: center;
+  margin-left: auto;
   transition: background 180ms, border-color 180ms, transform 240ms;
   position: relative;
 }
 .exec-row.is-next .exec-check {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(0,184,148,0.12);
+  /* §3-4: is-next 時の box-shadow リング削除（指示通り） */
   animation: execCheckBob 1.6s ease-in-out infinite;
 }
 @keyframes execCheckBob {
@@ -836,25 +905,14 @@ body {
   opacity: 1;
   transform: scale(1);
 }
+/* execCheckBurst: タップ時の一瞬の burst は base 通り維持
+   （§3-4 の「薄緑リング不要」は is-next idle 状態のリングを指す指摘） */
 @keyframes execCheckBurst {
   0%   { box-shadow: 0 0 0 0 rgba(0,184,148,0.5); }
   60%  { box-shadow: 0 0 0 16px rgba(0,184,148,0); }
   100% { box-shadow: 0 0 0 0 rgba(0,184,148,0); }
 }
-.exec-row-arrow {
-  color: var(--text-muted);
-  flex-shrink: 0;
-  transition: opacity 180ms, transform 180ms;
-}
-.exec-row.is-next .exec-row-arrow {
-  color: var(--primary);
-  transform: translateX(2px);
-  animation: execArrowNudge 1.6s ease-in-out infinite;
-}
-@keyframes execArrowNudge {
-  0%, 100% { transform: translateX(0); }
-  50%      { transform: translateX(4px); }
-}
+/* §3-2: .exec-row-arrow は JSX から削除（CSS も不要） */
 .exec-progress {
   font-size: 13px;
   font-weight: 700;

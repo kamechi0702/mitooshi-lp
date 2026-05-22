@@ -367,10 +367,9 @@ function App() {
     setCardDraft({ type: 'illust', label: it.label, illustId: it.id, illustSrc: it.src });
     setRoute({ name: 'confirm' });
   };
-  const onPhotoSaved = (cd) => {
-    setCardDraft(cd);
-    setRoute({ name: 'confirm' });
-  };
+  // §4 写真は S4b でキャプション入力済 → confirm をスキップして edit に直行
+  // （clock/text と同じ運用に統一）
+  const onPhotoSaved = (cd) => addCardToDraft({...cd, id: newCardId()});
   const onClockSaved = (cd) => addCardToDraft({...cd, id: newCardId()});
   const onTextSaved  = (cd) => addCardToDraft({...cd, id: newCardId()});
   const onConfirmed  = (cd) => addCardToDraft({...cd, id: newCardId()});
@@ -383,6 +382,17 @@ function App() {
 
   const deleteCard = (cid) => {
     setDraft(d => ({...d, cards: d.cards.filter(c => c.id !== cid)}));
+  };
+
+  // §2-4 並び替え: draft.cards の順序を入れ替える
+  const reorderCards = (fromIdx, toIdx) => {
+    setDraft(d => {
+      if (!d || !d.cards || fromIdx === toIdx) return d;
+      const next = [...d.cards];
+      const [moved] = next.splice(fromIdx, 1);
+      next.splice(toIdx, 0, moved);
+      return {...d, cards: next};
+    });
   };
 
   const saveScene = () => {
@@ -418,6 +428,23 @@ function App() {
     });
   };
 
+  // TOP / すべてのリスト画面の長押し削除
+  const promptDeleteScene = (scene) => {
+    setModal({
+      title: 'このリストを削除しますか？',
+      body: `「${scene.name}」を削除します。この操作は取り消せません。`,
+      actions: [
+        { label: 'キャンセル', kind: 'cancel', action: ()=>setModal(null) },
+        { label: '削除する', kind: 'danger', action: ()=>{
+          setModal(null);
+          setScenes(prev => prev.filter(s => s.id !== scene.id));
+          showToast('リストを削除しました');
+        }},
+      ],
+    });
+  };
+  const showAllLists = () => setRoute({ name: 'allLists' });
+
   const askDiscard = (onConfirm) => {
     setModal({
       title: '編集を破棄しますか？',
@@ -448,7 +475,12 @@ function App() {
   if (showOnb) {
     screen = <Onboarding illustLib={ILLUST_LIB} onDone={()=>setShowOnb(false)}/>;
   } else if (route.name === 'top') {
-    screen = <ScreenTop scenes={scenes} onOpen={openScene} onEdit={editScene} onToggleFav={toggleFav} onTab={onTabSwitch}/>;
+    screen = <ScreenTop scenes={scenes} onOpen={openScene} onLongPressDelete={promptDeleteScene}
+              onShowAllLists={showAllLists} onToggleFav={toggleFav} onTab={onTabSwitch}/>;
+  } else if (route.name === 'allLists') {
+    screen = <ScreenAllLists scenes={scenes} onOpen={openScene} onEdit={editScene}
+              onLongPressDelete={promptDeleteScene}
+              onToggleFav={toggleFav} onBack={()=>setRoute({name:'top'})} onTab={onTabSwitch}/>;
   } else if (route.name === 'newlist') {
     screen = <ScreenNewList onBack={()=>{ setDraft(null); setRoute({name:'top'}); }} onSave={saveDraftName} onTab={onTabSwitch}/>;
   } else if (route.name === 'edit') {
@@ -456,6 +488,7 @@ function App() {
       sceneName={draft?.name || ''} cards={draft?.cards || []} isNew={draft?.isNew}
       onBack={()=>{ setDraft(null); setEditingScene(null); setRoute({name:'top'}); }}
       onSave={saveScene} onAddCard={startAddCard} onDeleteCard={deleteCard}
+      onReorderCards={reorderCards}
       onTab={onTabSwitch} askDelete={askDelete} askDiscard={askDiscard}/>;
   } else if (route.name === 'cardtype') {
     screen = <ScreenCardType sceneName={sceneName} onBack={()=>setRoute({name:'edit'})} onPick={pickCardType} onTab={onTabSwitch}/>;
@@ -479,7 +512,8 @@ function App() {
   } else if (route.name === 'my') {
     screen = <ScreenMy profile={profile} setProfile={setProfile} onTab={onTabSwitch} sceneCount={scenes.length}/>;
   } else {
-    screen = <ScreenTop scenes={scenes} onOpen={openScene} onEdit={editScene} onToggleFav={toggleFav} onTab={onTabSwitch}/>;
+    screen = <ScreenTop scenes={scenes} onOpen={openScene} onLongPressDelete={promptDeleteScene}
+              onShowAllLists={showAllLists} onToggleFav={toggleFav} onTab={onTabSwitch}/>;
   }
 
   // ── primary color override (CSS var) ──
@@ -601,7 +635,7 @@ function CanvasView({ onBackToProto, appProps }) {
       </DCSection>
 
       <DCSection id="main" title="メインフロー">
-        <Frame label="S1 TOP"><ScreenTop scenes={presetScenes} onOpen={noop} onEdit={noop} onToggleFav={noop} onTab={noop}/></Frame>
+        <Frame label="S1 TOP"><ScreenTop scenes={presetScenes} onOpen={noop} onLongPressDelete={noop} onShowAllLists={noop} onToggleFav={noop} onTab={noop}/></Frame>
         <Frame label="S2 リスト新規作成"><ScreenNewList onBack={noop} onSave={noop} onTab={noop}/></Frame>
         <Frame label="S3 カード種別選択"><ScreenCardType sceneName="あさのしたく" onBack={noop} onPick={noop} onTab={noop}/></Frame>
         <Frame label="S5 リスト編集"><ScreenEdit sceneName="あさのしたく" cards={presetScenes[0].cards} isNew={false} onBack={noop} onSave={noop} onAddCard={noop} onDeleteCard={noop} onTab={noop} askDelete={noop} askDiscard={noop}/></Frame>

@@ -37,6 +37,7 @@ function SubHeader({ onBack, title, right }) {
 }
 
 function TabBar({ active, onTab, fabPosition='center' }) {
+  // base 維持: TOP/中央 FAB は元の挙動。マイページのアイコンだけ §5-3 で緑に統一。
   return (
     <div className="tab-bar">
       <button className={`tab ${active==='top'?'active':''}`} onClick={()=>onTab('top')}>
@@ -44,11 +45,11 @@ function TabBar({ active, onTab, fabPosition='center' }) {
         <span>TOP</span>
       </button>
       <button className="tab center" onClick={()=>onTab('create')}>
-        <span className="fab"><Icon name="plus" size={26} stroke="#fff" strokeWidth={2.4}/></span>
-        <span className="tab-label">新規作成</span>
+        <span className="fab"><Icon name="plus" size={24} stroke="#fff" strokeWidth={2.4}/></span>
+        <span className="tab-label">リストを作成</span>{/* §5-1 */}
       </button>
       <button className={`tab ${active==='my'?'active':''}`} onClick={()=>onTab('my')}>
-        <Icon name="user" size={24} stroke={active==='my'?'var(--primary)':'var(--text-sub)'}/>
+        <Icon name="user" size={24} stroke="var(--primary)"/>{/* §5-3 緑固定 */}
         <span>マイページ</span>
       </button>
     </div>
@@ -89,10 +90,15 @@ function CardThumb({ card, size = 56, className = '' }) {
 // ═══════════════════════════════════════════════
 // S1 — TOP
 // ═══════════════════════════════════════════════
-function ScreenTop({ scenes, onOpen, onEdit, onToggleFav, onTab, onAdd }) {
+function ScreenTop({ scenes, onOpen, onLongPressDelete, onShowAllLists, onToggleFav, onTab }) {
   const fav = scenes.filter(s=>s.isFavorite).sort((a,b)=>(b.favoriteSetAt||b.createdAt)-(a.favoriteSetAt||a.createdAt));
   const norm = scenes.filter(s=>!s.isFavorite).sort((a,b)=>(b.lastUsedAt||b.createdAt)-(a.lastUsedAt||a.createdAt));
-  // ListRow shows the first card's thumbnail as the row icon (illust/photo/clock/text — handled by CardThumb)
+  // 表示数は各セクション最大 5 件に絞る（全件は「すべてのリスト」ボタンから）
+  const LIMIT = 5;
+  const favShown = fav.slice(0, LIMIT);
+  const normShown = norm.slice(0, LIMIT);
+  const total = fav.length + norm.length;
+  const hidden = total - (favShown.length + normShown.length);
 
   return (
     <div className="screen top-screen">
@@ -106,32 +112,41 @@ function ScreenTop({ scenes, onOpen, onEdit, onToggleFav, onTab, onAdd }) {
           <Icon name="star" size={14} fill="var(--star-yellow)" stroke="var(--star-yellow-border)" strokeWidth={1.6}/>
           よく使うリスト
         </div>
-        {fav.length === 0 ? (
+        {favShown.length === 0 ? (
           <div className="empty-hint">
             <span className="empty-icon"><Icon name="star" size={16} stroke="var(--primary)"/></span>
             <span>★をタップすると、よく使うリストが上にきます。</span>
           </div>
         ) : (
           <div className="list-rows">
-            {fav.map((s) => (
+            {favShown.map((s) => (
               <ListRow key={s.id} scene={s} variant="fav"
-                       onOpen={onOpen} onEdit={onEdit} onToggleFav={onToggleFav}/>
+                       onOpen={onOpen} onLongPress={onLongPressDelete} onToggleFav={onToggleFav}/>
             ))}
           </div>
         )}
         <div className="section-divider"/>
         <div className="section-label">そのほかのリスト</div>
-        {norm.length === 0 ? (
+        {normShown.length === 0 ? (
           <div className="empty-hint">
             <span className="empty-icon"><Icon name="plus" size={16} stroke="var(--primary)"/></span>
             <span>＋ボタンから新しいリストをつくれます。</span>
           </div>
         ) : (
           <div className="list-rows">
-            {norm.map((s) => (
+            {normShown.map((s) => (
               <ListRow key={s.id} scene={s} variant="normal"
-                       onOpen={onOpen} onEdit={onEdit} onToggleFav={onToggleFav}/>
+                       onOpen={onOpen} onLongPress={onLongPressDelete} onToggleFav={onToggleFav}/>
             ))}
+          </div>
+        )}
+        {total > 0 && (
+          <div className="all-lists-bar">
+            <button className="all-lists-btn" onClick={onShowAllLists}>
+              すべてのリストを見る{hidden > 0 ? ` (+${hidden})` : ''}
+              <Icon name="chevron-right" size={16} stroke="var(--primary)" strokeWidth={2}/>
+            </button>
+            <div className="all-lists-hint">長押しでリストを削除できます</div>
           </div>
         )}
         <div style={{height:24}}/>
@@ -141,7 +156,60 @@ function ScreenTop({ scenes, onOpen, onEdit, onToggleFav, onTab, onAdd }) {
   );
 }
 
-function ListRow({ scene, onOpen, onEdit, onToggleFav, variant }) {
+// ═══════════════════════════════════════════════
+// S1b — すべてのリスト（フル管理画面）
+// ═══════════════════════════════════════════════
+function ScreenAllLists({ scenes, onOpen, onEdit, onLongPressDelete, onToggleFav, onBack, onTab }) {
+  const fav = scenes.filter(s=>s.isFavorite).sort((a,b)=>(b.favoriteSetAt||b.createdAt)-(a.favoriteSetAt||a.createdAt));
+  const norm = scenes.filter(s=>!s.isFavorite).sort((a,b)=>(b.lastUsedAt||b.createdAt)-(a.lastUsedAt||a.createdAt));
+  return (
+    <div className="screen top-screen">
+      <StatusBar/>
+      <SubHeader onBack={onBack} title="すべてのリスト"/>
+      <div className="screen-scroll">
+        {fav.length > 0 && (
+          <>
+            <div className="section-label">
+              <Icon name="star" size={14} fill="var(--star-yellow)" stroke="var(--star-yellow-border)" strokeWidth={1.6}/>
+              よく使うリスト ({fav.length})
+            </div>
+            <div className="list-rows">
+              {fav.map((s) => (
+                <ListRow key={s.id} scene={s} variant="fav"
+                         onOpen={onOpen} onLongPress={onLongPressDelete} onEditBtn={onEdit} onToggleFav={onToggleFav}/>
+              ))}
+            </div>
+          </>
+        )}
+        {norm.length > 0 && (
+          <>
+            {fav.length > 0 && <div className="section-divider"/>}
+            <div className="section-label">そのほかのリスト ({norm.length})</div>
+            <div className="list-rows">
+              {norm.map((s) => (
+                <ListRow key={s.id} scene={s} variant="normal"
+                         onOpen={onOpen} onLongPress={onLongPressDelete} onEditBtn={onEdit} onToggleFav={onToggleFav}/>
+              ))}
+            </div>
+          </>
+        )}
+        {scenes.length === 0 && (
+          <div className="empty-hint">
+            <span>リストがありません。＋ボタンからつくってください。</span>
+          </div>
+        )}
+        <div className="all-lists-hint" style={{padding:'12px 16px 24px', textAlign:'center'}}>
+          鉛筆 = 編集 / 長押し = 削除
+        </div>
+      </div>
+      <TabBar active="top" onTab={onTab}/>
+    </div>
+  );
+}
+
+function ListRow({ scene, onOpen, onLongPress, onEditBtn, onToggleFav, variant }) {
+  // onLongPress: 長押し時に呼ばれる（TOP=削除確認、すべてのリスト=編集へ遷移）
+  // onEditBtn  : 行内の鉛筆ボタンが押された時に呼ばれる（あれば描画）
   const [pressing, setPressing] = useState(false);
   const timerRef = useRef(null);
   const triggeredRef = useRef(false);
@@ -154,7 +222,7 @@ function ListRow({ scene, onOpen, onEdit, onToggleFav, variant }) {
       timerRef.current = setTimeout(()=>{
         triggeredRef.current = true;
         setPressing(false);
-        onEdit(scene);
+        if (onLongPress) onLongPress(scene);
       }, 400);
     }, 200);
   };
@@ -180,17 +248,18 @@ function ListRow({ scene, onOpen, onEdit, onToggleFav, variant }) {
          onTouchStart={startPress} onTouchEnd={endPress}>
       <StarBtn on={scene.isFavorite} onClick={()=>onToggleFav(scene.id)}/>
       {firstCard ? (
-        <CardThumb card={firstCard} size={40} className="row-thumb"/>
+        <CardThumb card={firstCard} size={48} className="row-thumb"/>
       ) : (
         <span className="row-thumb-empty" aria-hidden="true">
-          <Icon name="palette" size={18} stroke="var(--text-muted)"/>
+          <Icon name="palette" size={20} stroke="var(--text-muted)"/>
         </span>
       )}
       <div className="row-name">{scene.name}</div>
-      <button className="edit-btn" onClick={(e)=>{e.stopPropagation(); onEdit(scene);}} aria-label="編集">
-        <Icon name="pencil" size={18}/>
-      </button>
-      <Icon name="chevron-right" size={18} stroke="var(--text-muted)" className="row-chev"/>
+      {onEditBtn && (
+        <button className="edit-btn" onClick={(e)=>{e.stopPropagation(); onEditBtn(scene);}} aria-label="編集">
+          <Icon name="pencil" size={18}/>
+        </button>
+      )}
     </div>
   );
 }
@@ -480,8 +549,12 @@ function ScreenConfirm({ onBack, onSave, sceneName, onTab, draft }) {
 // ═══════════════════════════════════════════════
 // S5 — リスト編集
 // ═══════════════════════════════════════════════
-function ScreenEdit({ onBack, onSave, sceneName, cards, onAddCard, onDeleteCard, onTab, askDelete, askDiscard, isNew }) {
+function ScreenEdit({ onBack, onSave, sceneName, cards, onAddCard, onDeleteCard, onReorderCards, onTab, askDelete, askDiscard, isNew }) {
   const [removingId, setRemovingId] = useState(null);
+  // §2-4 pointer-event ベース並び替え state
+  const [drag, setDrag] = useState(null); // { id, fromIdx, startY, deltaY, hoverIdx }
+  const rowEls = useRef({});
+
   const handleDelete = (id) => {
     askDelete(()=>{
       setRemovingId(id);
@@ -492,10 +565,58 @@ function ScreenEdit({ onBack, onSave, sceneName, cards, onAddCard, onDeleteCard,
     });
   };
   const handleBack = () => {
-    if (isNew && cards.length === 0) onBack(); // direct back
+    if (isNew && cards.length === 0) onBack();
     else if (cards.length > 0) askDiscard(onBack);
     else onBack();
   };
+
+  // §2-4 ドラッグ開始（pointerdown on handle）
+  const onHandleDown = (e, idx, id) => {
+    if (e.button !== undefined && e.button !== 0) return;  // 左クリックのみ
+    e.preventDefault();
+    e.stopPropagation();
+    const startY = e.clientY;
+    setDrag({ id, fromIdx: idx, startY, deltaY: 0, hoverIdx: idx });
+  };
+
+  useEffect(() => {
+    if (!drag) return;
+    const onMove = (ev) => {
+      const y = ev.clientY;
+      const deltaY = y - drag.startY;
+      // pointer の Y 座標に最も近い行のインデックスを求める
+      let hoverIdx = drag.fromIdx;
+      const ids = Object.keys(rowEls.current);
+      for (const rid of ids) {
+        const el = rowEls.current[rid];
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        if (y >= r.top && y <= r.bottom) {
+          const idx = cards.findIndex(c => c.id === rid);
+          if (idx !== -1) hoverIdx = idx;
+          break;
+        }
+      }
+      setDrag(d => d ? {...d, deltaY, hoverIdx} : d);
+    };
+    const onUp = () => {
+      setDrag(curr => {
+        if (curr && curr.fromIdx !== curr.hoverIdx && onReorderCards) {
+          onReorderCards(curr.fromIdx, curr.hoverIdx);
+        }
+        return null;
+      });
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  }, [drag, cards, onReorderCards]);
+
   return (
     <div className="screen">
       <StatusBar/>
@@ -503,29 +624,43 @@ function ScreenEdit({ onBack, onSave, sceneName, cards, onAddCard, onDeleteCard,
       <div className="screen-scroll">
         {cards.length === 0 ? (
           <div className="s5-empty">
-            まだカードがありません。<br/>
-            下の <strong style={{color:'var(--primary)'}}>＋</strong> でカードを追加してください。
+            まだタスクがありません。<br/>
+            下の <strong style={{color:'var(--primary)'}}>タスクを追加する</strong> ボタンから追加してください。
           </div>
         ) : (
           <div className="edit-rows-pad">
-            {cards.map((c, i) => (
-              <div key={c.id} className={`edit-row ${removingId===c.id?'removing':''}`}>
-                <button className="edit-row-btn delete" onClick={()=>handleDelete(c.id)} aria-label="削除">
-                  <Icon name="trash" size={20} stroke="var(--danger)"/>
-                </button>
-                <CardThumb card={c} size={52}/>
-                <div className="ed-label">{c.label || '(無題)'}</div>
-                <button className="edit-row-btn" aria-label="並び替え">
-                  <Icon name="menu" size={20} stroke="var(--text-sub)"/>
-                </button>
-              </div>
-            ))}
+            {cards.map((c, i) => {
+              const isDragging = drag?.id === c.id;
+              const isDropTarget = drag && !isDragging && drag.hoverIdx === i;
+              const rowStyle = isDragging
+                ? { transform: `translateY(${drag.deltaY}px)` }
+                : undefined;
+              return (
+                <div key={c.id}
+                     ref={el => { rowEls.current[c.id] = el; }}
+                     className={`edit-row ${removingId===c.id?'removing':''} ${isDragging?'dragging':''} ${isDropTarget?'drop-target':''}`}
+                     style={rowStyle}>
+                  <button className="edit-row-btn delete" onClick={()=>handleDelete(c.id)} aria-label="削除">
+                    <Icon name="trash" size={26} stroke="var(--danger)"/>{/* §2-2 */}
+                  </button>
+                  <CardThumb card={c} size={56} className="row-thumb"/>{/* §2-3 */}
+                  <div className="ed-label">{c.label || '(無題)'}</div>
+                  <button className="edit-row-btn drag-handle"
+                          aria-label="並び替え"
+                          onPointerDown={(e)=>onHandleDown(e, i, c.id)}>
+                    <Icon name="menu" size={20} stroke="var(--text-sub)"/>{/* base 維持 */}
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
       <div className="s5-footer">
-        <button className="add-card-btn" onClick={onAddCard} aria-label="カードを追加">
-          <Icon name="plus" size={26} stroke="var(--primary)" strokeWidth={2.4}/>
+        {/* §2-5/6/7: テキスト付き白背景ボタン、保存と同radius、両サイド45% */}
+        <button className="add-card-btn" onClick={onAddCard} aria-label="タスクを追加する">
+          <Icon name="plus" size={20} stroke="var(--primary)" strokeWidth={2.4}/>
+          <span>タスクを追加する</span>
         </button>
         <button className="cta-button" onClick={onSave} disabled={cards.length===0}>
           リストを保存する <Icon name="chevron-right" size={18} stroke="#fff" strokeWidth={2.2}/>
@@ -595,16 +730,12 @@ function ScreenExec({ scene, doneIds, onTap, onBack, onComplete }) {
                     aria-pressed={isActive}
                     aria-label={`${c.label} を できた にする`}
                     onClick={()=>tap(c.id)}>
+              {/* §3-1/3-2/3-3: サムネ大きく → ラベル → ○ を右端に。> chevron は削除 */}
+              <CardThumb card={c} size={64} className="row-thumb"/>
+              <div className="exec-label">{c.label}</div>
               <div className={`exec-check ${isActive?'is-checking':''}`}>
                 <svg viewBox="0 0 24 24" className="exec-check-mark" aria-hidden="true">
                   <path d="M5 12.5 L10 17.5 L19 7.5" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <CardThumb card={c} size={56}/>
-              <div className="exec-label">{c.label}</div>
-              <div className="exec-row-arrow" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="18" height="18">
-                  <path d="M9 6 L15 12 L9 18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
             </button>
@@ -794,7 +925,7 @@ function AppIcon({ size = 120 }) {
 }
 
 Object.assign(window, {
-  ScreenTop, ScreenNewList, ScreenCardType, ScreenIllust, ScreenPhoto, ScreenClock, ScreenText,
+  ScreenTop, ScreenAllLists, ScreenNewList, ScreenCardType, ScreenIllust, ScreenPhoto, ScreenClock, ScreenText,
   ScreenConfirm, ScreenEdit, ScreenExec, ScreenComplete, ScreenMy, Onboarding, AppIcon,
   CardThumb, AnalogClock, StatusBar, SubHeader, TabBar, BackBtn, ListRow, StarBtn,
 });
